@@ -1,0 +1,1539 @@
+{
+  "items": [
+    {
+      "id": "0d20d93a-af9b-4f8f-809d-68d3e6ac42bd",
+      "timestamp": "2025-05-18T06:20:01.874+0000",
+      "title": "title 018",
+      "icon": "logos/timeline_interest_new/v2",
+      "avatar": {
+        "asset": "logos/timeline_interest_new/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 070",
+      "amount": {
+        "currency": "EUR",
+        "value": 0.01,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "0d20d93a-af9b-4f8f-809d-68d3e6ac42bd"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "INTEREST_PAYOUT",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/timeline_interest_new/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 018",
+          "subtitle": "subtitle 071"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 072",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "0d20d93a-af9b-4f8f-809d-68d3e6ac42bd"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "769ed2df-f780-4275-9fa2-a409255b1930",
+      "timestamp": "2025-02-15T05:46:34.511+0000",
+      "title": "title 018",
+      "icon": "logos/timeline_interest_new/v2",
+      "avatar": {
+        "asset": "logos/timeline_interest_new/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 070",
+      "amount": {
+        "currency": "EUR",
+        "value": 0.05,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "769ed2df-f780-4275-9fa2-a409255b1930"
+      },
+      "cashAccountNumber": null,
+      "hidden": false,
+      "deleted": false,
+      "eventType": "INTEREST_PAYOUT",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/timeline_interest_new/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 018",
+          "subtitle": "subtitle 074"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 075",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "769ed2df-f780-4275-9fa2-a409255b1930"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "f563b533-cb7b-4850-9142-e4576a0b7a03",
+      "timestamp": "2025-01-21T09:15:51.828+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -151.79,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "f563b533-cb7b-4850-9142-e4576a0b7a03"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 079"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 080",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "f563b533-cb7b-4850-9142-e4576a0b7a03"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "41da1ce1-195d-44de-831b-4597feabebca",
+      "timestamp": "2025-01-15T03:49:06.766+0000",
+      "title": "title 018",
+      "icon": "logos/timeline_interest_new/v2",
+      "avatar": {
+        "asset": "logos/timeline_interest_new/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 070",
+      "amount": {
+        "currency": "EUR",
+        "value": 151.79,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "41da1ce1-195d-44de-831b-4597feabebca"
+      },
+      "cashAccountNumber": null,
+      "hidden": false,
+      "deleted": false,
+      "eventType": "INTEREST_PAYOUT",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/timeline_interest_new/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 018",
+          "subtitle": "subtitle 082"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 083",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "41da1ce1-195d-44de-831b-4597feabebca"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "3a52740d-1ec4-4dd8-9b5c-b99d50a31e22",
+      "timestamp": "2025-01-02T08:13:30.465+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -160187.63,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "3a52740d-1ec4-4dd8-9b5c-b99d50a31e22"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 085"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 086",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "3a52740d-1ec4-4dd8-9b5c-b99d50a31e22"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "48b463e9-6964-4f87-b700-c4b82d677cdb",
+      "timestamp": "2024-12-27T12:33:47.866+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -1086.19,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "48b463e9-6964-4f87-b700-c4b82d677cdb"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 088"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 089",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "48b463e9-6964-4f87-b700-c4b82d677cdb"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "2396c6b4-6710-4a01-9f2a-0d1cec9826e1",
+      "timestamp": "2024-12-19T08:12:36.459+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -19200.0,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "2396c6b4-6710-4a01-9f2a-0d1cec9826e1"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 091"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 092",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "2396c6b4-6710-4a01-9f2a-0d1cec9826e1"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "ddee02ac-34a8-44ac-9b46-68bd9b61aa7f",
+      "timestamp": "2024-12-16T05:32:16.344+0000",
+      "title": "title 018",
+      "icon": "logos/timeline_interest_new/v2",
+      "avatar": {
+        "asset": "logos/timeline_interest_new/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 070",
+      "amount": {
+        "currency": "EUR",
+        "value": 247.82,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "ddee02ac-34a8-44ac-9b46-68bd9b61aa7f"
+      },
+      "cashAccountNumber": null,
+      "hidden": false,
+      "deleted": false,
+      "eventType": "INTEREST_PAYOUT",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/timeline_interest_new/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 018",
+          "subtitle": "subtitle 094"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 095",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "ddee02ac-34a8-44ac-9b46-68bd9b61aa7f"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "11a9e9e9-db47-4f1d-85b6-5a7893094427",
+      "timestamp": "2024-12-05T10:56:27.641+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -1123.73,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "11a9e9e9-db47-4f1d-85b6-5a7893094427"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 097"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 098",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "11a9e9e9-db47-4f1d-85b6-5a7893094427"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "988140fd-97a4-4449-af00-e2640461e88a",
+      "timestamp": "2024-12-02T14:26:55.959+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -144.97,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "988140fd-97a4-4449-af00-e2640461e88a"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 100"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 101",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "988140fd-97a4-4449-af00-e2640461e88a"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "fdfc1dda-bc5b-4269-83bf-a61726e67457",
+      "timestamp": "2024-11-29T07:18:10.514+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -2301.18,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "fdfc1dda-bc5b-4269-83bf-a61726e67457"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 103"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 104",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "fdfc1dda-bc5b-4269-83bf-a61726e67457"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "785bfad0-9f6a-4285-a2eb-e0a260fe21bb",
+      "timestamp": "2024-11-19T12:17:03.181+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 106",
+      "amount": {
+        "currency": "EUR",
+        "value": 196200.0,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "785bfad0-9f6a-4285-a2eb-e0a260fe21bb"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_INCOMING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 107"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 108",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "785bfad0-9f6a-4285-a2eb-e0a260fe21bb"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "f7f2fd43-1539-4d39-89fb-69db737a54d3",
+      "timestamp": "2024-11-15T06:36:05.638+0000",
+      "title": "title 018",
+      "icon": "logos/timeline_interest_new/v2",
+      "avatar": {
+        "asset": "logos/timeline_interest_new/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 070",
+      "amount": {
+        "currency": "EUR",
+        "value": 0.49,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "f7f2fd43-1539-4d39-89fb-69db737a54d3"
+      },
+      "cashAccountNumber": null,
+      "hidden": false,
+      "deleted": false,
+      "eventType": "INTEREST_PAYOUT",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/timeline_interest_new/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 018",
+          "subtitle": "subtitle 110"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 111",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "f7f2fd43-1539-4d39-89fb-69db737a54d3"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "1e2bc5b0-99fc-4e55-8b78-ec827951ea3d",
+      "timestamp": "2024-11-13T07:05:42.576+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -4305.84,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "1e2bc5b0-99fc-4e55-8b78-ec827951ea3d"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 113"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 114",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "1e2bc5b0-99fc-4e55-8b78-ec827951ea3d"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "76e85b05-db00-46d1-82fa-39a02268ad03",
+      "timestamp": "2024-11-11T13:47:52.965+0000",
+      "title": "title 116",
+      "icon": "logos/US0378331005/v2",
+      "avatar": {
+        "asset": "logos/US0378331005/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 117",
+      "amount": {
+        "currency": "EUR",
+        "value": 3959.7,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "76e85b05-db00-46d1-82fa-39a02268ad03"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "TRADING_TRADE_EXECUTED",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/US0378331005/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 116",
+          "subtitle": "subtitle 118"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 119",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "76e85b05-db00-46d1-82fa-39a02268ad03"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "f9fd91b4-d21c-4884-9266-f64748d56134",
+      "timestamp": "2024-10-17T07:35:47.418+0000",
+      "title": "title 121",
+      "icon": "logos/USCBH6L9JE60/v2",
+      "avatar": {
+        "asset": "logos/USCBH6L9JE60/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 122",
+      "amount": {
+        "currency": "EUR",
+        "value": 2.9,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "f9fd91b4-d21c-4884-9266-f64748d56134"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "SSP_CORPORATE_ACTION_CASH",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/USCBH6L9JE60/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 121",
+          "subtitle": "subtitle 123"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 124",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "f9fd91b4-d21c-4884-9266-f64748d56134"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "47700b43-3368-416b-ba97-1b5d29d86095",
+      "timestamp": "2024-10-15T05:03:22.125+0000",
+      "title": "title 018",
+      "icon": "logos/timeline_interest_new/v2",
+      "avatar": {
+        "asset": "logos/timeline_interest_new/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 070",
+      "amount": {
+        "currency": "EUR",
+        "value": 2.9,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "47700b43-3368-416b-ba97-1b5d29d86095"
+      },
+      "cashAccountNumber": null,
+      "hidden": false,
+      "deleted": false,
+      "eventType": "INTEREST_PAYOUT",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/timeline_interest_new/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 018",
+          "subtitle": "subtitle 126"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 127",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "47700b43-3368-416b-ba97-1b5d29d86095"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "297c2dcf-6977-48d4-82ab-a847632b69c8",
+      "timestamp": "2024-10-11T05:41:59.978+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -3558.61,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "297c2dcf-6977-48d4-82ab-a847632b69c8"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 129"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 130",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "297c2dcf-6977-48d4-82ab-a847632b69c8"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "661c28d7-78d6-4d56-abf7-84b3537361ae",
+      "timestamp": "2024-10-10T06:12:08.473+0000",
+      "title": "title 121",
+      "icon": "logos/USCBH6L9JE60/v2",
+      "avatar": {
+        "asset": "logos/USCBH6L9JE60/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 117",
+      "amount": {
+        "currency": "EUR",
+        "value": 3558.61,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "661c28d7-78d6-4d56-abf7-84b3537361ae"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "TRADING_TRADE_EXECUTED",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/USCBH6L9JE60/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 121",
+          "subtitle": "subtitle 132"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 133",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "661c28d7-78d6-4d56-abf7-84b3537361ae"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "bd35b5fb-614c-4506-9710-8d5057cf7122",
+      "timestamp": "2024-10-09T08:12:48.802+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -54120.35,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "bd35b5fb-614c-4506-9710-8d5057cf7122"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 135"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 136",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "bd35b5fb-614c-4506-9710-8d5057cf7122"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "6598f9c6-3822-4265-b2ff-064dbd9988eb",
+      "timestamp": "2024-10-08T14:12:26.743+0000",
+      "title": "title 116",
+      "icon": "logos/US0378331005/v2",
+      "avatar": {
+        "asset": "logos/US0378331005/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 117",
+      "amount": {
+        "currency": "EUR",
+        "value": 5471.4,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "6598f9c6-3822-4265-b2ff-064dbd9988eb"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "TRADING_TRADE_EXECUTED",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/US0378331005/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 116",
+          "subtitle": "subtitle 138"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 139",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "6598f9c6-3822-4265-b2ff-064dbd9988eb"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "785486db-27a9-4ba5-891c-0536a708b96d",
+      "timestamp": "2024-10-08T14:09:53.248+0000",
+      "title": "title 121",
+      "icon": "logos/USCBH6L9JE60/v2",
+      "avatar": {
+        "asset": "logos/USCBH6L9JE60/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 117",
+      "amount": {
+        "currency": "EUR",
+        "value": 47236.03,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "785486db-27a9-4ba5-891c-0536a708b96d"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "TRADING_TRADE_EXECUTED",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/USCBH6L9JE60/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 121",
+          "subtitle": "subtitle 138"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 141",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "785486db-27a9-4ba5-891c-0536a708b96d"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "bf83e4f7-0e36-4aac-8ee2-1733617d1aac",
+      "timestamp": "2024-09-15T07:11:37.205+0000",
+      "title": "title 018",
+      "icon": "logos/timeline_interest_new/v2",
+      "avatar": {
+        "asset": "logos/timeline_interest_new/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 143",
+      "amount": {
+        "currency": "EUR",
+        "value": 0.03,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "bf83e4f7-0e36-4aac-8ee2-1733617d1aac"
+      },
+      "cashAccountNumber": null,
+      "hidden": false,
+      "deleted": false,
+      "eventType": "INTEREST_PAYOUT",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/timeline_interest_new/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 018",
+          "subtitle": "subtitle 144"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 145",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "bf83e4f7-0e36-4aac-8ee2-1733617d1aac"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "b73d2d98-7230-4527-a3d8-51fd5df55eb8",
+      "timestamp": "2024-08-29T08:23:00.484+0000",
+      "title": "title 116",
+      "icon": "logos/US0378331005/v2",
+      "avatar": {
+        "asset": "logos/US0378331005/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 122",
+      "amount": {
+        "currency": "EUR",
+        "value": 10.07,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "b73d2d98-7230-4527-a3d8-51fd5df55eb8"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "SSP_CORPORATE_ACTION_CASH",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/US0378331005/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 116",
+          "subtitle": "subtitle 147"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 148",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "b73d2d98-7230-4527-a3d8-51fd5df55eb8"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "010bbc14-43b4-4356-95fe-575d7d094d3a",
+      "timestamp": "2024-08-15T06:07:39.266+0000",
+      "title": "title 018",
+      "icon": "logos/timeline_interest_new/v2",
+      "avatar": {
+        "asset": "logos/timeline_interest_new/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 143",
+      "amount": {
+        "currency": "EUR",
+        "value": 8.07,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "010bbc14-43b4-4356-95fe-575d7d094d3a"
+      },
+      "cashAccountNumber": null,
+      "hidden": false,
+      "deleted": false,
+      "eventType": "INTEREST_PAYOUT",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/timeline_interest_new/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 018",
+          "subtitle": "subtitle 150"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 151",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "010bbc14-43b4-4356-95fe-575d7d094d3a"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "fcdae8b1-0c77-4d49-a408-a04ad198d3a7",
+      "timestamp": "2024-08-07T08:14:24.819+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 078",
+      "amount": {
+        "currency": "EUR",
+        "value": -117.55,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "fcdae8b1-0c77-4d49-a408-a04ad198d3a7"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_OUTGOING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 153"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 154",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "fcdae8b1-0c77-4d49-a408-a04ad198d3a7"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "40af0853-b9b1-4006-967b-bdbb9dd8140f",
+      "timestamp": "2024-07-29T05:31:41.000+0000",
+      "title": "title 116",
+      "icon": "logos/US0378331005/v2",
+      "avatar": {
+        "asset": "logos/US0378331005/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 156",
+      "amount": {
+        "currency": "EUR",
+        "value": -9523.12,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "40af0853-b9b1-4006-967b-bdbb9dd8140f"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "TRADING_TRADE_EXECUTED",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/US0378331005/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 116",
+          "subtitle": "subtitle 157"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 158",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "40af0853-b9b1-4006-967b-bdbb9dd8140f"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "16b3dd54-d971-4538-b79e-40cdb7c52bed",
+      "timestamp": "2024-07-25T06:40:33.709+0000",
+      "title": "title 077",
+      "icon": "logos/contacts-O-Grey/v2",
+      "avatar": {
+        "asset": "logos/contacts-O-Grey/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 106",
+      "amount": {
+        "currency": "EUR",
+        "value": 840.01,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "16b3dd54-d971-4538-b79e-40cdb7c52bed"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "BANK_TRANSACTION_INCOMING",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/contacts-O-Grey/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 077",
+          "subtitle": "subtitle 160"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 161",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "16b3dd54-d971-4538-b79e-40cdb7c52bed"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "6306cfc6-7ad9-475f-b7c1-4bdafa57b156",
+      "timestamp": "2024-07-23T16:31:45.000+0000",
+      "title": "title 116",
+      "icon": "logos/US0378331005/v2",
+      "avatar": {
+        "asset": "logos/US0378331005/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 163",
+      "amount": {
+        "currency": "EUR",
+        "value": 8455.03,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "6306cfc6-7ad9-475f-b7c1-4bdafa57b156"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "TRADING_TRADE_EXECUTED",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/US0378331005/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 116",
+          "subtitle": "subtitle 164"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 165",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "6306cfc6-7ad9-475f-b7c1-4bdafa57b156"
+        },
+        "type": "listItem"
+      }
+    },
+    {
+      "id": "d1d87681-4708-4019-a172-d89efc1caaed",
+      "timestamp": "2024-07-23T12:21:14.120+0000",
+      "title": "title 116",
+      "icon": "logos/US0378331005/v2",
+      "avatar": {
+        "asset": "logos/US0378331005/v2",
+        "badge": null
+      },
+      "badge": null,
+      "subtitle": "subtitle 156",
+      "amount": {
+        "currency": "EUR",
+        "value": -8418.73,
+        "fractionDigits": 2
+      },
+      "subAmount": null,
+      "status": "EXECUTED",
+      "action": {
+        "type": "timelineDetail",
+        "payload": "d1d87681-4708-4019-a172-d89efc1caaed"
+      },
+      "cashAccountNumber": "6426369619",
+      "hidden": false,
+      "deleted": false,
+      "eventType": "TRADING_TRADE_EXECUTED",
+      "actor": null,
+      "presentation": {
+        "leading": {
+          "type": "avatar",
+          "icon": "logos/US0378331005/v2"
+        },
+        "content": {
+          "type": "default",
+          "title": "title 116",
+          "subtitle": "subtitle 167"
+        },
+        "trailing": {
+          "type": "value",
+          "title": "title 168",
+          "titleColor": "default",
+          "strikethrough": false,
+          "titleDataSensitivity": "SENSITIVE"
+        },
+        "action": {
+          "type": "timelineDetail",
+          "payload": "d1d87681-4708-4019-a172-d89efc1caaed"
+        },
+        "type": "listItem"
+      }
+    }
+  ],
+  "cursors": {
+    "after": "after 169",
+    "before": "before 170"
+  },
+  "startingTransactionId": null
+}

@@ -1,0 +1,13 @@
+{
+  "data": {
+    "verifyLoginWithPush": {
+      "status": "SUCCESS",
+      "errors": null,
+      "isAuthorizationPending": null,
+      "shouldAbortLoginAttempt": null,
+      "challengeType": null,
+      "rateLimit": null,
+      "__typename": "VerifyLoginWithPush"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+// Base build settings of the MFN app target.
+//
+// FinTS product registration (Deutsche Kreditwirtschaft). The real number stays out of git
+// (the DK terms ask not to publish it): put it into FinTS.local.xcconfig next to this file:
+//     MFN_FINTS_PRODUCT_ID = <number>
+// Without that file the app sends the placeholder and ING/DKB reject FinTS (9078).
+MFN_FINTS_PRODUCT_ID = MFN-UNREGISTERED
+
+// Signing team (empty = ad-hoc/unsigned self builds). Set DEVELOPMENT_TEAM in FinTS.local.xcconfig.
+DEVELOPMENT_TEAM =
+
+// Sparkle updates. Both empty in a self-built app: the updater stays off and the menu item is hidden.
+// Official builds set them in FinTS.local.xcconfig (see docs/RELEASING.md). In xcconfig a URL needs
+// the $() trick so "//" does not start a comment:
+//     MFN_APPCAST_URL = https:/$()/example.com/appcast.xml
+//     MFN_SPARKLE_PUBLIC_KEY = <base64 EdDSA public key from generate_keys>
+MFN_APPCAST_URL =
+MFN_SPARKLE_PUBLIC_KEY =
+
+#include? "FinTS.local.xcconfig"

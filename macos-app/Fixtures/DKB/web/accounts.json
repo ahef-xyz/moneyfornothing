@@ -1,0 +1,386 @@
+{
+  "data": [
+    {
+      "type": "account",
+      "id": "bb11d306-d250-4cb3-9865-9f52173dde49",
+      "attributes": {
+        "holderName": "Max Mustermann",
+        "iban": "DE00898902834340121211",
+        "permissions": [
+          "transactions-read",
+          "recipients-read",
+          "accounts-read",
+          "recurring-payments-read",
+          "scheduled-payments-read",
+          "bulk-scheduled-sepa-credit-transfers-read"
+        ],
+        "currencyCode": "EUR",
+        "balance": {
+          "currencyCode": "EUR",
+          "value": "4540.86"
+        },
+        "availableBalance": {
+          "currencyCode": "EUR",
+          "value": "4540.86"
+        },
+        "nearTimeBalance": {
+          "currencyCode": "EUR",
+          "value": "4540.86"
+        },
+        "product": {
+          "id": "LI_FPBAD_1",
+          "type": "checking-account-private",
+          "displayName": "Girokonto 2"
+        },
+        "state": "active",
+        "updatedAt": "2026-02-24",
+        "openingDate": "2020-03-20",
+        "overdraftLimit": "0.00",
+        "interestRate": "2.250",
+        "unauthorizedOverdraftInterestRate": "10.000",
+        "lastAccountStatementDate": "2026-02-24",
+        "referenceAccount": {
+          "iban": "DE00711914069711055041",
+          "accountNumber": "8956282840",
+          "blz": "12030000"
+        },
+        "interests": [
+          {
+            "type": "overdraft",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "10.000",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "0.00"
+                }
+              }
+            ]
+          },
+          {
+            "type": "credit",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "2.250",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "0.00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "account",
+      "id": "f73c183a-19a4-47d5-8a15-15f404f38446",
+      "attributes": {
+        "holderName": "Max Mustermann",
+        "iban": "DE00245442831624936444",
+        "permissions": [
+          "transactions-read",
+          "scheduled-payment-read",
+          "scheduled-payment-update",
+          "recurring-payments-read",
+          "recurring-payments-update",
+          "direct-debit-read",
+          "bulk-scheduled-sepa-credit-transfers-delete",
+          "single-payment-read",
+          "single-payment-create",
+          "instant-scheduled-sepa-credit-transfers-create",
+          "instant-sepa-credit-transfers-read",
+          "recurring-sepa-credit-transfers-suspend",
+          "scheduled-payments-read",
+          "recurring-payments-create",
+          "instant-scheduled-sepa-credit-transfers-update",
+          "instant-recurring-sepa-credit-transfers-update",
+          "scheduled-payment-create",
+          "recipients-read",
+          "accounts-read",
+          "bulk-scheduled-sepa-credit-transfers-read",
+          "scheduled-payments-delete",
+          "instant-recurring-sepa-credit-transfers-create",
+          "instant-sepa-credit-transfers-create",
+          "transactions-revoke",
+          "recurring-payments-delete"
+        ],
+        "currencyCode": "EUR",
+        "balance": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "availableBalance": {
+          "currencyCode": "EUR",
+          "value": "161.29"
+        },
+        "nearTimeBalance": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "product": {
+          "id": "KL_Miga_4",
+          "type": "checking-account-private",
+          "displayName": "Girokonto 1"
+        },
+        "state": "active",
+        "updatedAt": "2026-02-23",
+        "openingDate": "2012-08-06",
+        "overdraftLimit": "161.29",
+        "overdraftInterestRate": "10.500",
+        "interestRate": "0.000",
+        "unauthorizedOverdraftInterestRate": "10.500",
+        "lastAccountStatementDate": "2026-02-24",
+        "interests": [
+          {
+            "type": "overdraft",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "10.500",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "164.26"
+                }
+              }
+            ]
+          },
+          {
+            "type": "credit",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "0.000",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "0.00"
+                }
+              }
+            ]
+          },
+          {
+            "type": "debit",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "10.500",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "0.00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "account",
+      "id": "89c120a1-5d94-48ef-97cf-8568229ded81",
+      "attributes": {
+        "holderName": "Max Mustermann",
+        "iban": "DE00711914069711055041",
+        "permissions": [
+          "transactions-read",
+          "scheduled-payment-read",
+          "scheduled-payment-update",
+          "recurring-payments-read",
+          "recurring-payments-update",
+          "direct-debit-read",
+          "bulk-scheduled-sepa-credit-transfers-delete",
+          "single-payment-read",
+          "single-payment-create",
+          "instant-scheduled-sepa-credit-transfers-create",
+          "instant-sepa-credit-transfers-read",
+          "recurring-sepa-credit-transfers-suspend",
+          "scheduled-payments-read",
+          "recurring-payments-create",
+          "instant-scheduled-sepa-credit-transfers-update",
+          "instant-recurring-sepa-credit-transfers-update",
+          "scheduled-payment-create",
+          "recipients-read",
+          "accounts-read",
+          "bulk-scheduled-sepa-credit-transfers-read",
+          "scheduled-payments-delete",
+          "instant-recurring-sepa-credit-transfers-create",
+          "instant-sepa-credit-transfers-create",
+          "transactions-revoke",
+          "recurring-payments-delete"
+        ],
+        "currencyCode": "EUR",
+        "balance": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "availableBalance": {
+          "currencyCode": "EUR",
+          "value": "882.49"
+        },
+        "nearTimeBalance": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "product": {
+          "id": "KL_Miga_4",
+          "type": "checking-account-private",
+          "displayName": "Girokonto 1"
+        },
+        "state": "active",
+        "updatedAt": "2026-02-24",
+        "openingDate": "2013-08-09",
+        "overdraftLimit": "882.49",
+        "overdraftInterestRate": "10.500",
+        "interestRate": "0.000",
+        "unauthorizedOverdraftInterestRate": "10.500",
+        "lastAccountStatementDate": "2026-02-24",
+        "interests": [
+          {
+            "type": "overdraft",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "10.500",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "1020.84"
+                }
+              }
+            ]
+          },
+          {
+            "type": "credit",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "0.000",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "0.00"
+                }
+              }
+            ]
+          },
+          {
+            "type": "debit",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "10.500",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "0.00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "account",
+      "id": "1e879e4b-34e5-4eaa-b72d-9ab47f87fbb8",
+      "attributes": {
+        "holderName": "Max Mustermann",
+        "iban": "DE00106754415476194559",
+        "permissions": [
+          "transactions-read",
+          "scheduled-payment-read",
+          "scheduled-payment-update",
+          "direct-debit-read",
+          "single-payment-read",
+          "single-payment-create",
+          "instant-scheduled-sepa-credit-transfers-create",
+          "instant-sepa-credit-transfers-read",
+          "recurring-payments-read",
+          "non-sepa-credit-transfer-create",
+          "recurring-payments-create",
+          "instant-scheduled-sepa-credit-transfers-update",
+          "instant-recurring-sepa-credit-transfers-update",
+          "scheduled-payment-create",
+          "accounts-read",
+          "instant-sepa-credit-transfers-create",
+          "transactions-revoke",
+          "recurring-payments-update",
+          "bulk-scheduled-sepa-credit-transfers-delete",
+          "recurring-sepa-credit-transfers-suspend",
+          "scheduled-payments-read",
+          "recipients-read",
+          "bulk-scheduled-sepa-credit-transfers-read",
+          "scheduled-payments-delete",
+          "instant-recurring-sepa-credit-transfers-create",
+          "recurring-payments-delete"
+        ],
+        "currencyCode": "EUR",
+        "balance": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "availableBalance": {
+          "currencyCode": "EUR",
+          "value": "161.29"
+        },
+        "nearTimeBalance": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "product": {
+          "id": "KL_Miga_4",
+          "type": "checking-account-private",
+          "displayName": "Girokonto 1"
+        },
+        "state": "active",
+        "updatedAt": "2026-02-24",
+        "openingDate": "2010-05-28",
+        "overdraftLimit": "161.29",
+        "overdraftInterestRate": "10.500",
+        "interestRate": "0.000",
+        "unauthorizedOverdraftInterestRate": "10.500",
+        "lastAccountStatementDate": "2026-02-24",
+        "interests": [
+          {
+            "type": "overdraft",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "10.500",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "164.26"
+                }
+              }
+            ]
+          },
+          {
+            "type": "credit",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "0.000",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "0.00"
+                }
+              }
+            ]
+          },
+          {
+            "type": "debit",
+            "method": "individual-rate",
+            "details": [
+              {
+                "interestRate": "10.500",
+                "condition": {
+                  "currency": "EUR",
+                  "minimumAmount": "0.00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "included": []
+}

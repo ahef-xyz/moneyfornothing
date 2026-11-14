@@ -1,0 +1,17 @@
+{
+  "Item": {
+    "Transactions": [],
+    "OTPRequired": true,
+    "EligibleTransactionCount": 0,
+    "HasMore": false,
+    "TotalRowCount": 0,
+    "Cached": false
+  },
+  "Result": {
+    "IsSuccess": true,
+    "HasWarning": false,
+    "HasSuccess": false,
+    "HasInformation": false,
+    "HasAnyResultElement": false
+  }
+}

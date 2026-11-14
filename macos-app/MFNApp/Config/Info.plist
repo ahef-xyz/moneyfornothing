@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MFNFinTSProductID</key>
+	<string>$(MFN_FINTS_PRODUCT_ID)</string>
+	<key>SUFeedURL</key>
+	<string>$(MFN_APPCAST_URL)</string>
+	<key>SUPublicEDKey</key>
+	<string>$(MFN_SPARKLE_PUBLIC_KEY)</string>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
+	<key>SUEnableSystemProfiling</key>
+	<false/>
+</dict>
+</plist>

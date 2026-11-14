@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "2700"
+   version = "1.7">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A00000000000000000000601"
+               BuildableName = "MFN.app"
+               BlueprintName = "MFN"
+               ReferencedContainer = "container:MFNApp/MFNApp.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNCoreTests"
+               BuildableName = "MFNCoreTests"
+               BlueprintName = "MFNCoreTests"
+               ReferencedContainer = "container:Packages/MFNCore">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNStoreTests"
+               BuildableName = "MFNStoreTests"
+               BlueprintName = "MFNStoreTests"
+               ReferencedContainer = "container:Packages/MFNCore">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNMockTests"
+               BuildableName = "MFNMockTests"
+               BlueprintName = "MFNMockTests"
+               ReferencedContainer = "container:Packages/MFNMock">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNConformanceTests"
+               BuildableName = "MFNConformanceTests"
+               BlueprintName = "MFNConformanceTests"
+               ReferencedContainer = "container:Packages/MFNConformance">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNFinTSTests"
+               BuildableName = "MFNFinTSTests"
+               BlueprintName = "MFNFinTSTests"
+               ReferencedContainer = "container:Packages/MFNFinTS">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNScrapeTests"
+               BuildableName = "MFNScrapeTests"
+               BlueprintName = "MFNScrapeTests"
+               ReferencedContainer = "container:Packages/MFNScrape">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNTradeRepublicTests"
+               BuildableName = "MFNTradeRepublicTests"
+               BlueprintName = "MFNTradeRepublicTests"
+               ReferencedContainer = "container:Packages/MFNTradeRepublic">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNC24Tests"
+               BuildableName = "MFNC24Tests"
+               BlueprintName = "MFNC24Tests"
+               ReferencedContainer = "container:Packages/MFNC24">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNEasybankTests"
+               BuildableName = "MFNEasybankTests"
+               BlueprintName = "MFNEasybankTests"
+               ReferencedContainer = "container:Packages/MFNEasybank">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNN26Tests"
+               BuildableName = "MFNN26Tests"
+               BlueprintName = "MFNN26Tests"
+               ReferencedContainer = "container:Packages/MFNN26">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNDKBTests"
+               BuildableName = "MFNDKBTests"
+               BlueprintName = "MFNDKBTests"
+               ReferencedContainer = "container:Packages/MFNDKB">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNIntelligenceTests"
+               BuildableName = "MFNIntelligenceTests"
+               BlueprintName = "MFNIntelligenceTests"
+               ReferencedContainer = "container:Packages/MFNIntelligence">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A00000000000000000000601"
+            BuildableName = "MFN.app"
+            BlueprintName = "MFN"
+            ReferencedContainer = "container:MFNApp/MFNApp.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A00000000000000000000601"
+            BuildableName = "MFN.app"
+            BlueprintName = "MFN"
+            ReferencedContainer = "container:MFNApp/MFNApp.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>

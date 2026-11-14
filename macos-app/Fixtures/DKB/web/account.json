@@ -1,0 +1,106 @@
+{
+  "data": {
+    "type": "account",
+    "id": "1e879e4b-34e5-4eaa-b72d-9ab47f87fbb8",
+    "attributes": {
+      "holderName": "Max Mustermann",
+      "iban": "DE00106754415476194559",
+      "permissions": [
+        "transactions-revoke",
+        "recurring-payments-read",
+        "recurring-payments-create",
+        "instant-scheduled-sepa-credit-transfers-create",
+        "transactions-read",
+        "recipients-read",
+        "scheduled-payments-delete",
+        "non-sepa-credit-transfer-create",
+        "single-payment-read",
+        "single-payment-create",
+        "bulk-scheduled-sepa-credit-transfers-read",
+        "bulk-scheduled-sepa-credit-transfers-delete",
+        "scheduled-payments-read",
+        "instant-scheduled-sepa-credit-transfers-update",
+        "instant-sepa-credit-transfers-read",
+        "scheduled-payment-read",
+        "scheduled-payment-update",
+        "recurring-payments-update",
+        "recurring-sepa-credit-transfers-suspend",
+        "instant-recurring-sepa-credit-transfers-create",
+        "scheduled-payment-create",
+        "direct-debit-read",
+        "recurring-payments-delete",
+        "instant-recurring-sepa-credit-transfers-update",
+        "accounts-read",
+        "instant-sepa-credit-transfers-create"
+      ],
+      "currencyCode": "EUR",
+      "balance": {
+        "currencyCode": "EUR",
+        "value": "0.00"
+      },
+      "availableBalance": {
+        "currencyCode": "EUR",
+        "value": "161.29"
+      },
+      "nearTimeBalance": {
+        "currencyCode": "EUR",
+        "value": "0.00"
+      },
+      "product": {
+        "id": "KL_Miga_4",
+        "type": "checking-account-private",
+        "displayName": "Girokonto 1"
+      },
+      "state": "active",
+      "updatedAt": "2026-02-24",
+      "openingDate": "2010-05-28",
+      "overdraftLimit": "161.29",
+      "overdraftInterestRate": "10.500",
+      "interestRate": "0.000",
+      "unauthorizedOverdraftInterestRate": "10.500",
+      "lastAccountStatementDate": "2026-02-24",
+      "interests": [
+        {
+          "type": "overdraft",
+          "method": "individual-rate",
+          "details": [
+            {
+              "interestRate": "10.500",
+              "condition": {
+                "currency": "EUR",
+                "minimumAmount": "164.26"
+              }
+            }
+          ]
+        },
+        {
+          "type": "credit",
+          "method": "individual-rate",
+          "details": [
+            {
+              "interestRate": "0.000",
+              "condition": {
+                "currency": "EUR",
+                "minimumAmount": "0.00"
+              }
+            }
+          ]
+        },
+        {
+          "type": "debit",
+          "method": "individual-rate",
+          "details": [
+            {
+              "interestRate": "10.500",
+              "condition": {
+                "currency": "EUR",
+                "minimumAmount": "0.00"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "included": []
+}

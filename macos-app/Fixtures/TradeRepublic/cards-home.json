@@ -1,0 +1,88 @@
+{
+  "data": {
+    "cardholder": {
+      "authAccountId": "b88c51cd-d8cd-4337-ad75-daa875ea93a1",
+      "externalId": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+      "cashAccountNumber": "6426369619"
+    },
+    "card": {
+      "id": "68256a8c-d9c1-4021-a5d4-1f0bfe2b99eb",
+      "createTime": "2023-06-22T18:35:47.057Z",
+      "updateTime": "2025-02-13T22:22:40.538Z",
+      "externalId": "bbb2b4b9-5668-4ee6-b190-d90a5d4e6b74",
+      "authAccountId": "b88c51cd-d8cd-4337-ad75-daa875ea93a1",
+      "lastFourPan": "0394",
+      "status": "ACTIVATED",
+      "cardholderName": "accountName 003",
+      "activateTime": "2023-06-22T18:35:47.057Z",
+      "expireTime": "2028-07-15T23:59:59.000Z",
+      "securitySettings": {
+        "atm": {
+          "allowed": false,
+          "canEdit": true
+        },
+        "online": {
+          "allowed": false,
+          "canEdit": true
+        },
+        "contactless": {
+          "allowed": true,
+          "canEdit": true
+        },
+        "swipe": {
+          "allowed": false,
+          "canEdit": true
+        },
+        "gambling": {
+          "allowed": false,
+          "canEdit": true
+        },
+        "crypto": {
+          "allowed": false,
+          "canEdit": true
+        }
+      },
+      "isPinSet": false
+    },
+    "cardAsset": {
+      "front": "cards/products/virtual/front",
+      "back": "cards/products/virtual/back",
+      "standing": "cards/products/virtual/standing",
+      "interactive": "cards/products/virtual/interactive",
+      "verticalRotation": "cards/products/virtual/verticalRotation",
+      "verticalRotationWithoutName": "cards/products/virtual/verticalRotation/withoutName",
+      "horizontalRotation": "cards/products/virtual/horizontalRotation",
+      "icon": "cards/products/virtual/icon",
+      "frozenIcon": "cards/products/virtual/frozenIcon",
+      "lockedIcon": "cards/products/virtual/lockedIcon",
+      "translucent": true
+    },
+    "cardProduct": {
+      "id": "25eca81d-f076-4c0f-b383-7bedccf13407",
+      "name": "name 014",
+      "description": "description 015",
+      "price": 0,
+      "priceWithCurrency": {
+        "value": 0.0,
+        "currency": "EUR"
+      },
+      "type": "VIRTUAL"
+    },
+    "activeLocks": [],
+    "tokens": [],
+    "xPayEligibility": {
+      "applePay": true,
+      "googlePay": true
+    },
+    "fundingSource": {
+      "type": "CASH"
+    },
+    "clickToPay": {
+      "status": "NOT_ENROLLED"
+    },
+    "visaPlus": {
+      "status": "NOT_ENROLLED"
+    }
+  },
+  "view": "view 016"
+}

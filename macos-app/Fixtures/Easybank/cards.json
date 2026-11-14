@@ -1,0 +1,218 @@
+{
+  "AccountListResponse": {
+    "AccountList": [
+      {
+        "Number": "8560530425",
+        "AccountName": "easybank Kreditkarte",
+        "IBAN": "DE00993731195043973676",
+        "OpeningDate": "2019-01-03T00:00:00+00:00",
+        "InterestRate": 0.0,
+        "ClosingDate": "0001-01-01T00:00:00+00:00",
+        "HostID": "37796c28-37c4-44a3-bbaf-2addecd8164c",
+        "IsJointAccount": false,
+        "AvailableBalanceInLocalCurrency": {
+          "Value": 12473.4,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "CurrentBalance": {
+          "Value": -804.76,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "InstallmentAmount": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "NumberOfInstallmentsOutstanding": 0,
+        "NextPaymentDate": "2026-02-28T00:00:00+00:00",
+        "NextPaymentAmount": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "OutstandingBalanceInLocalCurrency": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "BlockCode": "",
+        "BlockCodeReason": "NORM",
+        "BlockCodeLastUpdateDate": "2014-06-11T00:00:00+00:00",
+        "BlockCodeReasonDate": "0001-01-01T00:00:00+00:00",
+        "BlockCodeReasonType": "AccountVisible",
+        "Logo": "12",
+        "AccountSubstatus": "Undefined",
+        "ProductName": "easybank Kreditkarte",
+        "TotalCreditLimit": {
+          "Value": 12473.4,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "IsEppEnrolled": false,
+        "LoanEndDate": "0001-01-01T00:00:00+00:00",
+        "LoanStatus": "",
+        "Ownership": "Primary",
+        "TotalAmountDue": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "AccountSettingsDisabled": false,
+        "CreditLimitAssignedDate": "0001-01-01T00:00:00+00:00",
+        "CurrentCreditLimit": {
+          "Value": 11400.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "AvailableCreditLimit": {
+          "Value": 12473.4,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "CreditLimitIncreaseSuppression": false,
+        "DateMaxAffordableCreditLimit": "0001-01-01T00:00:00+00:00",
+        "HasPendingCreditLimitIncreaseRequest": false,
+        "AccountOnRestriction": false,
+        "AccountStatus": "Active",
+        "AccountType": "Card",
+        "AccountSubType": "BauAccount",
+        "FullNumber": "8560530425",
+        "AccountInfo": "DE00993731195043973676",
+        "AccountNameAndNumber": "AccountNameAndNumber 004",
+        "AccountIcon": ""
+      }
+    ],
+    "Cached": true
+  },
+  "DashboardTransactionItemList": [
+    {
+      "AccountNumber": "8560530425",
+      "TransactionItem": {
+        "ExchangeRate": 0.0,
+        "InternalID": "6194373d-cc53-41fb-bb4e-a0dbd7e0cd0c",
+        "PostingDate": "0001-01-01T00:00:00+00:00",
+        "ValueDate": "2026-02-23T16:19:47+00:00",
+        "TransactionDate": "2026-02-23T16:19:47+00:00",
+        "TransactionTime": "2026-02-23T16:19:47+00:00",
+        "ReferenceNumber": "374575978119963",
+        "Description": "Description 007",
+        "Amount": {
+          "Value": 34.5,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "LocalCurrencyAmount": {
+          "Value": 34.5,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "TransactionNature": "Credit",
+        "TransactionType": "Pending",
+        "EPPEligible": false,
+        "HasEPP": false,
+        "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+        "MaskedCardNumber": "415691******1114",
+        "LastConversionDate": "0001-01-01T00:00:00+00:00",
+        "EqualPaymentOption": [],
+        "OfferCondition": {
+          "Code": "NONE"
+        },
+        "CountryCode": "LU",
+        "ContactlessPayment": false,
+        "CardNetwork": "Visa",
+        "CardHoldersName": "CardHoldersName 010",
+        "ExtractDate": "0001-01-01T00:00:00+00:00",
+        "EffectiveDate": "0001-01-01T00:00:00+00:00",
+        "Sequence": "Sequence 011",
+        "StatementDate": "0001-01-01T00:00:00+00:00",
+        "TransactionCode": "0",
+        "TransactionCodeDescription": "",
+        "MCCCode": "5999",
+        "MerchantName": "Description 007",
+        "Disputable": false,
+        "LogicModule": "0",
+        "EntryMode": "10",
+        "AcquirerRefNumber": "374575978119963",
+        "AuthCode": "753947",
+        "CounterBookingAvailable": false,
+        "FundsTransferRevokable": false,
+        "OutgoingDirectDebitRevokable": false,
+        "FeeReversable": false,
+        "CreditPlan": "10001",
+        "ResponseStatus": "",
+        "HostTransactionType": "Undefined",
+        "BookingDate": "0001-01-01T00:00:00+00:00",
+        "IsFTTransaction": false,
+        "IsInstantPayment": false,
+        "SepaPaymentType": "Undefined",
+        "IsExternalTransfer": false,
+        "FormattedAmount": "+34,50 €",
+        "FormattedLocalAmount": "+34,50 €",
+        "IsDisputable": false,
+        "DisputeNotAllowedReason": "DR2",
+        "DisputeStatus": "Undefined",
+        "DisputeDate": "0001-01-01T00:00:00+00:00",
+        "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+        "DisputeReleaseType": "Undefined",
+        "DisputeReleasedInFavor": "Undefined",
+        "DisputeAutoReleaseCounter": "0",
+        "FinalAction": "APPROVED",
+        "Extent": "2",
+        "InputSource": "RECEIVED FROM VISANET NETWORK",
+        "RequestType": "M-MERCH RETURN",
+        "TermId": "378373",
+        "CycleToDays": "0",
+        "TransactionReferenceNumber": "374575978119963",
+        "TransactionEligibility": "APPROVE",
+        "TransactionExchangeRate": "0,00",
+        "TransactionAncillaryData": [],
+        "MerchantData": {
+          "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 014",
+          "Name": "Description 007",
+          "AltText": "AltText 015",
+          "URL": "URL 016",
+          "Type": "Merchant"
+        },
+        "IsPending": true,
+        "IsEPPEligible": false,
+        "IsEPPEligibleAccountLevel": true,
+        "BankNameVisible": false,
+        "ShowMerchantDetail": false
+      },
+      "HasTransaction": true
+    }
+  ]
+}

@@ -1,0 +1,380 @@
+{
+  "Item": {
+    "Request": {
+      "Account": {
+        "Number": "8560530425",
+        "AccountName": "easybank Kreditkarte",
+        "IBAN": "DE00993731195043973676",
+        "OpeningDate": "2019-01-03T00:00:00+00:00",
+        "InterestRate": 0.0,
+        "ClosingDate": "0001-01-01T00:00:00+00:00",
+        "HostID": "37796c28-37c4-44a3-bbaf-2addecd8164c",
+        "IsJointAccount": false,
+        "AvailableBalanceInLocalCurrency": {
+          "Value": 12473.4,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "CurrentBalance": {
+          "Value": -804.76,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "InstallmentAmount": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "NumberOfInstallmentsOutstanding": 0,
+        "NextPaymentDate": "2026-02-28T00:00:00+00:00",
+        "NextPaymentAmount": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "OutstandingBalanceInLocalCurrency": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "BlockCode": "",
+        "BlockCodeReason": "NORM",
+        "BlockCodeLastUpdateDate": "2014-06-11T00:00:00+00:00",
+        "BlockCodeReasonDate": "0001-01-01T00:00:00+00:00",
+        "BlockCodeReasonType": "AccountVisible",
+        "Logo": "12",
+        "AccountSubstatus": "Undefined",
+        "ProductName": "easybank Kreditkarte",
+        "TotalCreditLimit": {
+          "Value": 12473.4,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "IsEppEnrolled": false,
+        "LoanEndDate": "0001-01-01T00:00:00+00:00",
+        "LoanStatus": "",
+        "Ownership": "Primary",
+        "TotalAmountDue": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "AccountSettingsDisabled": false,
+        "CreditLimitAssignedDate": "0001-01-01T00:00:00+00:00",
+        "CurrentCreditLimit": {
+          "Value": 11400.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "AvailableCreditLimit": {
+          "Value": 12473.4,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "CreditLimitIncreaseSuppression": false,
+        "DateMaxAffordableCreditLimit": "0001-01-01T00:00:00+00:00",
+        "HasPendingCreditLimitIncreaseRequest": false,
+        "AccountOnRestriction": false,
+        "AccountStatus": "Active",
+        "AccountType": "Card",
+        "AccountSubType": "BauAccount",
+        "FullNumber": "8560530425",
+        "AccountInfo": "DE00993731195043973676",
+        "AccountNameAndNumber": "AccountNameAndNumber 004",
+        "AccountIcon": ""
+      },
+      "Transaction": {
+        "ExchangeRate": 0.0,
+        "InternalID": "18294b01-efec-462b-8fdf-6ef233fc2f70",
+        "PostingDate": "2026-01-01T00:00:00+00:00",
+        "ValueDate": "2025-12-31T20:43:03+00:00",
+        "TransactionDate": "2025-12-31T20:43:03+00:00",
+        "TransactionTime": "2025-12-31T20:43:03+00:00",
+        "ReferenceNumber": "30911459571425569571109",
+        "Description": "Description 105",
+        "Amount": {
+          "Value": 116.51,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "LocalCurrencyAmount": {
+          "Value": 116.51,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "TransactionNature": "Debit",
+        "TransactionType": "Billed",
+        "EPPEligible": false,
+        "HasEPP": false,
+        "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+        "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+        "MaskedCardNumber": "415691******1114",
+        "LastConversionDate": "2026-02-25T00:00:00+00:00",
+        "CountryCode": "LU",
+        "ContactlessPayment": false,
+        "CardNetwork": "Visa",
+        "CardHoldersName": "CardHoldersName 010",
+        "ExtractDate": "0001-01-01T00:00:00+00:00",
+        "EffectiveDate": "0001-01-01T00:00:00+00:00",
+        "Sequence": "Sequence 318",
+        "StatementDate": "2026-01-02T00:00:00+00:00",
+        "TransactionCode": "6107",
+        "TransactionCodeDescription": "",
+        "MCCCode": "5999",
+        "MerchantName": "MerchantName 319",
+        "Disputable": false,
+        "LogicModule": "1",
+        "EntryMode": "10",
+        "ECommerceIndicator": "7",
+        "AcquirerRefNumber": "30911459571425569571109",
+        "AuthCode": "225478",
+        "CounterBookingAvailable": false,
+        "FundsTransferRevokable": false,
+        "OutgoingDirectDebitRevokable": false,
+        "FeeReversable": false,
+        "CreditPlan": "10001",
+        "ResponseStatus": "",
+        "HostTransactionType": "Undefined",
+        "BookingDate": "0001-01-01T00:00:00+00:00",
+        "IsFTTransaction": false,
+        "IsInstantPayment": false,
+        "SepaPaymentType": "Undefined",
+        "IsExternalTransfer": false,
+        "LoanTransactionAmount": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "MobilePaymentType": "Undefined",
+        "FormattedAmount": "-116,51 €",
+        "FormattedLocalAmount": "-116,51 €",
+        "IsDisputable": true,
+        "DisputeNotAllowedReason": "Undefined",
+        "DisputeStatus": "Undefined",
+        "DisputeDate": "0001-01-01T00:00:00+00:00",
+        "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+        "DisputeReleaseType": "Undefined",
+        "DisputeReleasedInFavor": "Undefined",
+        "DisputeAutoReleaseCounter": "0",
+        "TransactionReferenceNumber": "VT586142051478338101538",
+        "TransactionExchangeRate": "0,00",
+        "MerchantData": {
+          "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 322",
+          "Name": "Description 105",
+          "AltText": "AltText 111",
+          "URL": "URL 112",
+          "Type": "Merchant"
+        },
+        "IsPending": false,
+        "IsEPPEligible": false,
+        "IsEPPEligibleAccountLevel": false,
+        "BankNameVisible": false,
+        "ShowMerchantDetail": true
+      },
+      "StepName": "Undefined",
+      "ComingFromTransactionWidget": false,
+      "IsDisputeCategorySelection": false,
+      "TwoFactorAuthentication": {
+        "IsOTPRequired": false,
+        "Password": "<entfernt>",
+        "AuthenticationType": "AuthenticationType 477",
+        "IsSoftTokenRequired": false,
+        "IsSecretQuestionRequired": false
+      },
+      "SelectedApprovalRule": 0,
+      "SelectedApprovalSubRule": 0,
+      "DisableNonStp": false,
+      "IsSourceFutureDated": false,
+      "OpenCaseAndExecuteTransaction": false,
+      "OpenConditionalCase": false,
+      "OpenCaseAndNotExecute": false
+    },
+    "Response": {
+      "Cached": false
+    },
+    "TransactionHeader": {
+      "SelectedRuleSet": 0,
+      "Customer": {
+        "CustomerID": "b999cecf-653b-4b19-bb2f-a424f3855434",
+        "UserId": 75989,
+        "FirstName": "FirstName 022",
+        "LastName": "LastName 023",
+        "LastLoginInfo": {
+          "Succesful": [
+            {
+              "LastLoginIP": "LastLoginIP 024",
+              "LastLoginTime": "2026-02-23T22:08:37.373+00:00"
+            }
+          ],
+          "FirstMobileLogin": "2019-01-01T18:55:03.067+00:00",
+          "MobileInactiveDay": 0,
+          "InactiveDay": 0
+        },
+        "OTPSettings": {
+          "OTPType": "OTPType 025"
+        },
+        "Salutation": "Salutation 026",
+        "IsFirstTimeLogin": false,
+        "AccountUserType": "GermanyUser",
+        "AllowBanner": true,
+        "NSIDoNotDisturb": false,
+        "HasG3ActiveStatus": false,
+        "CustomerType": "Retail",
+        "CustomerSubType": "Default",
+        "FullName": "FullName 027",
+        "MaskedMobilePhoneNumber": "**********6738",
+        "SCHOnly": false,
+        "IsCustomerEnabledForAppRating": false
+      },
+      "TransactionDefinition": {
+        "TransactionName": "AccountTransactionDetail",
+        "TransactionType": "NonFinancial",
+        "KeepChangeSet": false
+      },
+      "ExecutingTransactionName": "AccountTransactionDetail",
+      "Channel": {
+        "ChannelID": 2,
+        "ChannelType": "InternetBanking"
+      },
+      "UniqueKey": "017787104532826635"
+    },
+    "StepConfig": {
+      "FlowName": "AccountTransactionDetail",
+      "ModuleName": "ModuleName 030",
+      "ControllerName": "",
+      "StepName": "StepName 031",
+      "EnableNext": false,
+      "EnablePrevious": true,
+      "HeaderText": "HeaderText 478",
+      "HeaderMessage": "",
+      "ShowReceiptButton": false,
+      "ShowContract": false,
+      "ShowRepeatTransactionButton": false,
+      "MasterUIView": {
+        "Disabled": false
+      },
+      "DisableDynamicValidation": false,
+      "Parkable": false,
+      "ControlAuthorizationConfig": [],
+      "HasHelpInfo": false
+    },
+    "StepResources": [
+      {
+        "StepName": "StepName 031",
+        "HeaderText": "HeaderText 478"
+      }
+    ],
+    "InitialCallResponses": [
+      {
+        "Response": {
+          "Item": true
+        },
+        "Config": {
+          "Url": "Url 479",
+          "ClientRequest": "ClientRequest 480",
+          "ForceClientRequestCheck": false,
+          "ClearClientStateAfterInitialization": false
+        }
+      },
+      {
+        "Response": {
+          "Item": true
+        },
+        "Config": {
+          "Url": "Url 190",
+          "ClientRequest": "ClientRequest 089",
+          "ForceClientRequestCheck": false,
+          "ClearClientStateAfterInitialization": false
+        }
+      },
+      {
+        "Response": {
+          "Item": {
+            "ID": "AccountTransactionDetail_RTEPP",
+            "ChannelID": 0,
+            "Type": "AccountTransactionDetail_RTEPP",
+            "IsIframe": true,
+            "IframeContent": "IframeContent 481",
+            "Culture": "de-DE",
+            "InternalContent": "InternalContent 482",
+            "IsURLDefined": true,
+            "HCRTnCConfigurationType": "HCRTnCConfigurationType 483"
+          }
+        },
+        "Config": {
+          "Url": "Url 484",
+          "ClientRequest": "ClientRequest 485",
+          "ForceClientRequestCheck": false,
+          "ClearClientStateAfterInitialization": false
+        }
+      }
+    ],
+    "SystemDateTime": "2026-02-23T22:14:33.1311139+00:00",
+    "FlowConfig": [
+      {
+        "Name": "StepName 031",
+        "Action": "Action 191",
+        "MasterUIView": {
+          "Disabled": false
+        }
+      }
+    ],
+    "AllFlowConfig": [
+      {
+        "Name": "Name 486",
+        "Action": "Action 191",
+        "MasterUIView": {
+          "Disabled": false
+        }
+      },
+      {
+        "Name": "StepName 031",
+        "Action": "Action 191",
+        "MasterUIView": {
+          "Disabled": false
+        }
+      }
+    ]
+  },
+  "Result": {
+    "IsSuccess": true,
+    "HasWarning": false,
+    "HasSuccess": false,
+    "HasInformation": false,
+    "HasAnyResultElement": false
+  }
+}

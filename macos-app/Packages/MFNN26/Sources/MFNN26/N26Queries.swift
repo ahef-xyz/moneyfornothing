@@ -1,0 +1,408 @@
+// Query texts as the N26 web app sends them (Fixtures/N26/*.graphql, from the HAR).
+// `N26QueryTests` keeps both identical. The login mutations are not here: the headless login fills the web
+// app's form and the app sends them itself.
+
+enum N26Queries {
+    static let transactionsList = """
+        query getTransactionsList($accountId: String) {
+          feed: getTransactionsList(accountId: $accountId) {
+            balance {
+              title
+              money {
+                ...FeedAmountMoney
+                __typename
+              }
+              __typename
+            }
+            tracking {
+              action
+              category
+              label
+              trackingValue
+              property
+              __typename
+            }
+            activities {
+              title
+              values {
+                title
+                selected
+                accountId
+                image {
+                  type
+                  lightImageUrl
+                  darkImageUrl
+                  __typename
+                }
+                tracking {
+                  action
+                  category
+                  label
+                  trackingValue
+                  property
+                  __typename
+                }
+                __typename
+              }
+              tracking {
+                action
+                category
+                label
+                trackingValue
+                property
+                __typename
+              }
+              __typename
+            }
+            searchButton {
+              text
+              action {
+                tracking {
+                  action
+                  category
+                  label
+                  trackingValue
+                  property
+                  __typename
+                }
+                uri
+                __typename
+              }
+              __typename
+            }
+            modules {
+              ... on FeedInfoCardModule {
+                __typename
+                infoCards {
+                  id
+                  title
+                  type
+                  subtitle
+                  brandTheme
+                  buttons {
+                    primaryButton {
+                      title
+                      actionType
+                      url
+                      __typename
+                    }
+                    secondaryButton {
+                      title
+                      actionType
+                      url
+                      __typename
+                    }
+                    __typename
+                  }
+                  icon
+                  progressViewOptions
+                  context {
+                    currentStep
+                    progress
+                    description
+                    __typename
+                  }
+                  steps
+                  __typename
+                }
+              }
+              ... on FeedPendingModule {
+                __typename
+                pendingItems {
+                  id
+                  title
+                  subtitle {
+                    template
+                    __typename
+                  }
+                  tintedSubtitle {
+                    ...TintedSubtitleElements
+                    __typename
+                  }
+                  styledAmount {
+                    value
+                    appearance
+                    money {
+                      ...FeedAmountMoney
+                      __typename
+                    }
+                    __typename
+                  }
+                  type
+                  expiredTS
+                  utcNowTS
+                  __typename
+                }
+              }
+              ... on FeedRecurringModule {
+                __typename
+                type
+                hasMoreItems
+                recurringItems {
+                  deeplink
+                  title
+                  title
+                  type
+                  styledAmount {
+                    appearance
+                    money {
+                      ...FeedAmountMoney
+                      __typename
+                    }
+                    __typename
+                  }
+                  id
+                  tintedSubtitle {
+                    ...TintedSubtitleElements
+                    __typename
+                  }
+                  leftImage {
+                    darkImageUrl
+                    lightImageUrl
+                    type
+                    __typename
+                  }
+                  subtitle {
+                    elements {
+                      templateVariables {
+                        name
+                        value {
+                          ...FeedAmountMoney
+                          __typename
+                        }
+                        __typename
+                      }
+                      value
+                      __typename
+                    }
+                    __typename
+                  }
+                  tracking {
+                    action
+                    category
+                    __typename
+                  }
+                  __typename
+                }
+              }
+              ... on FeedTimelineModule {
+                __typename
+                paginationKey
+                timelineItems {
+                  ... on FeedTimelineTransaction {
+                    externalId
+                    accountId
+                    title
+                    deeplink
+                    tintedSubtitle {
+                      ...TintedSubtitleElements
+                      __typename
+                    }
+                    secondarySubtitle {
+                      ...TintedSubtitleElements
+                      __typename
+                    }
+                    styledAmount {
+                      value
+                      appearance
+                      money {
+                        ...FeedAmountMoney
+                        __typename
+                      }
+                      __typename
+                    }
+                    type
+                    timestamp
+                    customReferenceText
+                    category
+                    highlight
+                    balance {
+                      amount
+                      currency
+                      title
+                      money {
+                        ...FeedAmountMoney
+                        __typename
+                      }
+                      __typename
+                    }
+                    icon {
+                      type
+                      url
+                      darkUrl
+                      value
+                      statusIcon {
+                        lightUrl
+                        darkUrl
+                        __typename
+                      }
+                      __typename
+                    }
+                    secondaryAmount {
+                      appearance
+                      money {
+                        ...FeedAmountMoney
+                        __typename
+                      }
+                      __typename
+                    }
+                    __typename
+                  }
+                  ... on FeedTimelineGroupHeading {
+                    __typename
+                    title
+                    timestamp
+                    type
+                  }
+                  __typename
+                }
+              }
+              ... on FeedEmptyModule {
+                emptyModuleItems {
+                  title
+                  subtitle {
+                    template
+                    __typename
+                  }
+                  tintedSubtitle {
+                    ...TintedSubtitleElements
+                    __typename
+                  }
+                  type
+                  buttons {
+                    primaryButton {
+                      url
+                      title
+                      actionType
+                      __typename
+                    }
+                    __typename
+                  }
+                  __typename
+                }
+                __typename
+              }
+              __typename
+            }
+            __typename
+          }
+        }
+
+        fragment TintedSubtitleElements on FeedTintedItemSubtitle {
+          elements {
+            tint
+            value
+            __typename
+          }
+          __typename
+        }
+
+        fragment FeedAmountMoney on FeedAmountMoney {
+          unscaledAmount
+          currency {
+            code
+            decimals
+            __typename
+          }
+          __typename
+        }
+        """
+
+    static let timeline = """
+        query getTimeline($paginationKey: ID!, $activity: String, $accountId: String) {
+          timeline: getTimeline(
+            paginationKey: $paginationKey
+            activity: $activity
+            accountId: $accountId
+          ) {
+            timelineItems {
+              __typename
+              ... on FeedTimelineTransaction {
+                externalId
+                accountId
+                title
+                deeplink
+                tintedSubtitle {
+                  ...TintedSubtitleElements
+                  __typename
+                }
+                secondarySubtitle {
+                  ...TintedSubtitleElements
+                  __typename
+                }
+                styledAmount {
+                  money {
+                    ...FeedAmountMoney
+                    __typename
+                  }
+                  appearance
+                  __typename
+                }
+                type
+                timestamp
+                category
+                highlight
+                balance {
+                  amount
+                  money {
+                    ...FeedAmountMoney
+                    __typename
+                  }
+                  currency
+                  title
+                  __typename
+                }
+                icon {
+                  type
+                  url
+                  darkUrl
+                  value
+                  statusIcon {
+                    lightUrl
+                    darkUrl
+                    __typename
+                  }
+                  __typename
+                }
+                secondaryAmount {
+                  appearance
+                  money {
+                    ...FeedAmountMoney
+                    __typename
+                  }
+                  __typename
+                }
+                __typename
+              }
+              ... on FeedTimelineGroupHeading {
+                __typename
+                title
+                timestamp
+                type
+              }
+            }
+            paginationKey
+            __typename
+          }
+        }
+
+        fragment TintedSubtitleElements on FeedTintedItemSubtitle {
+          elements {
+            tint
+            value
+            __typename
+          }
+          __typename
+        }
+
+        fragment FeedAmountMoney on FeedAmountMoney {
+          unscaledAmount
+          currency {
+            code
+            decimals
+            __typename
+          }
+          __typename
+        }
+        """
+}

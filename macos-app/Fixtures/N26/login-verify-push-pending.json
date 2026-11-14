@@ -1,0 +1,24 @@
+{
+  "data": {
+    "verifyLoginWithPush": {
+      "status": "FAILURE",
+      "errors": [
+        {
+          "translationKey": null,
+          "message": "Please confirm your login using your paired device, and try again.",
+          "field": "authorization_pending",
+          "__typename": "RequestError"
+        }
+      ],
+      "isAuthorizationPending": true,
+      "shouldAbortLoginAttempt": false,
+      "challengeType": "PUSH",
+      "rateLimit": {
+        "limit": 60,
+        "current": 2,
+        "__typename": "RateLimit"
+      },
+      "__typename": "VerifyLoginWithPush"
+    }
+  }
+}

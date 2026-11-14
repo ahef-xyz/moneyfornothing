@@ -1,0 +1,45 @@
+{
+  "data": {
+    "type": "mfa-challenge",
+    "id": "4e57e467-ef91-4f1b-8897-a5ca4071dd12",
+    "attributes": {
+      "methodId": "20777ca4-8d1a-49ea-8b9c-ff54f398041d",
+      "methodType": "seal_one",
+      "mfaId": "7175da9c-5b5a-419d-b0b2-15cacdd106ab",
+      "verificationStatus": "processing"
+    },
+    "relationships": {
+      "method": {
+        "data": {
+          "type": "mfa-methods",
+          "id": "20777ca4-8d1a-49ea-8b9c-ff54f398041d"
+        }
+      }
+    },
+    "links": {
+      "self": "https://api.dkb.de/mfa/mfa/challenges/4e57e467-ef91-4f1b-8897-a5ca4071dd12"
+    }
+  },
+  "included": [
+    {
+      "type": "mfa-methods",
+      "id": "20777ca4-8d1a-49ea-8b9c-ff54f398041d",
+      "attributes": {
+        "deviceName": "iPhone",
+        "enrolledAt": "2025-01-06T13:22:08.600Z",
+        "locked": false,
+        "methodType": "seal_one",
+        "owners": {
+          "7754d94c-3ffc-4f1d-8dbf-81fc1c1fa36b": {
+            "ownerSince": "2025-01-06T13:22:05.525Z"
+          }
+        },
+        "portfolio": "dkb",
+        "preferredDevice": false,
+        "remainingChallenges": 4,
+        "remainingValidationAttempts": 3,
+        "sealOneId": "2Q9GC-FEBTG-9GR09"
+      }
+    }
+  ]
+}

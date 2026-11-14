@@ -1,0 +1,2202 @@
+{
+  "Item": {
+    "Request": {
+      "StartDate": "0001-01-01T00:00:00+00:00",
+      "EndDate": "0001-01-01T00:00:00+00:00",
+      "HasStartAmountValue": false,
+      "HasEndAmountValue": false,
+      "Account": {
+        "Number": "8560530425",
+        "AccountName": "easybank Kreditkarte",
+        "IBAN": "DE00993731195043973676",
+        "OpeningDate": "2019-01-03T00:00:00+00:00",
+        "InterestRate": 0.0,
+        "ClosingDate": "0001-01-01T00:00:00+00:00",
+        "HostID": "37796c28-37c4-44a3-bbaf-2addecd8164c",
+        "IsJointAccount": false,
+        "AvailableBalanceInLocalCurrency": {
+          "Value": 12473.4,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "CurrentBalance": {
+          "Value": -804.76,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "InstallmentAmount": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "NumberOfInstallmentsOutstanding": 0,
+        "NextPaymentDate": "2026-02-28T00:00:00+00:00",
+        "NextPaymentAmount": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "OutstandingBalanceInLocalCurrency": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "BlockCode": "",
+        "BlockCodeReason": "NORM",
+        "BlockCodeLastUpdateDate": "2014-06-11T00:00:00+00:00",
+        "BlockCodeReasonDate": "0001-01-01T00:00:00+00:00",
+        "BlockCodeReasonType": "AccountVisible",
+        "Logo": "12",
+        "AccountSubstatus": "Undefined",
+        "ProductName": "easybank Kreditkarte",
+        "TotalCreditLimit": {
+          "Value": 12473.4,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "IsEppEnrolled": false,
+        "LoanEndDate": "0001-01-01T00:00:00+00:00",
+        "LoanStatus": "",
+        "Ownership": "Primary",
+        "TotalAmountDue": {
+          "Value": 0.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "AccountSettingsDisabled": false,
+        "CreditLimitAssignedDate": "0001-01-01T00:00:00+00:00",
+        "CurrentCreditLimit": {
+          "Value": 11400.0,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "AvailableCreditLimit": {
+          "Value": 12473.4,
+          "Currency": {
+            "ID": 0,
+            "Code": "EUR",
+            "DecimalDigitsSpecified": false
+          }
+        },
+        "CreditLimitIncreaseSuppression": false,
+        "DateMaxAffordableCreditLimit": "0001-01-01T00:00:00+00:00",
+        "HasPendingCreditLimitIncreaseRequest": false,
+        "AccountOnRestriction": false,
+        "AccountStatus": "Active",
+        "AccountType": "Card",
+        "AccountSubType": "BauAccount",
+        "FullNumber": "8560530425",
+        "AccountInfo": "DE00993731195043973676",
+        "AccountNameAndNumber": "AccountNameAndNumber 004",
+        "AccountIcon": ""
+      },
+      "TransactionFlag": "TransactionFlag 017",
+      "TransactionTypeIndicator": "TransactionFlag 017",
+      "Status": "Status 018",
+      "OTPAlreadyChecked": false,
+      "IsExporting": false,
+      "hasOptionDetail": false,
+      "CardNetwork": "Undefined",
+      "IsDisputeOnly": false,
+      "IsStatementDateSelected": false,
+      "StatementDate": "0001-01-01T00:00:00+00:00",
+      "FetchAll": false,
+      "HasFilters": false,
+      "HasSorting": false,
+      "PageSize": 0,
+      "PageIndex": 0,
+      "SortingOrder": "SortingOrder 019",
+      "IncludeTotalCount": false,
+      "Take": 0,
+      "Skip": 0,
+      "SelectedApprovalRule": 0,
+      "SelectedApprovalSubRule": 0,
+      "DisableNonStp": false,
+      "IsSourceFutureDated": false,
+      "OpenCaseAndExecuteTransaction": false,
+      "OpenConditionalCase": false,
+      "OpenCaseAndNotExecute": false
+    },
+    "Response": {
+      "OTPRequired": false,
+      "EligibleTransactionCount": 0,
+      "HasMore": false,
+      "TotalRowCount": 0,
+      "Cached": false
+    },
+    "TransactionHeader": {
+      "SelectedRuleSet": 0,
+      "Customer": {
+        "CustomerID": "b999cecf-653b-4b19-bb2f-a424f3855434",
+        "UserId": 75989,
+        "FirstName": "FirstName 022",
+        "LastName": "LastName 023",
+        "LastLoginInfo": {
+          "Succesful": [
+            {
+              "LastLoginIP": "LastLoginIP 024",
+              "LastLoginTime": "2026-02-23T22:08:37.373+00:00"
+            }
+          ],
+          "FirstMobileLogin": "2019-01-01T18:55:03.067+00:00",
+          "MobileInactiveDay": 0,
+          "InactiveDay": 0
+        },
+        "OTPSettings": {
+          "OTPType": "OTPType 025"
+        },
+        "Salutation": "Salutation 026",
+        "IsFirstTimeLogin": false,
+        "AccountUserType": "GermanyUser",
+        "AllowBanner": true,
+        "NSIDoNotDisturb": false,
+        "HasG3ActiveStatus": false,
+        "CustomerType": "Retail",
+        "CustomerSubType": "Default",
+        "FullName": "FullName 027",
+        "MaskedMobilePhoneNumber": "**********6738",
+        "SCHOnly": false,
+        "IsCustomerEnabledForAppRating": false
+      },
+      "TransactionDefinition": {
+        "TransactionName": "AccountTransactionHistory",
+        "TransactionType": "NonFinancial",
+        "KeepChangeSet": false
+      },
+      "ExecutingTransactionName": "AccountTransactionHistory",
+      "Channel": {
+        "ChannelID": 2,
+        "ChannelType": "InternetBanking"
+      },
+      "UniqueKey": "017787104532826635"
+    },
+    "StepConfig": {
+      "FlowName": "AccountTransactionHistory",
+      "ModuleName": "ModuleName 030",
+      "ControllerName": "",
+      "StepName": "StepName 031",
+      "EnableNext": false,
+      "EnablePrevious": true,
+      "HeaderText": "HeaderText 032",
+      "HeaderMessage": "",
+      "ValidationConfig": {
+        "ControlList": [
+          {
+            "ControlID": "ControlID 033",
+            "ValidatorList": [
+              {
+                "Parameters": [
+                  {
+                    "PropertyName": "PropertyName 034",
+                    "Value": "0"
+                  },
+                  {
+                    "PropertyName": "PropertyName 035",
+                    "Value": "0"
+                  },
+                  {
+                    "PropertyName": "PropertyName 036",
+                    "Value": "0"
+                  },
+                  {
+                    "PropertyName": "PropertyName 037",
+                    "Value": "Value 038"
+                  }
+                ],
+                "DisableDynamicValidation": false,
+                "PropertyName": "Value 038",
+                "ControlID": "ControlID 033",
+                "Name": "Name 039",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 040",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 042",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "Name 039",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 042"
+              },
+              {
+                "DisableDynamicValidation": false,
+                "PropertyName": "Value 038",
+                "ControlID": "ControlID 033",
+                "Name": "Name 044",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 045",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 046",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "ClientSideMethodName 047",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 046"
+              },
+              {
+                "Parameters": [
+                  {
+                    "PropertyName": "PropertyName 048"
+                  }
+                ],
+                "DisableDynamicValidation": false,
+                "PropertyName": "Value 038",
+                "ControlID": "ControlID 033",
+                "Name": "Name 049",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 050",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 051",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "ClientSideMethodName 052",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 051"
+              },
+              {
+                "Parameters": [
+                  {
+                    "PropertyName": "PropertyName 034",
+                    "Value": "1"
+                  },
+                  {
+                    "PropertyName": "PropertyName 035",
+                    "Value": "0"
+                  },
+                  {
+                    "PropertyName": "PropertyName 036",
+                    "Value": "0"
+                  },
+                  {
+                    "PropertyName": "PropertyName 037",
+                    "Value": "Value 038"
+                  }
+                ],
+                "DisableDynamicValidation": false,
+                "PropertyName": "Value 038",
+                "ControlID": "ControlID 033",
+                "Name": "Name 053",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 040",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 042",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "Name 039",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 042"
+              }
+            ]
+          },
+          {
+            "ControlID": "ControlID 054",
+            "ValidatorList": [
+              {
+                "Parameters": [
+                  {
+                    "PropertyName": "PropertyName 055",
+                    "Value": "Value 038"
+                  }
+                ],
+                "DisableDynamicValidation": false,
+                "PropertyName": "PropertyName 056",
+                "EnabledExpression": "EnabledExpression 057",
+                "ControlID": "ControlID 054",
+                "Name": "Name 058",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 059",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 060",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "ClientSideMethodName 061",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 060"
+              },
+              {
+                "DisableDynamicValidation": false,
+                "PropertyName": "PropertyName 056",
+                "ControlID": "ControlID 054",
+                "Name": "Name 062",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 045",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 046",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "ClientSideMethodName 047",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 046"
+              },
+              {
+                "Parameters": [
+                  {
+                    "PropertyName": "PropertyName 048"
+                  }
+                ],
+                "DisableDynamicValidation": false,
+                "PropertyName": "PropertyName 056",
+                "ControlID": "ControlID 054",
+                "Name": "Name 063",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 050",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 051",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "ClientSideMethodName 052",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 051"
+              },
+              {
+                "Parameters": [
+                  {
+                    "PropertyName": "PropertyName 034",
+                    "Value": "-7"
+                  },
+                  {
+                    "PropertyName": "PropertyName 035"
+                  },
+                  {
+                    "PropertyName": "PropertyName 036"
+                  },
+                  {
+                    "PropertyName": "PropertyName 037"
+                  }
+                ],
+                "DisableDynamicValidation": false,
+                "PropertyName": "PropertyName 056",
+                "EnabledExpression": "EnabledExpression 065",
+                "ControlID": "ControlID 054",
+                "Name": "Name 066",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 067",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 068",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "ClientSideMethodName 069",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 068"
+              }
+            ]
+          },
+          {
+            "ControlID": "ControlID 070",
+            "ValidatorList": [
+              {
+                "Parameters": [
+                  {
+                    "PropertyName": "PropertyName 055",
+                    "Value": "Value 071"
+                  }
+                ],
+                "DisableDynamicValidation": false,
+                "PropertyName": "PropertyName 072",
+                "EnabledExpression": "EnabledExpression 073",
+                "ControlID": "ControlID 070",
+                "Name": "Name 074",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 075",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 076",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "ClientSideMethodName 061",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 076"
+              },
+              {
+                "Parameters": [
+                  {
+                    "PropertyName": "PropertyName 055",
+                    "Value": "Value 077"
+                  }
+                ],
+                "DisableDynamicValidation": false,
+                "PropertyName": "PropertyName 072",
+                "EnabledExpression": "EnabledExpression 078",
+                "ControlID": "ControlID 070",
+                "Name": "Name 079",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 080",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 081",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "ClientSideMethodName 061",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 081"
+              }
+            ]
+          },
+          {
+            "ControlID": "ControlID 082",
+            "ValidatorList": [
+              {
+                "Parameters": [
+                  {
+                    "PropertyName": "PropertyName 055",
+                    "Value": "Value 077"
+                  }
+                ],
+                "DisableDynamicValidation": false,
+                "PropertyName": "Value 071",
+                "ControlID": "ControlID 082",
+                "Name": "Name 083",
+                "TypeSpecified": false,
+                "ResourceKey": "ResourceKey 080",
+                "ResourceType": "ResourceType 041",
+                "ResourceTypeSpecified": true,
+                "ErrorMessage": "ErrorMessage 081",
+                "MaxLengthSpecified": false,
+                "MinLengthSpecified": false,
+                "ValidateEmptyString": false,
+                "ValidateEmptyStringSpecified": true,
+                "ClientSideMethodName": "ClientSideMethodName 061",
+                "ValidationGroup": "ValidationGroup 043",
+                "SetFocusOnError": false,
+                "SetFocusOnErrorSpecified": true,
+                "ConstErrorMessage": "ErrorMessage 081"
+              }
+            ]
+          }
+        ]
+      },
+      "ShowReceiptButton": false,
+      "ShowContract": false,
+      "ShowRepeatTransactionButton": false,
+      "MasterUIView": {
+        "Disabled": false
+      },
+      "ChildUIViews": [
+        {
+          "Name": "Name 084",
+          "Disabled": false,
+          "TemplateUrl": "TemplateUrl 085"
+        }
+      ],
+      "DisableDynamicValidation": false,
+      "Parkable": false,
+      "ControlAuthorizationConfig": [],
+      "HasHelpInfo": false
+    },
+    "StepResources": [
+      {
+        "StepName": "StepName 031",
+        "HeaderText": "HeaderText 032"
+      }
+    ],
+    "InitialCallResponses": [
+      {
+        "Response": {
+          "Item": {
+            "NextDDDate": "2026-02-28T00:00:00+00:00",
+            "MinimumAmountDue": 15.0,
+            "OTBBalance": {
+              "Value": 12473.4,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "NewTransactionsAfterStatement": {
+              "Value": -66.2,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "CreditLimit": {
+              "Value": 11400.0,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "BillingCycle": 0,
+            "TotalLoanAmount": {
+              "Value": 0.0
+            },
+            "LoanTenure": 0,
+            "RemainingLoanAmount": {
+              "Value": 0.0
+            },
+            "RemainingLoanTerm": 0,
+            "InterestRate": 0.0,
+            "NextInstallmentDate": "0001-01-01T00:00:00+00:00",
+            "LastStatementDate": "2026-02-01T00:00:00+00:00",
+            "LastStatementBalancePer": {
+              "Value": -918.68,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "PendingPayments": {
+              "Value": 0.0,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "PendingDebits": {
+              "Value": 17.47,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "PendingTransactionsBalance": {
+              "Value": -17.47,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "IsBEPPEligible": true,
+            "LastConversionDate": "2026-02-25T00:00:00+00:00",
+            "CurrentBalance": {
+              "Value": -804.76,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "PaymentDueDate": "2026-02-28T00:00:00+00:00",
+            "AvailableFunds": {
+              "Value": 9320.78,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "TotalSpendingAfterStatement": 3237.21,
+            "StatementBalance": {
+              "Value": 0.0,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "BeppEligibleAmount": {
+              "Value": 918.68,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "CycleStartDate": "2026-02-01T00:00:00+00:00",
+            "EstimatedDDAmount": {
+              "Value": 0.0,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "InstallmentPlanFullPaymentAmount": {
+              "Value": 804.76,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "EppBalance": {
+              "Value": 0.0,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "TotalDisputedAmount": {
+              "Value": 0.0,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "LastPaymentAmount": {
+              "Value": 725.75,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "AvailableCash": {
+              "Value": 12473.4,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "OpenToBuyAmount": {
+              "Value": 12473.4,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "LastCyclePaymentDate": "2026-02-19T00:00:00+00:00",
+            "NextStatementDate": "2026-03-04T00:00:00+00:00",
+            "NextPaymentMinimumAmount": {
+              "Value": 25.97,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "NextPaymentFullAmount": {
+              "Value": 0.0,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "AlternateMAD": {
+              "Value": 25.97,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "ProjectedAmountofDD": {
+              "Value": 0.0,
+              "Currency": {
+                "ID": 0,
+                "Code": "EUR",
+                "DecimalDigitsSpecified": false
+              }
+            },
+            "PCTId": "789",
+            "EmblemId": "21",
+            "Cached": false
+          },
+          "Result": {
+            "IsSuccess": true,
+            "HasWarning": false,
+            "HasSuccess": false,
+            "HasInformation": false,
+            "HasAnyResultElement": false
+          }
+        },
+        "Config": {
+          "Url": "Url 088",
+          "ClientRequest": "ClientRequest 089",
+          "ForceClientRequestCheck": true,
+          "ClearClientStateAfterInitialization": false,
+          "RequestCheckProperties": [
+            "RequestCheckProperties 090"
+          ]
+        }
+      },
+      {
+        "Response": {
+          "Item": {
+            "Transactions": [
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "a920cbc2-6bd7-4d68-a372-5490ff251c42",
+                "PostingDate": "0001-01-01T00:00:00+00:00",
+                "ValueDate": "2026-02-23T16:19:47+00:00",
+                "TransactionDate": "2026-02-23T16:19:47+00:00",
+                "TransactionTime": "2026-02-23T16:19:47+00:00",
+                "ReferenceNumber": "374575978119963",
+                "Description": "Description 007",
+                "Amount": {
+                  "Value": 34.5,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 34.5,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Credit",
+                "TransactionType": "Pending",
+                "EPPEligible": false,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "0001-01-01T00:00:00+00:00",
+                "CountryCode": "LU",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "MCCCode": "5999",
+                "MerchantName": "Description 007",
+                "Disputable": false,
+                "EntryMode": "10",
+                "AcquirerRefNumber": "374575978119963",
+                "AuthCode": "753947",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "Genehmigt",
+                "HostTransactionType": "Approved",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "+34,50 €",
+                "FormattedLocalAmount": "+34,50 €",
+                "IsDisputable": false,
+                "DisputeNotAllowedReason": "DR2",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "FinalAction": "APPROVED",
+                "Extent": "2",
+                "InputSource": "RECEIVED FROM VISANET NETWORK",
+                "RequestType": "M-MERCH RETURN",
+                "TermId": "378373",
+                "CycleToDays": "0",
+                "TransactionEligibility": "APPROVE",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 014",
+                  "Name": "Description 007",
+                  "AltText": "AltText 015",
+                  "URL": "URL 016",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": false
+              },
+              {
+                "ExchangeRate": 1.1131898971000935,
+                "InternalID": "ef958c0d-df39-40f8-95b9-956a6070e01e",
+                "PostingDate": "0001-01-01T00:00:00+00:00",
+                "ValueDate": "2026-02-22T18:41:11+00:00",
+                "TransactionDate": "2026-02-22T18:41:11+00:00",
+                "TransactionTime": "2026-02-22T18:41:11+00:00",
+                "ReferenceNumber": "602992013226638",
+                "Description": "Description 094",
+                "Amount": {
+                  "Value": 20.39,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "USD",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 17.47,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Pending",
+                "EPPEligible": false,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "0001-01-01T00:00:00+00:00",
+                "CountryCode": "US",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "MCCCode": "5734",
+                "MerchantName": "MerchantName 095",
+                "Disputable": false,
+                "EntryMode": "01",
+                "AcquirerRefNumber": "602992013226638",
+                "AuthCode": "333559",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "Genehmigt",
+                "HostTransactionType": "Approved",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "-20,39 USD",
+                "FormattedLocalAmount": "-17,47 €",
+                "IsDisputable": false,
+                "DisputeNotAllowedReason": "DR2",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "FinalAction": "APPROVED",
+                "Extent": "1",
+                "InputSource": "RECEIVED FROM VISANET NETWORK",
+                "RequestType": "A-AUTH REQ/ADV",
+                "TermId": "302041",
+                "CycleToDays": "0",
+                "TransactionEligibility": "APPROVE",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 098",
+                  "Name": "Description 094",
+                  "AltText": "AltText 015",
+                  "URL": "URL 016",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": true
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "988140fd-97a4-4449-af00-e2640461e88a",
+                "PostingDate": "0001-01-01T00:00:00+00:00",
+                "ValueDate": "2026-02-22T18:41:11+00:00",
+                "TransactionDate": "2026-02-22T18:41:11+00:00",
+                "TransactionTime": "2026-02-22T18:41:11+00:00",
+                "ReferenceNumber": "602992013226638",
+                "Description": "Description 094",
+                "Amount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "USD",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Pending",
+                "EPPEligible": false,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "0001-01-01T00:00:00+00:00",
+                "CountryCode": "US",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "MCCCode": "5734",
+                "MerchantName": "MerchantName 095",
+                "Disputable": false,
+                "EntryMode": "01",
+                "AcquirerRefNumber": "602992013226638",
+                "AuthCode": "333559",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "Genehmigt",
+                "HostTransactionType": "Approved",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "0,00 USD",
+                "FormattedLocalAmount": "0,00 €",
+                "IsDisputable": false,
+                "DisputeNotAllowedReason": "DR2",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "FinalAction": "APPROVED",
+                "Extent": "1",
+                "InputSource": "RECEIVED FROM VISANET NETWORK",
+                "RequestType": "V-ADDR VERIFY",
+                "TermId": "302041",
+                "CycleToDays": "0",
+                "TransactionEligibility": "APPROVE",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 098",
+                  "Name": "Description 094",
+                  "AltText": "AltText 015",
+                  "URL": "URL 016",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": true
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "469fa378-8b96-492b-91b1-2e8926d4cd25",
+                "PostingDate": "0001-01-01T00:00:00+00:00",
+                "ValueDate": "2026-02-21T20:52:32+00:00",
+                "TransactionDate": "2026-02-21T20:52:32+00:00",
+                "TransactionTime": "2026-02-21T20:52:32+00:00",
+                "ReferenceNumber": "632199402029431",
+                "Description": "Description 007",
+                "Amount": {
+                  "Value": 127.59,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 127.59,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Credit",
+                "TransactionType": "Pending",
+                "EPPEligible": false,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "0001-01-01T00:00:00+00:00",
+                "CountryCode": "LU",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "MCCCode": "5999",
+                "MerchantName": "Description 007",
+                "Disputable": false,
+                "EntryMode": "10",
+                "AcquirerRefNumber": "632199402029431",
+                "AuthCode": "692245",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "Genehmigt",
+                "HostTransactionType": "Approved",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "+127,59 €",
+                "FormattedLocalAmount": "+127,59 €",
+                "IsDisputable": false,
+                "DisputeNotAllowedReason": "DR2",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "FinalAction": "APPROVED",
+                "Extent": "0",
+                "InputSource": "RECEIVED FROM VISANET NETWORK",
+                "RequestType": "M-MERCH RETURN",
+                "TermId": "378373",
+                "CycleToDays": "0",
+                "TransactionEligibility": "APPROVE",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 014",
+                  "Name": "Description 007",
+                  "AltText": "AltText 015",
+                  "URL": "URL 016",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": false
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "873968b1-607f-431c-bf6b-531ddca02db9",
+                "PostingDate": "2026-02-21T00:00:00+00:00",
+                "ValueDate": "2026-02-20T23:01:02+00:00",
+                "TransactionDate": "2026-02-20T23:01:02+00:00",
+                "TransactionTime": "2026-02-20T23:01:02+00:00",
+                "ReferenceNumber": "72489746570495668480756",
+                "Description": "Description 105",
+                "Amount": {
+                  "Value": 907.8,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 907.8,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Unbilled",
+                "EPPEligible": true,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "2026-03-04T00:00:00+00:00",
+                "CountryCode": "LU",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 106",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "TransactionCode": "6107",
+                "TransactionCodeDescription": "",
+                "MCCCode": "5999",
+                "MerchantName": "MerchantName 107",
+                "Disputable": false,
+                "LogicModule": "1",
+                "EntryMode": "10",
+                "ECommerceIndicator": "5",
+                "AcquirerRefNumber": "72489746570495668480756",
+                "AuthCode": "532543",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "-907,80 €",
+                "FormattedLocalAmount": "-907,80 €",
+                "IsDisputable": true,
+                "DisputeNotAllowedReason": "Undefined",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "VT272970609575262450806",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 110",
+                  "Name": "Description 105",
+                  "AltText": "AltText 111",
+                  "URL": "URL 112",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": true
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "7d05dbfe-9bf4-459d-807f-2c1fed023887",
+                "PostingDate": "2026-02-20T00:00:00+00:00",
+                "ValueDate": "2026-02-19T18:45:06+00:00",
+                "TransactionDate": "2026-02-19T18:45:06+00:00",
+                "TransactionTime": "2026-02-19T18:45:06+00:00",
+                "ReferenceNumber": "52085332761287236421587",
+                "Description": "Description 115",
+                "Amount": {
+                  "Value": 725.75,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 725.75,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Unbilled",
+                "EPPEligible": true,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "2026-03-04T00:00:00+00:00",
+                "CountryCode": "DE",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 116",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "TransactionCode": "6101",
+                "TransactionCodeDescription": "",
+                "MCCCode": "6011",
+                "MerchantName": "Description 115",
+                "Disputable": false,
+                "LogicModule": "1",
+                "EntryMode": "05",
+                "AcquirerRefNumber": "52085332761287236421587",
+                "AuthCode": "616923",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "20001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "-725,75 €",
+                "FormattedLocalAmount": "-725,75 €",
+                "IsDisputable": true,
+                "DisputeNotAllowedReason": "Undefined",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "VT658113167643978022488",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "Name": "Description 115",
+                  "AltText": "AltText 119",
+                  "URL": "URL 120",
+                  "Type": "Internal"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": false
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "990c0a53-e9d6-449d-b86f-eb6c6b703360",
+                "PostingDate": "2026-02-19T00:00:00+00:00",
+                "ValueDate": "2026-02-19T00:00:00+00:00",
+                "TransactionDate": "2026-02-19T00:00:00+00:00",
+                "TransactionTime": "0001-01-01T00:00:00+00:00",
+                "ReferenceNumber": "ReferenceNumber 122",
+                "Description": "Description 123",
+                "Amount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 725.75,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Credit",
+                "TransactionType": "Unbilled",
+                "EPPEligible": false,
+                "HasEPP": false,
+                "DeviceID": "",
+                "LastConversionDate": "2026-03-04T00:00:00+00:00",
+                "CountryCode": "",
+                "ContactlessPayment": false,
+                "CardNetwork": "Undefined",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 124",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "TransactionCode": "6361",
+                "TransactionCodeDescription": "Gutschrift EchtzeitÃ¼berweisung",
+                "MCCCode": "0",
+                "MerchantName": "Description 123",
+                "Disputable": false,
+                "LogicModule": "30",
+                "AcquirerRefNumber": "ReferenceNumber 122",
+                "AuthCode": "",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": true,
+                "IsInstantPayment": true,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "CardReferenceID": "47700b43-3368-416b-ba97-1b5d29d86095",
+                "CardPaymentReference": "CardPaymentReference 126",
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "+725,75 €",
+                "FormattedLocalAmount": "+725,75 €",
+                "IsDisputable": false,
+                "DisputeNotAllowedReason": "DR1",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "38182192334398984941306",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "Name": "Description 123",
+                  "AltText": "AltText 119",
+                  "URL": "URL 120",
+                  "Type": "Internal"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": false
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "297c2dcf-6977-48d4-82ab-a847632b69c8",
+                "PostingDate": "2026-02-19T00:00:00+00:00",
+                "ValueDate": "2026-02-18T11:17:02+00:00",
+                "TransactionDate": "2026-02-18T11:17:02+00:00",
+                "TransactionTime": "2026-02-18T11:17:02+00:00",
+                "ReferenceNumber": "44494878096354235750431",
+                "Description": "Description 130",
+                "Amount": {
+                  "Value": 62.59,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 62.59,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Unbilled",
+                "EPPEligible": false,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "2026-03-04T00:00:00+00:00",
+                "CountryCode": "US",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 131",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "TransactionCode": "6107",
+                "TransactionCodeDescription": "",
+                "MCCCode": "5734",
+                "MerchantName": "Description 130",
+                "Disputable": false,
+                "LogicModule": "1",
+                "EntryMode": "01",
+                "ECommerceIndicator": "7",
+                "AcquirerRefNumber": "44494878096354235750431",
+                "AuthCode": "426928",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "-62,59 €",
+                "FormattedLocalAmount": "-62,59 €",
+                "IsDisputable": true,
+                "DisputeNotAllowedReason": "Undefined",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "VT150621200089595291136",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 134",
+                  "Name": "Description 130",
+                  "AltText": "AltText 015",
+                  "URL": "URL 016",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": false
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "35f09789-738e-482b-a518-a4f10f2d2f76",
+                "PostingDate": "2026-02-19T00:00:00+00:00",
+                "ValueDate": "2026-02-18T11:21:03+00:00",
+                "TransactionDate": "2026-02-18T11:21:03+00:00",
+                "TransactionTime": "2026-02-18T11:21:03+00:00",
+                "ReferenceNumber": "64973956809254467919869",
+                "Description": "Description 137",
+                "Amount": {
+                  "Value": 77.99,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 77.99,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Unbilled",
+                "EPPEligible": false,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "2026-03-04T00:00:00+00:00",
+                "CountryCode": "NL",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 138",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "TransactionCode": "6107",
+                "TransactionCodeDescription": "",
+                "MCCCode": "5817",
+                "MerchantName": "Description 137",
+                "Disputable": false,
+                "LogicModule": "1",
+                "EntryMode": "01",
+                "ECommerceIndicator": "5",
+                "AcquirerRefNumber": "64973956809254467919869",
+                "AuthCode": "659569",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "-77,99 €",
+                "FormattedLocalAmount": "-77,99 €",
+                "IsDisputable": true,
+                "DisputeNotAllowedReason": "Undefined",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "VT163980614234816355052",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 141",
+                  "Name": "Description 137",
+                  "AltText": "AltText 015",
+                  "URL": "URL 016",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": false
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "bf83e4f7-0e36-4aac-8ee2-1733617d1aac",
+                "PostingDate": "2026-02-17T00:00:00+00:00",
+                "ValueDate": "2026-02-17T00:00:00+00:00",
+                "TransactionDate": "2026-02-17T00:00:00+00:00",
+                "TransactionTime": "0001-01-01T00:00:00+00:00",
+                "ReferenceNumber": "ReferenceNumber 143",
+                "Description": "Description 123",
+                "Amount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 2600.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Credit",
+                "TransactionType": "Unbilled",
+                "EPPEligible": false,
+                "HasEPP": false,
+                "DeviceID": "",
+                "LastConversionDate": "2026-03-04T00:00:00+00:00",
+                "CountryCode": "",
+                "ContactlessPayment": false,
+                "CardNetwork": "Undefined",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 144",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "TransactionCode": "6361",
+                "TransactionCodeDescription": "Gutschrift EchtzeitÃ¼berweisung",
+                "MCCCode": "0",
+                "MerchantName": "Description 123",
+                "Disputable": false,
+                "LogicModule": "30",
+                "AcquirerRefNumber": "ReferenceNumber 143",
+                "AuthCode": "",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": true,
+                "IsInstantPayment": true,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "CardReferenceID": "e481f7a1-7e9b-4789-a51e-e1983e6611d5",
+                "CardPaymentReference": "CardPaymentReference 146",
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "+2.600,00 €",
+                "FormattedLocalAmount": "+2.600,00 €",
+                "IsDisputable": false,
+                "DisputeNotAllowedReason": "DR1",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "67614924344024648980723",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "Name": "Description 123",
+                  "AltText": "AltText 119",
+                  "URL": "URL 120",
+                  "Type": "Internal"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": false
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "610d8de1-9ab4-48cd-b4c2-6161631d0dc7",
+                "PostingDate": "2026-02-09T00:00:00+00:00",
+                "ValueDate": "2026-02-07T10:01:01+00:00",
+                "TransactionDate": "2026-02-07T10:01:01+00:00",
+                "TransactionTime": "2026-02-07T10:01:01+00:00",
+                "ReferenceNumber": "25135368325930039974882",
+                "Description": "Description 150",
+                "Amount": {
+                  "Value": 990.07,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 990.07,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Unbilled",
+                "EPPEligible": true,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "2026-03-04T00:00:00+00:00",
+                "CountryCode": "DE",
+                "ContactlessPayment": true,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 151",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "TransactionCode": "6107",
+                "TransactionCodeDescription": "",
+                "MCCCode": "5712",
+                "MerchantName": "MerchantName 152",
+                "Disputable": false,
+                "LogicModule": "1",
+                "EntryMode": "07",
+                "AcquirerRefNumber": "25135368325930039974882",
+                "AuthCode": "403035",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "MobilePaymentType": "ApplePay",
+                "FormattedAmount": "-990,07 €",
+                "FormattedLocalAmount": "-990,07 €",
+                "IsDisputable": true,
+                "DisputeNotAllowedReason": "Undefined",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "VT486974722235038974701",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 155",
+                  "Name": "Description 150",
+                  "AltText": "AltText 156",
+                  "URL": "URL 157",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": true
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "7d0d2ba4-6297-4c26-8f19-2e39657755d3",
+                "PostingDate": "2026-02-06T00:00:00+00:00",
+                "ValueDate": "2026-02-05T15:33:01+00:00",
+                "TransactionDate": "2026-02-05T15:33:01+00:00",
+                "TransactionTime": "2026-02-05T15:33:01+00:00",
+                "ReferenceNumber": "14177053832373925001583",
+                "Description": "Description 160",
+                "Amount": {
+                  "Value": 61.58,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 61.58,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Unbilled",
+                "EPPEligible": false,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "2026-03-04T00:00:00+00:00",
+                "CountryCode": "DE",
+                "ContactlessPayment": true,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 161",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "TransactionCode": "6107",
+                "TransactionCodeDescription": "",
+                "MCCCode": "5941",
+                "MerchantName": "MerchantName 162",
+                "Disputable": false,
+                "LogicModule": "1",
+                "EntryMode": "07",
+                "AcquirerRefNumber": "14177053832373925001583",
+                "AuthCode": "603826",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "MobilePaymentType": "ApplePay",
+                "FormattedAmount": "-61,58 €",
+                "FormattedLocalAmount": "-61,58 €",
+                "IsDisputable": true,
+                "DisputeNotAllowedReason": "Undefined",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "VT257452848838477995393",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 165",
+                  "Name": "Description 160",
+                  "AltText": "AltText 166",
+                  "URL": "URL 167",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": true
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "8ec5b110-c85c-4fc2-a412-fd6fad70d7db",
+                "PostingDate": "2026-02-04T00:00:00+00:00",
+                "ValueDate": "2026-02-03T19:43:34+00:00",
+                "TransactionDate": "2026-02-03T19:43:34+00:00",
+                "TransactionTime": "2026-02-03T19:43:34+00:00",
+                "ReferenceNumber": "13629069855740395305744",
+                "Description": "Description 170",
+                "Amount": {
+                  "Value": 165.92,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 165.92,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Unbilled",
+                "EPPEligible": true,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "2026-03-04T00:00:00+00:00",
+                "CountryCode": "US",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 171",
+                "StatementDate": "0001-01-01T00:00:00+00:00",
+                "TransactionCode": "6107",
+                "TransactionCodeDescription": "",
+                "MCCCode": "5734",
+                "MerchantName": "MerchantName 172",
+                "Disputable": false,
+                "LogicModule": "1",
+                "EntryMode": "10",
+                "AcquirerRefNumber": "13629069855740395305744",
+                "AuthCode": "139036",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "-165,92 €",
+                "FormattedLocalAmount": "-165,92 €",
+                "IsDisputable": true,
+                "DisputeNotAllowedReason": "Undefined",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "VT653220777827162744527",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 175",
+                  "Name": "Description 170",
+                  "AltText": "AltText 176",
+                  "URL": "URL 177",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": true
+              },
+              {
+                "ExchangeRate": 0.0,
+                "InternalID": "9ac2599f-6e8c-4f6a-bfe1-4cc6d48151cf",
+                "PostingDate": "2026-01-27T00:00:00+00:00",
+                "ValueDate": "2026-01-26T21:57:01+00:00",
+                "TransactionDate": "2026-01-26T21:57:01+00:00",
+                "TransactionTime": "2026-01-26T21:57:01+00:00",
+                "ReferenceNumber": "61152948767735874645457",
+                "Description": "Description 105",
+                "Amount": {
+                  "Value": 1131.21,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "LocalCurrencyAmount": {
+                  "Value": 1131.21,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "TransactionNature": "Debit",
+                "TransactionType": "Billed",
+                "EPPEligible": true,
+                "HasEPP": false,
+                "DeviceID": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "CardNumber": "a9069cbb-fddb-48b9-8c55-e371c0c6e3fe",
+                "MaskedCardNumber": "415691******1114",
+                "LastConversionDate": "2026-02-25T00:00:00+00:00",
+                "CountryCode": "LU",
+                "ContactlessPayment": false,
+                "CardNetwork": "Visa",
+                "CardHoldersName": "CardHoldersName 010",
+                "ExtractDate": "0001-01-01T00:00:00+00:00",
+                "EffectiveDate": "0001-01-01T00:00:00+00:00",
+                "Sequence": "Sequence 180",
+                "StatementDate": "2026-01-31T00:00:00+00:00",
+                "TransactionCode": "6107",
+                "TransactionCodeDescription": "",
+                "MCCCode": "5999",
+                "MerchantName": "MerchantName 181",
+                "Disputable": false,
+                "LogicModule": "1",
+                "EntryMode": "10",
+                "ECommerceIndicator": "5",
+                "AcquirerRefNumber": "61152948767735874645457",
+                "AuthCode": "665099",
+                "CounterBookingAvailable": false,
+                "FundsTransferRevokable": false,
+                "OutgoingDirectDebitRevokable": false,
+                "FeeReversable": false,
+                "CreditPlan": "10001",
+                "ResponseStatus": "",
+                "HostTransactionType": "Undefined",
+                "BookingDate": "0001-01-01T00:00:00+00:00",
+                "IsFTTransaction": false,
+                "IsInstantPayment": false,
+                "SepaPaymentType": "Undefined",
+                "IsExternalTransfer": false,
+                "LoanTransactionAmount": {
+                  "Value": 0.0,
+                  "Currency": {
+                    "ID": 0,
+                    "Code": "EUR",
+                    "DecimalDigitsSpecified": false
+                  }
+                },
+                "FormattedAmount": "-1131,21 €",
+                "FormattedLocalAmount": "-1131,21 €",
+                "IsDisputable": true,
+                "DisputeNotAllowedReason": "Undefined",
+                "DisputeStatus": "Undefined",
+                "DisputeDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseDate": "0001-01-01T00:00:00+00:00",
+                "DisputeReleaseType": "Undefined",
+                "DisputeReleasedInFavor": "Undefined",
+                "DisputeAutoReleaseCounter": "0",
+                "TransactionReferenceNumber": "VT220798182835704504392",
+                "TransactionExchangeRate": "0,00",
+                "MerchantData": {
+                  "SearchCriteriaIdentifier": "SearchCriteriaIdentifier 184",
+                  "Name": "Description 105",
+                  "AltText": "AltText 111",
+                  "URL": "URL 112",
+                  "Type": "Merchant"
+                },
+                "IsPending": false,
+                "IsEPPEligible": false,
+                "IsEPPEligibleAccountLevel": false,
+                "BankNameVisible": false,
+                "ShowMerchantDetail": true
+              }
+            ],
+            "OTPRequired": false,
+            "EligibleTransactionCount": 0,
+            "HasMore": false,
+            "TotalRowCount": 0,
+            "Cached": false
+          },
+          "Result": {
+            "IsSuccess": true,
+            "HasWarning": false,
+            "HasSuccess": false,
+            "HasInformation": false,
+            "HasAnyResultElement": false
+          }
+        },
+        "Config": {
+          "Url": "Url 185",
+          "ClientRequest": "ClientRequest 186",
+          "ForceClientRequestCheck": true,
+          "ClearClientStateAfterInitialization": false,
+          "RequestCheckProperties": [
+            "RequestCheckProperties 090",
+            "RequestCheckProperties 187",
+            "RequestCheckProperties 188",
+            "RequestCheckProperties 189"
+          ]
+        }
+      },
+      {
+        "Response": {
+          "Item": true
+        },
+        "Config": {
+          "Url": "Url 190",
+          "ClientRequest": "ClientRequest 089",
+          "ForceClientRequestCheck": false,
+          "ClearClientStateAfterInitialization": false
+        }
+      }
+    ],
+    "SystemDateTime": "2026-02-23T22:12:40.1927534+00:00",
+    "FlowConfig": [
+      {
+        "Name": "StepName 031",
+        "Action": "Action 191",
+        "MasterUIView": {
+          "Disabled": false
+        },
+        "ChildUIViews": [
+          {
+            "Name": "Name 084",
+            "Disabled": false,
+            "TemplateUrl": "TemplateUrl 085"
+          }
+        ]
+      }
+    ],
+    "AllFlowConfig": [
+      {
+        "Name": "StepName 031",
+        "Action": "Action 191",
+        "MasterUIView": {
+          "Disabled": false
+        },
+        "ChildUIViews": [
+          {
+            "Name": "Name 084",
+            "Disabled": false,
+            "TemplateUrl": "TemplateUrl 085"
+          }
+        ]
+      }
+    ]
+  },
+  "Result": {
+    "IsSuccess": true,
+    "HasWarning": false,
+    "HasSuccess": false,
+    "HasInformation": false,
+    "HasAnyResultElement": false
+  }
+}

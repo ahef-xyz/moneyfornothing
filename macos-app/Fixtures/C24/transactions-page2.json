@@ -1,0 +1,1281 @@
+{
+  "criteria": {
+    "account_numbers": [
+      "3238114929"
+    ],
+    "search_type": "fields_search",
+    "mambu_account_ids": [
+      "d08e6d02e343762"
+    ],
+    "include_auth_holds": true,
+    "include_adjusted": false,
+    "include_details": true
+  },
+  "pagination": {
+    "limit": 30,
+    "offset": 30,
+    "more": true
+  },
+  "transactions": [
+    {
+      "type": "SCT - outgoing",
+      "instructed_transaction_id": "B9-ad3d52f8f65959bc470e7714c8cbcbcd",
+      "preliminary": false,
+      "subtype": "pocket-transfer",
+      "id": "193d26ed6",
+      "tapas_transaction_guid": "6287a596-f29c-4402-ac60-4ac1b821fd64",
+      "key": "24de451f3880825f891299adc4587463",
+      "amount": "-58.22",
+      "date": "2025-12-01T08:28:27+02:00",
+      "sort_date": "2025-12-01T08:28:27+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "B9-ad3d52f8f65959bc470e7714c8cbcbcd",
+      "counterpart": "Gegenpartei 08",
+      "allow_transfer": false,
+      "points": null,
+      "category_id": 122,
+      "cashflow_excluded": true,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "01.12.2025"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "0ec9f5f3f404ee483c7d58cb9898ef9e",
+      "preliminary": false,
+      "id": "85e9c25bd",
+      "tapas_transaction_guid": "a934ebe8-8be3-4175-bd8d-c2b3b15383bf",
+      "key": "5e638caae4204fea4bb9e118a5811184",
+      "amount": "-11200.00",
+      "date": "2025-11-27T13:52:44+02:00",
+      "sort_date": "2025-11-27T13:52:42+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "0ec9f5f3f404ee483c7d58cb9898ef9e",
+      "counterpart": "Gegenpartei 18",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "c0c83629-4046-4e9c-a94a-e735df20492f",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 22"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "27.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00520119363944439795"
+        },
+        {
+          "title": "BIC",
+          "content": "GENODEF1EDE"
+        }
+      ]
+    },
+    {
+      "type": "SCT - outgoing",
+      "instructed_transaction_id": "55-fc8e2c1e9dfe34485335e3a1abb41375",
+      "preliminary": false,
+      "subtype": "pocket-transfer",
+      "id": "8907f3b17",
+      "tapas_transaction_guid": "d1d87681-4708-4019-a172-d89efc1caaed",
+      "key": "895fdb64dca0d36dc76b787600861c90",
+      "amount": "-323.64",
+      "date": "2025-11-21T08:46:34+02:00",
+      "sort_date": "2025-11-21T08:46:34+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "55-fc8e2c1e9dfe34485335e3a1abb41375",
+      "counterpart": "Gegenpartei 08",
+      "allow_transfer": false,
+      "points": null,
+      "category_id": 122,
+      "cashflow_excluded": true,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "21.11.2025"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "a5844c70ee4d978abc8953dcda286e4f",
+      "preliminary": false,
+      "id": "1f1b106f4",
+      "tapas_transaction_guid": "e36c94ec-8ac3-43cd-ac05-8488dacc9ded",
+      "key": "e0a932e4eded21d6703df94345da8253",
+      "amount": "-5767.09",
+      "date": "2025-11-19T22:29:26+02:00",
+      "sort_date": "2025-11-19T22:29:24+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "a5844c70ee4d978abc8953dcda286e4f",
+      "counterpart": "Gegenpartei 19",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 93,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/elv.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/elv.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/elv.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/elv.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/elv.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": "c9313928-17cf-4e4e-a56d-a92a2ed1adf6",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 23"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "19.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00978795226325768203"
+        },
+        {
+          "title": "BIC",
+          "content": "COBADEFFXXX"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 02"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "6f77d934f5d4125ccd0ad665f9dc9d9a",
+      "preliminary": false,
+      "id": "a1f9d7e82",
+      "tapas_transaction_guid": "553b564a-8b5b-4cba-9d49-147e5fe7aa6d",
+      "key": "6b479406cb2de590b16922b5e9dc8485",
+      "amount": "-1207.31",
+      "date": "2025-11-18T23:34:55+02:00",
+      "sort_date": "2025-11-18T23:34:55+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "6f77d934f5d4125ccd0ad665f9dc9d9a",
+      "counterpart": "Gegenpartei 20",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "2c410936-4e38-40ad-8e1a-a8ef5c6e8278",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 24"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "18.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00241912686812512422"
+        },
+        {
+          "title": "BIC",
+          "content": "DEUTDEDB237"
+        }
+      ]
+    },
+    {
+      "type": "SCT - incoming",
+      "preliminary": false,
+      "id": "1dd93ba31",
+      "tapas_transaction_guid": "b050ff28-80f6-4747-a6d8-e472b13ba318",
+      "key": "59f049dd181ab1d3eb8e721114c3ca7e",
+      "amount": "17400.00",
+      "date": "2025-11-18T03:28:09+02:00",
+      "sort_date": "2025-11-18T03:28:09+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "counterpart": "Gegenpartei 05",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 25"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "18.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00507415516557505449"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "preliminary": false,
+      "id": "ad3798aad",
+      "tapas_transaction_guid": "4b9089f9-d4d1-49c8-b76e-46f12c66ef2d",
+      "key": "ea046d33bba8aaf9a67cf6a5bbeca427",
+      "amount": "4900.00",
+      "date": "2025-11-16T10:54:14+02:00",
+      "sort_date": "2025-11-16T10:54:14+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "81E42D720C4",
+      "counterpart": "Gegenpartei 21",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 26"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00510419577619237527"
+        },
+        {
+          "title": "BIC",
+          "content": "GENODED1SPK"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "e9bce2e3b892ab85e22072873bac3712",
+      "preliminary": false,
+      "id": "c1cb44196",
+      "tapas_transaction_guid": "a7c6a085-dde1-4ec4-b7f7-63432a4a8c84",
+      "key": "21d53c2251242f0aa378c77ffb397960",
+      "amount": "-2084.70",
+      "date": "2025-11-14T09:49:19+02:00",
+      "sort_date": "2025-11-14T09:49:16+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "e9bce2e3b892ab85e22072873bac3712",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "ff33798c-aa79-4391-974e-9e644fa41bfe",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 27"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00468164991507616423"
+        },
+        {
+          "title": "BIC",
+          "content": "BARCDEHAXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "6ff40a9d92f24d75102c01783e8521d8",
+      "preliminary": false,
+      "id": "e4da35005",
+      "tapas_transaction_guid": "fde0677c-8871-41f0-8a7b-bd7a99de0c09",
+      "key": "2cb5eafccc3cceb8f881cbe31b79ae43",
+      "amount": "-6778.34",
+      "date": "2025-11-11T19:27:06+02:00",
+      "sort_date": "2025-11-11T19:27:04+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "6ff40a9d92f24d75102c01783e8521d8",
+      "counterpart": "Gegenpartei 22",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "149dc436-73f0-4eb2-ae0f-21c46d7f7c95",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 28"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "11.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00758099746551369356"
+        },
+        {
+          "title": "BIC",
+          "content": "COBADEFFXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "70152f33d5b43737bb92fa6519e5da91",
+      "preliminary": false,
+      "id": "6eb215758",
+      "tapas_transaction_guid": "dcfee587-909c-4952-a504-49de71c90f2c",
+      "key": "b4036467ec26f718f8c4aced6f7ae997",
+      "amount": "-279.23",
+      "date": "2025-11-11T19:25:39+02:00",
+      "sort_date": "2025-11-11T19:25:36+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "70152f33d5b43737bb92fa6519e5da91",
+      "counterpart": "Gegenpartei 22",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "90bb7a6b-888b-4f03-a0a0-cb5e98d5b1b6",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 29"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "11.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00758099746551369356"
+        },
+        {
+          "title": "BIC",
+          "content": "COBADEFFXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "81a4b3f2a7b34e625e12d3147d657ba3",
+      "preliminary": false,
+      "id": "464636748",
+      "tapas_transaction_guid": "3cd1771b-4f9f-496f-b37b-91132a4fe552",
+      "key": "12f30e4493f9d497296e3f25a133d4db",
+      "amount": "-2917.67",
+      "date": "2025-11-11T09:40:01+02:00",
+      "sort_date": "2025-11-11T09:39:59+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "81a4b3f2a7b34e625e12d3147d657ba3",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "7aae265c-37da-4f09-b501-64b2ab5bba68",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 30"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "11.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00468164991507616423"
+        },
+        {
+          "title": "BIC",
+          "content": "BARCDEHAXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "937995e2338356cb8f4249c00cf4a30c",
+      "preliminary": false,
+      "id": "766a87d30",
+      "tapas_transaction_guid": "f8f84675-1a29-4cf5-872e-6e4190d5be16",
+      "key": "48afa0bd5a0fef80dfe07b0abf002847",
+      "amount": "-3095.33",
+      "date": "2025-11-10T18:54:42+02:00",
+      "sort_date": "2025-11-10T18:54:39+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "937995e2338356cb8f4249c00cf4a30c",
+      "counterpart": "Gegenpartei 23",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "7f81684b-fec0-49a7-bf0e-0065b8a62315",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 31"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "10.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00672323823466513783"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "preliminary": false,
+      "id": "15c5fae44",
+      "tapas_transaction_guid": "4b96eade-4896-460b-a3bd-65e958c54e94",
+      "key": "f5a95c5d25a91678741dd5977f54d7bb",
+      "amount": "2000.00",
+      "date": "2025-11-02T17:04:06+02:00",
+      "sort_date": "2025-11-02T17:04:06+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "81E42D720C4",
+      "counterpart": "Gegenpartei 24",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 32"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "02.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00804624430300135236"
+        },
+        {
+          "title": "BIC",
+          "content": "NTSBDEB1XXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "4e51705f4cb52d608d057bf4e2f8c420",
+      "preliminary": false,
+      "id": "a25c14e9a",
+      "tapas_transaction_guid": "29d36662-e9b1-4904-b593-582e727ba16b",
+      "key": "b845ff32d0412e5436e10aa5945cbae6",
+      "amount": "-5307.24",
+      "date": "2025-10-30T13:00:24+02:00",
+      "sort_date": "2025-10-30T13:00:22+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "4e51705f4cb52d608d057bf4e2f8c420",
+      "counterpart": "Gegenpartei 22",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "efeed7c9-453e-4540-9804-3e711bf0a7ba",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 33"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "30.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00341215952992590527"
+        },
+        {
+          "title": "BIC",
+          "content": "GENODEFFXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "72504ea0b2d531d0124d681f5b1ae647",
+      "preliminary": false,
+      "id": "8a8871d9d",
+      "tapas_transaction_guid": "852c3379-e742-48dd-8da7-b997cd952545",
+      "key": "16d43c132b333b47593e91466f18c8e5",
+      "amount": "-7400.00",
+      "date": "2025-10-29T14:20:21+02:00",
+      "sort_date": "2025-10-29T14:20:17+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "72504ea0b2d531d0124d681f5b1ae647",
+      "counterpart": "Gegenpartei 25",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "073f991c-9d3e-4f17-aaef-f80ef6697394",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 09"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "29.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00233453574122469506"
+        },
+        {
+          "title": "BIC",
+          "content": "BRLADE21ANO"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "fdcec10745af2b52e8beedc003a73696",
+      "preliminary": false,
+      "id": "9db79e7a8",
+      "tapas_transaction_guid": "53d33a0f-7454-4740-ab93-5ced6aad9ef6",
+      "key": "9585b44c7930baa69c7afd513b6347e4",
+      "amount": "-880.81",
+      "date": "2025-10-29T13:12:11+02:00",
+      "sort_date": "2025-10-29T13:12:08+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "fdcec10745af2b52e8beedc003a73696",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "f2d567ab-7825-43a9-81ba-9676a68f19a8",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 09"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "29.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00468164991507616423"
+        },
+        {
+          "title": "BIC",
+          "content": "BARCDEHAXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "375533c2700d45300d0acfccdee8a955",
+      "preliminary": false,
+      "id": "2f102c499",
+      "tapas_transaction_guid": "5b55ced2-e19c-4ae4-986c-b00e13f49be8",
+      "key": "5fb90efadbfcdbcef5d41b0bc7572dfc",
+      "amount": "-3422.49",
+      "date": "2025-10-22T13:07:43+02:00",
+      "sort_date": "2025-10-22T13:07:40+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "375533c2700d45300d0acfccdee8a955",
+      "counterpart": "Gegenpartei 12",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "b2d83d44-85f2-4cb5-a900-4bd0e2afde76",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 34"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "22.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00589245305717621936"
+        },
+        {
+          "title": "BIC",
+          "content": "DRESDEFF200"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "a7d6e466b36ecb59f366620723da5409",
+      "preliminary": false,
+      "id": "c1c6936ef",
+      "tapas_transaction_guid": "7c037662-1dc3-4dcc-a66a-6707ee8f13c3",
+      "key": "1dc5326ae08e5e37effed63314991b06",
+      "amount": "-1600.00",
+      "date": "2025-10-19T22:03:21+02:00",
+      "sort_date": "2025-10-19T22:03:18+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "a7d6e466b36ecb59f366620723da5409",
+      "counterpart": "Gegenpartei 09",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "35a39a21-d69d-46d6-91d2-4b779caddffa",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 09"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "19.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00446443872967276382"
+        },
+        {
+          "title": "BIC",
+          "content": "TRBKDEBBXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "6fdef70effa54bc39677d1198aa3bbd8",
+      "preliminary": false,
+      "id": "492eb4fe2",
+      "tapas_transaction_guid": "e13520bc-f29c-493c-ae08-ad1018431538",
+      "key": "0251e7ee415f86bfe3d0c919a563b832",
+      "amount": "-880.81",
+      "date": "2025-10-19T22:02:41+02:00",
+      "sort_date": "2025-10-19T22:02:39+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "6fdef70effa54bc39677d1198aa3bbd8",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "5155a296-a529-404b-85a9-4da36deee6dc",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 09"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "19.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00468164991507616423"
+        },
+        {
+          "title": "BIC",
+          "content": "BARCDEHAXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "b240525eac32570a913ac5e9e6c98f4e",
+      "preliminary": false,
+      "id": "07c34a856",
+      "tapas_transaction_guid": "87f845fc-9599-4cc4-ab11-ef4c04c99f84",
+      "key": "7136ec3db5ef2da464b38effe8e3a7fb",
+      "amount": "-880.81",
+      "date": "2025-10-19T13:28:54+02:00",
+      "sort_date": "2025-10-19T13:28:51+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "b240525eac32570a913ac5e9e6c98f4e",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "05ee4d9c-5f41-4117-ab69-2f22565e7d17",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 09"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "19.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00468164991507616423"
+        },
+        {
+          "title": "BIC",
+          "content": "BARCDEHAXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "9acaf0cf7463379a9061286f45f0b497",
+      "preliminary": false,
+      "id": "b4883fb55",
+      "tapas_transaction_guid": "29b7614a-050a-4b2c-92ae-144872c5cc53",
+      "key": "28c605632ec950f228127f1d95464b59",
+      "amount": "-836.20",
+      "date": "2025-10-17T13:26:37+02:00",
+      "sort_date": "2025-10-17T13:26:34+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "9acaf0cf7463379a9061286f45f0b497",
+      "counterpart": "Gegenpartei 26",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "d3290e60-b6a0-426c-ab8e-122ffecfa5fb",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 35"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "17.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00895531523778866583"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "79ba94eff33659403df4d807a49f2424",
+      "preliminary": false,
+      "id": "788944581",
+      "tapas_transaction_guid": "94c1cb80-dc36-4c20-a34a-4f553d11f3d0",
+      "key": "bfad0f4cb2a2314dabdee9a2c7185483",
+      "amount": "-222.47",
+      "date": "2025-10-17T13:23:59+02:00",
+      "sort_date": "2025-10-17T13:23:56+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "79ba94eff33659403df4d807a49f2424",
+      "counterpart": "Gegenpartei 27",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 24,
+      "cashflow_excluded": false,
+      "auth_hold_key": "cb966ff6-cf30-4bbc-8a12-7b2a0e73a4b2",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 36"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "17.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00731644129933350976"
+        },
+        {
+          "title": "BIC",
+          "content": "GENODEF1EDE"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "fdd260c412e0cbf0d9983e52a101d9d0",
+      "preliminary": false,
+      "id": "e3acb22fe",
+      "tapas_transaction_guid": "ffc34d1f-32a4-4f7e-9936-c13b3e6a0742",
+      "key": "814f5f184d6f0bc658ae60f4e524dd19",
+      "amount": "-4668.89",
+      "date": "2025-10-15T08:28:08+02:00",
+      "sort_date": "2025-10-15T08:28:05+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "fdd260c412e0cbf0d9983e52a101d9d0",
+      "counterpart": "Gegenpartei 28",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "1ad48dad-e4b6-4ecf-b8a4-e8a5bf9e0857",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 37"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "15.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00131574227489191686"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        }
+      ]
+    },
+    {
+      "type": "SCT - outgoing",
+      "instructed_transaction_id": "1C-0d64e555433b554fa6ee77fac7e4bc19",
+      "preliminary": false,
+      "subtype": "pocket-transfer",
+      "id": "80e8b41e9",
+      "tapas_transaction_guid": "5e0c1495-46fe-471a-88bf-4a2bfa33763b",
+      "key": "ef313961fa78d6e8adc92008351604b1",
+      "amount": "-1158.64",
+      "date": "2025-10-14T21:59:48+02:00",
+      "sort_date": "2025-10-14T21:59:48+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "1C-0d64e555433b554fa6ee77fac7e4bc19",
+      "counterpart": "Gegenpartei 08",
+      "allow_transfer": false,
+      "points": null,
+      "category_id": 122,
+      "cashflow_excluded": true,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.10.2025"
+        }
+      ]
+    },
+    {
+      "type": "tax",
+      "preliminary": false,
+      "id": "c1d2c7288",
+      "tapas_transaction_guid": "1b5982cc-1735-445d-9edd-b85a84a90683",
+      "key": "2ce9058a868bc14d96cfb70c89a1a3c0",
+      "amount": "-2.61",
+      "date": "2025-10-14T09:20:18+02:00",
+      "sort_date": "2025-10-14T09:20:18+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "06cc4cf023d920102280237486a24c79",
+      "counterpart": "C24 Bank",
+      "allow_transfer": false,
+      "points": null,
+      "category_id": 28,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/c24bank.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/c24bank.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/c24bank.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/c24bank.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/c24bank.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 11"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.10.2025"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 01"
+        }
+      ]
+    },
+    {
+      "type": "Interest Applied",
+      "preliminary": false,
+      "id": "5b0f8152a",
+      "tapas_transaction_guid": "40260956-61f4-44c3-ac9a-5e04e55730f6",
+      "key": "d4dcd4ce851febad2e3bdd4b7d631c07",
+      "allow_transfer": false,
+      "amount": "10.38",
+      "date": "2025-10-14T00:00:00+02:00",
+      "sort_date": "2025-10-14T00:00:00+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "counterpart": "C24 Bank",
+      "category_id": 104,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/c24bank.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/c24bank.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/c24bank.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/c24bank.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/c24bank.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Habenzinsen",
+          "content": "10,38 €"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.10.2025"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "3438189c394de37432f709f59042915a",
+      "preliminary": false,
+      "id": "293dd20fd",
+      "tapas_transaction_guid": "1400df62-bc8d-4785-891c-70a85b8a0cef",
+      "key": "2c531a89e0ff15873da02deac6a02c9b",
+      "amount": "-4293.68",
+      "date": "2025-10-12T21:46:40+02:00",
+      "sort_date": "2025-10-12T21:46:35+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "3438189c394de37432f709f59042915a",
+      "counterpart": "Gegenpartei 29",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "96e6ffd5-e448-44be-a49d-62ea4cf52e19",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 38"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "12.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00206355589447365698"
+        },
+        {
+          "title": "BIC",
+          "content": "SLZODE22XXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "115fa33ea0992d7a14dcd479b0c4946c",
+      "preliminary": false,
+      "id": "dd1c613d6",
+      "tapas_transaction_guid": "69132579-1b80-418c-b333-6d1bf4e72309",
+      "key": "43307b1b3be65fdb8a9e3440ef09eb81",
+      "amount": "-365.07",
+      "date": "2025-10-08T09:49:48+02:00",
+      "sort_date": "2025-10-08T09:49:45+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "115fa33ea0992d7a14dcd479b0c4946c",
+      "counterpart": "Gegenpartei 05",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "0f10e701-86be-4dac-bbc9-23ec812d2463",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "08.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00486456963205570137"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFFXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "instructed_transaction_id": "2a32f24643fab28139b6871ce3222fd9",
+      "preliminary": false,
+      "id": "5327f0e9d",
+      "tapas_transaction_guid": "5e6a81c9-5f67-4984-a5fb-d76a8743a0d8",
+      "key": "be5f38a3e00860d8b7e13ea35e36e70c",
+      "amount": "-1105.46",
+      "date": "2025-10-07T21:54:44+02:00",
+      "sort_date": "2025-10-07T21:54:42+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "ent_to_end_id": "2a32f24643fab28139b6871ce3222fd9",
+      "counterpart": "Gegenpartei 28",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 100,
+      "cashflow_excluded": false,
+      "auth_hold_key": "23d3f68e-982d-4f24-b050-419cce58941a",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 39"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "07.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00131574227489191686"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        }
+      ]
+    },
+    {
+      "type": "SCT - incoming",
+      "preliminary": false,
+      "id": "6d866e0f0",
+      "tapas_transaction_guid": "455c2f71-6a2a-43c9-9180-65694ea28777",
+      "key": "7ac22614f9051ccf32244ca0ff34e6f1",
+      "amount": "34200.00",
+      "date": "2025-10-03T14:31:16+02:00",
+      "sort_date": "2025-10-03T14:31:16+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 03",
+      "account_number": "3238114929",
+      "counterpart": "Gegenpartei 09",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "67920"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "03.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00446443872967276382"
+        },
+        {
+          "title": "BIC",
+          "content": "TRBKDEBBXXX"
+        }
+      ]
+    }
+  ]
+}

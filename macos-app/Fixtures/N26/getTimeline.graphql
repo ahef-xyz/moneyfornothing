@@ -1,0 +1,95 @@
+query getTimeline($paginationKey: ID!, $activity: String, $accountId: String) {
+  timeline: getTimeline(
+    paginationKey: $paginationKey
+    activity: $activity
+    accountId: $accountId
+  ) {
+    timelineItems {
+      __typename
+      ... on FeedTimelineTransaction {
+        externalId
+        accountId
+        title
+        deeplink
+        tintedSubtitle {
+          ...TintedSubtitleElements
+          __typename
+        }
+        secondarySubtitle {
+          ...TintedSubtitleElements
+          __typename
+        }
+        styledAmount {
+          money {
+            ...FeedAmountMoney
+            __typename
+          }
+          appearance
+          __typename
+        }
+        type
+        timestamp
+        category
+        highlight
+        balance {
+          amount
+          money {
+            ...FeedAmountMoney
+            __typename
+          }
+          currency
+          title
+          __typename
+        }
+        icon {
+          type
+          url
+          darkUrl
+          value
+          statusIcon {
+            lightUrl
+            darkUrl
+            __typename
+          }
+          __typename
+        }
+        secondaryAmount {
+          appearance
+          money {
+            ...FeedAmountMoney
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      ... on FeedTimelineGroupHeading {
+        __typename
+        title
+        timestamp
+        type
+      }
+    }
+    paginationKey
+    __typename
+  }
+}
+
+fragment TintedSubtitleElements on FeedTintedItemSubtitle {
+  elements {
+    tint
+    value
+    __typename
+  }
+  __typename
+}
+
+fragment FeedAmountMoney on FeedAmountMoney {
+  unscaledAmount
+  currency {
+    code
+    decimals
+    __typename
+  }
+  __typename
+}

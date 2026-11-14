@@ -1,0 +1,916 @@
+{
+  "data": [
+    {
+      "type": "accountTransaction",
+      "id": "3648-85-87-31.00.69.505388",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2026-01-15",
+        "valueDate": "2026-01-15",
+        "description": "Verwendungszweck 001",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "4174-19-80-19.49.64.154199",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-10-15",
+        "valueDate": "2025-10-15",
+        "description": "Verwendungszweck 002",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "3203-73-50-94.39.29.032244",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-07-16",
+        "valueDate": "2025-07-16",
+        "description": "Verwendungszweck 003",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "4309-54-47-72.92.43.412248",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-04-15",
+        "valueDate": "2025-04-17",
+        "description": "Verwendungszweck 004",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "2874-80-54-45.05.68.008010",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-03-17",
+        "valueDate": "2025-03-17",
+        "valueDateTime": "2025-03-17T07:31:25.725Z",
+        "description": "Verwendungszweck 005",
+        "transactionType": "ECHTZEIT-UEBERWEISUNG",
+        "transactionTypeCode": "118",
+        "businessTransactionCode": "NTRF+118+9310+997",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "-882.49"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "8977104483",
+            "blz": "50010517",
+            "iban": "DE00556524677887320405"
+          },
+          "agent": {
+            "bic": "INGDDEFFXXX"
+          }
+        },
+        "debtor": {
+          "name": "Max Mustermann",
+          "debtorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "6397-77-56-58.25.50.139064",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-03-17",
+        "valueDate": "2025-03-17",
+        "valueDateTime": "2025-03-17T07:31:06.613Z",
+        "description": "Verwendungszweck 005",
+        "transactionType": "ECHTZEIT-UEBERWEISUNG",
+        "transactionTypeCode": "118",
+        "businessTransactionCode": "NTRF+118+9310+997",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "-882.49"
+        },
+        "creditor": {
+          "name": "Paul Demo",
+          "creditorAccount": {
+            "accountNr": "2664992727",
+            "blz": "50010517",
+            "iban": "DE00280270013233051852"
+          },
+          "agent": {
+            "bic": "INGDDEFFXXX"
+          }
+        },
+        "debtor": {
+          "name": "Max Mustermann",
+          "debtorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "0406-10-23-46.57.01.036720",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-02-27",
+        "valueDate": "2025-02-27",
+        "valueDateTime": "2025-02-27T08:40:34.745Z",
+        "description": "Verwendungszweck 006",
+        "transactionType": "ECHTZEIT-UEBERWEISUNG",
+        "transactionTypeCode": "118",
+        "businessTransactionCode": "NTRF+118+9310+997",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "-2000.00"
+        },
+        "creditor": {
+          "name": "Anna Fiktiv",
+          "creditorAccount": {
+            "accountNr": "1203696154",
+            "blz": "28020050",
+            "iban": "DE00112635601122089941"
+          },
+          "agent": {
+            "bic": "OLBODEH2XXX"
+          }
+        },
+        "debtor": {
+          "name": "Max Mustermann",
+          "debtorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "9850-37-14-02.80.90.796346",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-01-15",
+        "valueDate": "2025-01-15",
+        "description": "Verwendungszweck 007",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "4495-73-44-83.89.29.487732",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-12-02",
+        "valueDate": "2024-12-02",
+        "description": "Verwendungszweck 008",
+        "transactionType": "GUTSCHR. UEBERWEISUNG",
+        "transactionTypeCode": "166",
+        "businessTransactionCode": "NTRF+166+9263+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "733.13"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "debtor": {
+          "name": "Anna Fiktiv",
+          "debtorAccount": {
+            "accountNr": "1203696154",
+            "blz": "28020050",
+            "iban": "DE00112635601122089941"
+          },
+          "agent": {
+            "bic": "OLBODEH2XXX"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "3480-16-25-03.71.74.560313",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-10-15",
+        "valueDate": "2024-10-15",
+        "description": "Verwendungszweck 009",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "6887-59-08-98.60.58.167701",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-09-17",
+        "valueDate": "2024-09-17",
+        "description": "Verwendungszweck 010",
+        "transactionType": "ONLINE-UEBERWEISUNG",
+        "transactionTypeCode": "177",
+        "businessTransactionCode": "NTRF+177+9310+997",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "-733.13"
+        },
+        "creditor": {
+          "name": "Beispiel Versorgung AG",
+          "creditorAccount": {
+            "accountNr": "1252812259",
+            "blz": "79550000",
+            "iban": "DE00580451953512469516"
+          },
+          "agent": {
+            "bic": "BYLADEM1ASA"
+          }
+        },
+        "debtor": {
+          "name": "Max Mustermann",
+          "debtorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "1855-03-62-95.57.05.506243",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-08-22",
+        "valueDate": "2024-08-22",
+        "description": "Verwendungszweck 008",
+        "transactionType": "GUTSCHR. UEBERWEISUNG",
+        "transactionTypeCode": "166",
+        "businessTransactionCode": "NTRF+166+9263+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "2091.68"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "debtor": {
+          "name": "Anna Fiktiv",
+          "debtorAccount": {
+            "accountNr": "1203696154",
+            "blz": "28020050",
+            "iban": "DE00112635601122089941"
+          },
+          "agent": {
+            "bic": "OLBODEH2XXX"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "6397-57-60-52.17.84.733182",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-07-16",
+        "valueDate": "2024-07-16",
+        "description": "Verwendungszweck 011",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "9110-04-55-48.73.01.055255",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-05-28",
+        "valueDate": "2024-05-28",
+        "description": "Verwendungszweck 012",
+        "transactionType": "ONLINE-UEBERWEISUNG",
+        "transactionTypeCode": "177",
+        "businessTransactionCode": "NTRF+177+9310+997",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "-171.38"
+        },
+        "creditor": {
+          "name": "Platzhalter Versicherung",
+          "creditorAccount": {
+            "accountNr": "1950361188",
+            "blz": "28450000",
+            "iban": "DE00343027321572326239"
+          },
+          "agent": {
+            "bic": "BRLADE21EMD"
+          }
+        },
+        "debtor": {
+          "name": "Max Mustermann",
+          "debtorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "3749-38-96-04.65.77.926610",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-05-08",
+        "valueDate": "2024-05-08",
+        "description": "Verwendungszweck 008",
+        "transactionType": "GUTSCHR. UEBERWEISUNG",
+        "transactionTypeCode": "166",
+        "businessTransactionCode": "NTRF+166+9263+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "2000.00"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "debtor": {
+          "name": "Anna Fiktiv",
+          "debtorAccount": {
+            "accountNr": "1203696154",
+            "blz": "28020050",
+            "iban": "DE00112635601122089941"
+          },
+          "agent": {
+            "bic": "OLBODEH2XXX"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "7388-24-30-59.25.63.615870",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-04-15",
+        "valueDate": "2024-04-17",
+        "description": "Verwendungszweck 013",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "9774-04-25-01.28.94.151705",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-03-14",
+        "valueDate": "2024-03-14",
+        "description": "Verwendungszweck 005",
+        "transactionType": "ONLINE-UEBERWEISUNG",
+        "transactionTypeCode": "177",
+        "businessTransactionCode": "NTRF+177+9310+997",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "-5400.00"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "8977104483",
+            "blz": "50010517",
+            "iban": "DE00556524677887320405"
+          },
+          "agent": {
+            "bic": "INGDDEFFXXX"
+          }
+        },
+        "debtor": {
+          "name": "Max Mustermann",
+          "debtorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "2750-99-66-01.35.68.743919",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-03-14",
+        "valueDate": "2024-03-14",
+        "description": "Verwendungszweck 005",
+        "transactionType": "ONLINE-UEBERWEISUNG",
+        "transactionTypeCode": "177",
+        "businessTransactionCode": "NTRF+177+9310+997",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "-5400.00"
+        },
+        "creditor": {
+          "name": "Paul Demo",
+          "creditorAccount": {
+            "accountNr": "2664992727",
+            "blz": "50010517",
+            "iban": "DE00280270013233051852"
+          },
+          "agent": {
+            "bic": "INGDDEFFXXX"
+          }
+        },
+        "debtor": {
+          "name": "Max Mustermann",
+          "debtorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "5629-96-66-15.58.29.968966",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-01-29",
+        "valueDate": "2024-01-29",
+        "description": "Verwendungszweck 008",
+        "transactionType": "GUTSCHR. UEBERWEISUNG",
+        "transactionTypeCode": "166",
+        "businessTransactionCode": "NTRF+166+9263+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "787.70"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "debtor": {
+          "name": "Anna Fiktiv",
+          "debtorAccount": {
+            "accountNr": "1203696154",
+            "blz": "28020050",
+            "iban": "DE00112635601122089941"
+          },
+          "agent": {
+            "bic": "OLBODEH2XXX"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "4641-47-50-37.17.94.708607",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-01-16",
+        "valueDate": "2024-01-16",
+        "description": "Verwendungszweck 014",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "3267-89-51-92.28.82.574049",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-01-04",
+        "valueDate": "2024-01-04",
+        "description": "Verwendungszweck 008",
+        "transactionType": "GUTSCHR. UEBERWEISUNG",
+        "transactionTypeCode": "166",
+        "businessTransactionCode": "NTRF+166+9263+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "1201.43"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "debtor": {
+          "name": "Anna Fiktiv",
+          "debtorAccount": {
+            "accountNr": "1203696154",
+            "blz": "28020050",
+            "iban": "DE00112635601122089941"
+          },
+          "agent": {
+            "bic": "OLBODEH2XXX"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "7022-09-87-41.78.56.126636",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2023-12-05",
+        "valueDate": "2023-12-05",
+        "description": "Verwendungszweck 008",
+        "transactionType": "GUTSCHR. UEBERWEISUNG",
+        "transactionTypeCode": "166",
+        "businessTransactionCode": "NTRF+166+9263+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "383.08"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "debtor": {
+          "name": "Anna Fiktiv",
+          "debtorAccount": {
+            "accountNr": "1203696154",
+            "blz": "28020050",
+            "iban": "DE00112635601122089941"
+          },
+          "agent": {
+            "bic": "OLBODEH2XXX"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "5211-34-62-84.48.29.127825",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2023-11-16",
+        "valueDate": "2023-11-16",
+        "description": "Verwendungszweck 015",
+        "transactionType": "GUTSCHR. UEBERWEISUNG",
+        "transactionTypeCode": "166",
+        "businessTransactionCode": "NTRF+166+9263+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "171.38"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "debtor": {
+          "name": "Anna Fiktiv",
+          "debtorAccount": {
+            "accountNr": "1203696154",
+            "blz": "28020050",
+            "iban": "DE00112635601122089941"
+          },
+          "agent": {
+            "bic": "OLBODEH2XXX"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "3568-77-19-30.16.12.539908",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2023-10-16",
+        "valueDate": "2023-10-16",
+        "description": "Verwendungszweck 016",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "5369887653"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "3780-74-73-17.52.05.495092",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2023-09-25",
+        "valueDate": "2023-09-25",
+        "description": "Verwendungszweck 017",
+        "transactionType": "ONLINE-UEBERWEISUNG",
+        "transactionTypeCode": "177",
+        "businessTransactionCode": "NTRF+177+9310+997",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "-171.38"
+        },
+        "creditor": {
+          "name": "Platzhalter Versicherung",
+          "creditorAccount": {
+            "accountNr": "1950361188",
+            "blz": "28450000",
+            "iban": "DE00343027321572326239"
+          },
+          "agent": {
+            "bic": "BRLADE21EMD"
+          }
+        },
+        "debtor": {
+          "name": "Demo Telekom",
+          "debtorAccount": {
+            "accountNr": "5369887653",
+            "blz": "12030000",
+            "iban": "DE00245442831624936444"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "isRevocable": false
+      }
+    }
+  ],
+  "meta": {
+    "page": {
+      "next": "2023-09-25,5997-72-13-34.96.97.283049"
+    }
+  },
+  "links": {
+    "next": "/accounts/f73c183a-19a4-47d5-8a15-15f404f38446/transactions?page[size]=25&page[after]=2023-09-25,5997-72-13-34.96.97.283049"
+  },
+  "included": []
+}

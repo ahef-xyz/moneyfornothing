@@ -1,0 +1,188 @@
+{
+  "standing_orders": [
+    {
+      "id": 9759394,
+      "account_number": "4722030154",
+      "recipient": "Gegenpartei 33",
+      "iban": "DE00300157843046474015",
+      "bic": "INGDDEFFXXX",
+      "subject": "Verwendungszweck 49",
+      "interval": "monthly",
+      "amount": "151.48",
+      "last_executed_on": "2026-02-05",
+      "next_execution": "2026-03-08",
+      "start_date": "2024-11-05",
+      "end_date": null,
+      "calculation_date": "2026-03-08",
+      "image": null,
+      "instant": true,
+      "instant_payment_available": true,
+      "bank_logo": {
+        "mdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-mdpi/ingdiba.png",
+        "hdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-hdpi/ingdiba.png",
+        "xhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xhdpi/ingdiba.png",
+        "xxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxhdpi/ingdiba.png",
+        "xxxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxxhdpi/ingdiba.png",
+        "svg": null
+      }
+    },
+    {
+      "id": 9029964,
+      "account_number": "4722030154",
+      "recipient": "Gegenpartei 34",
+      "iban": "DE00468164991507616423",
+      "bic": "INGDDEFFXXX",
+      "subject": "Verwendungszweck 49",
+      "interval": "monthly",
+      "amount": "151.48",
+      "last_executed_on": "2026-02-05",
+      "next_execution": "2026-03-08",
+      "start_date": "2024-11-05",
+      "end_date": null,
+      "calculation_date": "2026-03-08",
+      "image": null,
+      "instant": true,
+      "instant_payment_available": true,
+      "bank_logo": {
+        "mdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-mdpi/ingdiba.png",
+        "hdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-hdpi/ingdiba.png",
+        "xhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xhdpi/ingdiba.png",
+        "xxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxhdpi/ingdiba.png",
+        "xxxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxxhdpi/ingdiba.png",
+        "svg": null
+      }
+    },
+    {
+      "id": 1090665,
+      "account_number": "4722030154",
+      "recipient": "Gegenpartei 35",
+      "iban": "DE00895531523778866583",
+      "bic": "DEFFDEFFXXX",
+      "subject": "Verwendungszweck 50",
+      "interval": "monthly",
+      "amount": "151.48",
+      "last_executed_on": "2026-02-05",
+      "next_execution": "2026-03-08",
+      "start_date": "2024-11-05",
+      "end_date": null,
+      "calculation_date": "2026-03-08",
+      "image": null,
+      "instant": false,
+      "instant_payment_available": false,
+      "bank_logo": {
+        "mdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-mdpi/c24bank.png",
+        "hdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-hdpi/c24bank.png",
+        "xhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xhdpi/c24bank.png",
+        "xxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxhdpi/c24bank.png",
+        "xxxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxxhdpi/c24bank.png",
+        "svg": null
+      }
+    },
+    {
+      "id": 6228335,
+      "account_number": "4722030154",
+      "recipient": "Gegenpartei 15",
+      "iban": "DE00131574227489191686",
+      "bic": "DEFFDEFFXXX",
+      "subject": "Verwendungszweck 50",
+      "interval": "monthly",
+      "amount": "309.59",
+      "last_executed_on": "2026-02-05",
+      "next_execution": "2026-03-08",
+      "start_date": "2024-11-05",
+      "end_date": null,
+      "calculation_date": "2026-03-08",
+      "image": null,
+      "instant": false,
+      "instant_payment_available": false,
+      "bank_logo": {
+        "mdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-mdpi/c24bank.png",
+        "hdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-hdpi/c24bank.png",
+        "xhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xhdpi/c24bank.png",
+        "xxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxhdpi/c24bank.png",
+        "xxxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxxhdpi/c24bank.png",
+        "svg": null
+      }
+    },
+    {
+      "id": 4230248,
+      "account_number": "3018350412",
+      "recipient": "Gegenpartei 36",
+      "iban": "DE00319225064558050198",
+      "bic": "SLZODE22XXX",
+      "subject": "Verwendungszweck 51",
+      "interval": "quarterly",
+      "amount": "227.38",
+      "last_executed_on": "2025-08-29",
+      "next_execution": "2026-03-01",
+      "start_date": "2025-06-02",
+      "end_date": null,
+      "calculation_date": "2026-03-01",
+      "image": null,
+      "instant": true,
+      "instant_payment_available": true,
+      "bank_logo": {
+        "mdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-mdpi/sparkasse.png",
+        "hdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-hdpi/sparkasse.png",
+        "xhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xhdpi/sparkasse.png",
+        "xxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxhdpi/sparkasse.png",
+        "xxxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxxhdpi/sparkasse.png",
+        "svg": null
+      },
+      "vop_info": {
+        "vop_id": "af456ff6-234c-402f-b8b7-05d16f460750",
+        "recipient_name_match": "MTCH"
+      }
+    }
+  ],
+  "direct_debits": [
+    {
+      "debtor_name": "Name 07",
+      "debtor_iban": "DE00131574227489191686",
+      "debtor_bic": "DEFFDEFFXXX",
+      "creditor_id": "20d51ca8ea4f6a72c6",
+      "creditor_name": "Gegenpartei 37",
+      "creditor_iban": "DE00446443872967276382",
+      "creditor_bic": "GENODEF1EK1",
+      "amount": "852.87",
+      "status": "RCVD",
+      "purpose": "Verwendungszweck 52",
+      "mandate_reference": "ab1cef3e99-ff",
+      "requested_collection_date": "2026-02-25",
+      "settlement_date": "2026-02-25",
+      "paymentorderid": "dde9f7ec202b412843156d6a7512137a",
+      "bank_logo": {
+        "mdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-mdpi/evangelische_bank.png",
+        "hdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-hdpi/evangelische_bank.png",
+        "xhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xhdpi/evangelische_bank.png",
+        "xxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxhdpi/evangelische_bank.png",
+        "xxxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxxhdpi/evangelische_bank.png",
+        "svg": null
+      }
+    },
+    {
+      "debtor_name": "Name 08",
+      "debtor_iban": "DE00131574227489191686",
+      "debtor_bic": "DEFFDEFFXXX",
+      "creditor_id": "20d51ca8ea4f6a72c6",
+      "creditor_name": "Gegenpartei 37",
+      "creditor_iban": "DE00446443872967276382",
+      "creditor_bic": "GENODEF1EK1",
+      "amount": "147.89",
+      "status": "RCVD",
+      "purpose": "Verwendungszweck 53",
+      "mandate_reference": "da072152d6-19",
+      "requested_collection_date": "2026-02-25",
+      "settlement_date": "2026-02-25",
+      "paymentorderid": "f6d5fbc6c7da45dfbd701c3ecd6bf2f9",
+      "bank_logo": {
+        "mdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-mdpi/evangelische_bank.png",
+        "hdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-hdpi/evangelische_bank.png",
+        "xhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xhdpi/evangelische_bank.png",
+        "xxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxhdpi/evangelische_bank.png",
+        "xxxhdpi": "https://uin.c24.de/images/bank-circle-logos/drawable-xxxhdpi/evangelische_bank.png",
+        "svg": null
+      }
+    }
+  ]
+}

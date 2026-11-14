@@ -1,0 +1,10 @@
+{
+  "data": {
+    "type": "mfa-challenge",
+    "attributes": {
+      "mfaId": "7175da9c-5b5a-419d-b0b2-15cacdd106ab",
+      "methodId": "20777ca4-8d1a-49ea-8b9c-ff54f398041d",
+      "methodType": "seal_one"
+    }
+  }
+}

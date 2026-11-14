@@ -1,0 +1,109 @@
+{
+  "Account": {
+    "Number": "8560530425",
+    "AccountName": "easybank Kreditkarte",
+    "IBAN": "DE00993731195043973676",
+    "OpeningDate": "2019-01-03T00:00:00+00:00",
+    "InterestRate": 0.0,
+    "ClosingDate": "0001-01-01T00:00:00+00:00",
+    "HostID": "37796c28-37c4-44a3-bbaf-2addecd8164c",
+    "IsJointAccount": false,
+    "AvailableBalanceInLocalCurrency": {
+      "Value": 12473.4,
+      "Currency": {
+        "ID": 0,
+        "Code": "EUR",
+        "DecimalDigitsSpecified": false
+      }
+    },
+    "CurrentBalance": {
+      "Value": -804.76,
+      "Currency": {
+        "ID": 0,
+        "Code": "EUR",
+        "DecimalDigitsSpecified": false
+      }
+    },
+    "InstallmentAmount": {
+      "Value": 0,
+      "Currency": {
+        "ID": 0,
+        "DecimalDigitsSpecified": false
+      }
+    },
+    "NumberOfInstallmentsOutstanding": 0,
+    "NextPaymentDate": "2026-02-28T00:00:00+00:00",
+    "NextPaymentAmount": {
+      "Value": 0,
+      "Currency": {
+        "ID": 0,
+        "Code": "EUR",
+        "DecimalDigitsSpecified": false
+      }
+    },
+    "OutstandingBalanceInLocalCurrency": {
+      "Value": 0,
+      "Currency": {
+        "ID": 0,
+        "DecimalDigitsSpecified": false
+      }
+    },
+    "BlockCode": "",
+    "BlockCodeReason": "NORM",
+    "BlockCodeLastUpdateDate": "2014-06-11T00:00:00+00:00",
+    "BlockCodeReasonDate": "0001-01-01T00:00:00+00:00",
+    "BlockCodeReasonType": "AccountVisible",
+    "Logo": "12",
+    "AccountSubstatus": "Undefined",
+    "ProductName": "easybank Kreditkarte",
+    "TotalCreditLimit": {
+      "Value": 12473.4,
+      "Currency": {
+        "ID": 0,
+        "Code": "EUR",
+        "DecimalDigitsSpecified": false
+      }
+    },
+    "IsEppEnrolled": false,
+    "LoanEndDate": "0001-01-01T00:00:00+00:00",
+    "LoanStatus": "",
+    "Ownership": "Primary",
+    "TotalAmountDue": {
+      "Value": 0,
+      "Currency": {
+        "ID": 0,
+        "Code": "EUR",
+        "DecimalDigitsSpecified": false
+      }
+    },
+    "AccountSettingsDisabled": false,
+    "CreditLimitAssignedDate": "0001-01-01T00:00:00+00:00",
+    "CurrentCreditLimit": {
+      "Value": 11400,
+      "Currency": {
+        "ID": 0,
+        "Code": "EUR",
+        "DecimalDigitsSpecified": false
+      }
+    },
+    "AvailableCreditLimit": {
+      "Value": 12473.4,
+      "Currency": {
+        "ID": 0,
+        "Code": "EUR",
+        "DecimalDigitsSpecified": false
+      }
+    },
+    "CreditLimitIncreaseSuppression": false,
+    "DateMaxAffordableCreditLimit": "0001-01-01T00:00:00+00:00",
+    "HasPendingCreditLimitIncreaseRequest": false,
+    "AccountOnRestriction": false,
+    "AccountStatus": "Active",
+    "AccountType": "Card",
+    "AccountSubType": "BauAccount",
+    "FullNumber": "8560530425",
+    "AccountInfo": "DE00993731195043973676",
+    "AccountNameAndNumber": "AccountNameAndNumber 004",
+    "AccountIcon": ""
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "Item": {
+    "CardCount": 0,
+    "AccountCount": 0,
+    "AccountList": [],
+    "BalanceEPPNumber": 0,
+    "TransactionEPPNumber": 0,
+    "SCHOnly": false,
+    "IsBrokeragePortalVisible": false,
+    "TotalRowCount": 0,
+    "Cached": false
+  },
+  "Result": {
+    "IsSuccess": true,
+    "HasWarning": false,
+    "HasSuccess": false,
+    "HasInformation": false,
+    "HasAnyResultElement": false
+  }
+}

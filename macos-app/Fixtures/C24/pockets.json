@@ -1,0 +1,442 @@
+{
+  "pockets_total_balance": "3372.87",
+  "pockets_available_balance": "3372.87",
+  "pockets": [
+    {
+      "id": 4732225,
+      "uuid": "25eca81d-f076-4c0f-b383-7bedccf13407",
+      "key": "944d2b338427628",
+      "pocket_number": "7108564637",
+      "parent_account_number": "4722030154",
+      "product_type": "pocket",
+      "total_balance": "46.19",
+      "hold_balance": "0.00",
+      "available_balance": "46.19",
+      "iban": "DE00319225064558050198",
+      "bic": "DEFFDEFFXXX",
+      "state": "active",
+      "lock_reason": null,
+      "lock_category": null,
+      "date_of_activation": "2024-07-19",
+      "downgrade_pending": false,
+      "date_of_closure": null,
+      "daily_payment_order_limit": {
+        "date": "2026-02-23",
+        "available_amount": "255834.55",
+        "used_amount": "1765.45",
+        "daily_limit": "257600"
+      },
+      "custom_details": {
+        "icon_code": "f544",
+        "icon_style": "light",
+        "icon_color": "pink",
+        "name": "Pocket 01"
+      },
+      "savings_target": {
+        "amount": "0.00",
+        "percentage": "0.00"
+      },
+      "credit_transfer_allowed": true,
+      "is_shareable": false,
+      "shared": {
+        "count": 0,
+        "limit": 0,
+        "me": {
+          "uuid": "479b2f0",
+          "first_name": "Name 02",
+          "last_name": "Name 03",
+          "role": "owner",
+          "image": "image 01"
+        },
+        "others": []
+      },
+      "is_card_assignable": true,
+      "interest": {
+        "interest_rate": "0.25",
+        "interest_max_investment_amount": "7400.00",
+        "interest_accrued": "0.04",
+        "interest_accrual_period": "quarterly",
+        "interest_guarantee_date": null
+      },
+      "interest_benefit_campaign": null,
+      "balance_alarm": null,
+      "contract": {
+        "contract_type": "CURRENT_ACCOUNT",
+        "contract_uuid": "68256a8c-d9c1-4021-a5d4-1f0bfe2b99eb",
+        "is_married": false,
+        "participants": [
+          {
+            "first_name": "Name 02",
+            "last_name": "Name 03",
+            "uuid": "7c6c028a-134a-4672-8b11-a583935f7db9",
+            "role": "owner",
+            "is_me": true
+          },
+          {
+            "first_name": "Name 05",
+            "last_name": "Name 06",
+            "uuid": "bbb2b4b9-5668-4ee6-b190-d90a5d4e6b74",
+            "role": "owner",
+            "is_me": false
+          }
+        ]
+      },
+      "source_system": "CURRENT_ACCOUNT",
+      "personalization": {
+        "wallpaper": null,
+        "icon_code": "f544",
+        "name": "Pocket 01"
+      },
+      "upcoming_tx_sufficient_account_balance": true
+    },
+    {
+      "id": 4732225,
+      "uuid": "945f1cc9-e0d4-4b3b-ae59-9202c392d623",
+      "key": "f9c79c0ab64ca70",
+      "pocket_number": "3018350412",
+      "parent_account_number": "4722030154",
+      "product_type": "pocket",
+      "total_balance": "13.41",
+      "hold_balance": "0.00",
+      "available_balance": "13.41",
+      "iban": "DE00206355589447365698",
+      "bic": "DEFFDEFFXXX",
+      "state": "active",
+      "lock_reason": null,
+      "lock_category": null,
+      "date_of_activation": "2024-07-19",
+      "downgrade_pending": false,
+      "date_of_closure": null,
+      "daily_payment_order_limit": {
+        "date": "2026-02-23",
+        "available_amount": "255834.55",
+        "used_amount": "1765.45",
+        "daily_limit": "257600"
+      },
+      "custom_details": {
+        "icon_code": "f015",
+        "icon_style": "light",
+        "icon_color": "orange",
+        "name": "Pocket 02"
+      },
+      "savings_target": {
+        "amount": "0.00",
+        "percentage": "0.00"
+      },
+      "credit_transfer_allowed": true,
+      "is_shareable": false,
+      "shared": {
+        "count": 0,
+        "limit": 0,
+        "me": {
+          "uuid": "479b2f0",
+          "first_name": "Name 02",
+          "last_name": "Name 03",
+          "role": "owner",
+          "image": "image 01"
+        },
+        "others": []
+      },
+      "is_card_assignable": true,
+      "interest": {
+        "interest_rate": "0.25",
+        "interest_max_investment_amount": "7400.00",
+        "interest_accrued": "0.81",
+        "interest_accrual_period": "quarterly",
+        "interest_guarantee_date": null
+      },
+      "interest_benefit_campaign": null,
+      "balance_alarm": null,
+      "contract": {
+        "contract_type": "CURRENT_ACCOUNT",
+        "contract_uuid": "68256a8c-d9c1-4021-a5d4-1f0bfe2b99eb",
+        "is_married": false,
+        "participants": [
+          {
+            "first_name": "Name 02",
+            "last_name": "Name 03",
+            "uuid": "7c6c028a-134a-4672-8b11-a583935f7db9",
+            "role": "owner",
+            "is_me": true
+          },
+          {
+            "first_name": "Name 05",
+            "last_name": "Name 06",
+            "uuid": "bbb2b4b9-5668-4ee6-b190-d90a5d4e6b74",
+            "role": "owner",
+            "is_me": false
+          }
+        ]
+      },
+      "source_system": "CURRENT_ACCOUNT",
+      "personalization": {
+        "wallpaper": null,
+        "icon_code": "f015",
+        "name": "Pocket 02"
+      },
+      "upcoming_tx_sufficient_account_balance": true
+    },
+    {
+      "id": 4732225,
+      "uuid": "3990e274-7240-465e-90f7-fe403e0f4f00",
+      "key": "2e75da5c71db6a4",
+      "pocket_number": "8448242167",
+      "parent_account_number": "4722030154",
+      "product_type": "pocket",
+      "total_balance": "1435.03",
+      "hold_balance": "0.00",
+      "available_balance": "1435.03",
+      "iban": "DE00486456963205570137",
+      "bic": "DEFFDEFFXXX",
+      "state": "active",
+      "lock_reason": null,
+      "lock_category": null,
+      "date_of_activation": "2024-07-19",
+      "downgrade_pending": false,
+      "date_of_closure": null,
+      "daily_payment_order_limit": {
+        "date": "2026-02-23",
+        "available_amount": "255834.55",
+        "used_amount": "1765.45",
+        "daily_limit": "257600"
+      },
+      "custom_details": {
+        "icon_code": "f004",
+        "icon_style": "light",
+        "icon_color": "yellow",
+        "name": "Pocket 03"
+      },
+      "savings_target": {
+        "amount": "0.00",
+        "percentage": "0.00"
+      },
+      "credit_transfer_allowed": true,
+      "is_shareable": false,
+      "shared": {
+        "count": 0,
+        "limit": 0,
+        "me": {
+          "uuid": "479b2f0",
+          "first_name": "Name 02",
+          "last_name": "Name 03",
+          "role": "owner",
+          "image": "image 01"
+        },
+        "others": []
+      },
+      "is_card_assignable": true,
+      "interest": {
+        "interest_rate": "0.25",
+        "interest_max_investment_amount": "7400.00",
+        "interest_accrued": "0.85",
+        "interest_accrual_period": "quarterly",
+        "interest_guarantee_date": null
+      },
+      "interest_benefit_campaign": null,
+      "balance_alarm": null,
+      "contract": {
+        "contract_type": "CURRENT_ACCOUNT",
+        "contract_uuid": "68256a8c-d9c1-4021-a5d4-1f0bfe2b99eb",
+        "is_married": false,
+        "participants": [
+          {
+            "first_name": "Name 02",
+            "last_name": "Name 03",
+            "uuid": "7c6c028a-134a-4672-8b11-a583935f7db9",
+            "role": "owner",
+            "is_me": true
+          },
+          {
+            "first_name": "Name 05",
+            "last_name": "Name 06",
+            "uuid": "bbb2b4b9-5668-4ee6-b190-d90a5d4e6b74",
+            "role": "owner",
+            "is_me": false
+          }
+        ]
+      },
+      "source_system": "CURRENT_ACCOUNT",
+      "personalization": {
+        "wallpaper": null,
+        "icon_code": "f004",
+        "name": "Pocket 03"
+      },
+      "upcoming_tx_sufficient_account_balance": true
+    },
+    {
+      "id": 4732225,
+      "uuid": "54b2e9a6-158d-4012-abd2-4efae7975754",
+      "key": "d1ae30322f5e1aa",
+      "pocket_number": "7879997991",
+      "parent_account_number": "4722030154",
+      "product_type": "pocket",
+      "total_balance": "457.95",
+      "hold_balance": "0.00",
+      "available_balance": "457.95",
+      "iban": "DE00131574227489191686",
+      "bic": "DEFFDEFFXXX",
+      "state": "active",
+      "lock_reason": null,
+      "lock_category": null,
+      "date_of_activation": "2024-07-19",
+      "downgrade_pending": false,
+      "date_of_closure": null,
+      "daily_payment_order_limit": {
+        "date": "2026-02-23",
+        "available_amount": "255834.55",
+        "used_amount": "1765.45",
+        "daily_limit": "257600"
+      },
+      "custom_details": {
+        "icon_code": "e43b",
+        "icon_style": "light",
+        "icon_color": "green",
+        "name": "Pocket 04"
+      },
+      "savings_target": {
+        "amount": "0.00",
+        "percentage": "0.00"
+      },
+      "credit_transfer_allowed": true,
+      "is_shareable": false,
+      "shared": {
+        "count": 0,
+        "limit": 0,
+        "me": {
+          "uuid": "479b2f0",
+          "first_name": "Name 02",
+          "last_name": "Name 03",
+          "role": "owner",
+          "image": "image 01"
+        },
+        "others": []
+      },
+      "is_card_assignable": true,
+      "interest": {
+        "interest_rate": "0.25",
+        "interest_max_investment_amount": "7400.00",
+        "interest_accrued": "0.47",
+        "interest_accrual_period": "quarterly",
+        "interest_guarantee_date": null
+      },
+      "interest_benefit_campaign": null,
+      "balance_alarm": null,
+      "contract": {
+        "contract_type": "CURRENT_ACCOUNT",
+        "contract_uuid": "68256a8c-d9c1-4021-a5d4-1f0bfe2b99eb",
+        "is_married": false,
+        "participants": [
+          {
+            "first_name": "Name 02",
+            "last_name": "Name 03",
+            "uuid": "7c6c028a-134a-4672-8b11-a583935f7db9",
+            "role": "owner",
+            "is_me": true
+          },
+          {
+            "first_name": "Name 05",
+            "last_name": "Name 06",
+            "uuid": "bbb2b4b9-5668-4ee6-b190-d90a5d4e6b74",
+            "role": "owner",
+            "is_me": false
+          }
+        ]
+      },
+      "source_system": "CURRENT_ACCOUNT",
+      "personalization": {
+        "wallpaper": null,
+        "icon_code": "e43b",
+        "name": "Pocket 04"
+      },
+      "upcoming_tx_sufficient_account_balance": true
+    },
+    {
+      "id": 4732225,
+      "uuid": "e5d82ef1-e22f-430f-abe5-19ba9a2f8552",
+      "key": "d08e6d02e343762",
+      "pocket_number": "3238114929",
+      "parent_account_number": "8560530425",
+      "product_type": "pocket_plus",
+      "total_balance": "1420.29",
+      "hold_balance": "0.00",
+      "available_balance": "1420.29",
+      "iban": "DE00446443872967276382",
+      "bic": "DEFFDEFFXXX",
+      "state": "active",
+      "lock_reason": null,
+      "lock_category": null,
+      "date_of_activation": "2025-06-10",
+      "downgrade_pending": false,
+      "date_of_closure": null,
+      "daily_payment_order_limit": {
+        "date": "2026-02-23",
+        "available_amount": "255834.55",
+        "used_amount": "1765.45",
+        "daily_limit": "257600"
+      },
+      "custom_details": {
+        "icon_code": "e1b3",
+        "icon_style": "light",
+        "icon_color": "green",
+        "name": "Pocket 05"
+      },
+      "savings_target": {
+        "amount": "0.00",
+        "percentage": "0.00"
+      },
+      "credit_transfer_allowed": true,
+      "is_shareable": true,
+      "shared": {
+        "count": 1,
+        "limit": 50,
+        "me": {
+          "uuid": "479b2f0",
+          "first_name": "Name 02",
+          "last_name": "Name 03",
+          "role": "owner",
+          "image": "image 01"
+        },
+        "others": [
+          {
+            "uuid": "638785a",
+            "first_name": "Name 05",
+            "last_name": "Name 06",
+            "role": "participant",
+            "image": null
+          }
+        ]
+      },
+      "is_card_assignable": true,
+      "interest": {
+        "interest_rate": "0.25",
+        "interest_max_investment_amount": "7400.00",
+        "interest_accrued": "4.77",
+        "interest_accrual_period": "quarterly",
+        "interest_guarantee_date": null
+      },
+      "interest_benefit_campaign": null,
+      "balance_alarm": null,
+      "contract": {
+        "contract_type": "CURRENT_ACCOUNT",
+        "contract_uuid": "6194373d-cc53-41fb-bb4e-a0dbd7e0cd0c",
+        "is_married": null,
+        "participants": [
+          {
+            "first_name": "Name 02",
+            "last_name": "Name 03",
+            "uuid": "7c6c028a-134a-4672-8b11-a583935f7db9",
+            "role": "owner",
+            "is_me": true
+          }
+        ]
+      },
+      "source_system": "CURRENT_ACCOUNT",
+      "personalization": {
+        "wallpaper": null,
+        "icon_code": "e1b3",
+        "name": "Pocket 05"
+      },
+      "upcoming_tx_sufficient_account_balance": true
+    }
+  ]
+}

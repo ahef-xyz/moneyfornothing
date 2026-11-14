@@ -1,0 +1,1132 @@
+{
+  "data": {
+    "feed": {
+      "balance": {
+        "title": "Aktueller Kontostand",
+        "money": {
+          "unscaledAmount": "179429",
+          "currency": {
+            "code": "EUR",
+            "decimals": 2,
+            "__typename": "FeedAmountMoneyCurrency"
+          },
+          "__typename": "FeedAmountMoney"
+        },
+        "__typename": "TransactionsListBalance"
+      },
+      "tracking": [
+        {
+          "action": "feed.page_viewed",
+          "category": "engagement",
+          "label": "SPACE",
+          "trackingValue": 0,
+          "property": null,
+          "__typename": "TransactionsListTracking"
+        }
+      ],
+      "activities": {
+        "title": "Aktivitäten",
+        "values": [
+          {
+            "title": "Alle Aktivitäten",
+            "selected": false,
+            "accountId": null,
+            "image": {
+              "type": "SYSTEM",
+              "lightImageUrl": "https://cdn.number26.de/feed/account-icons/all_activity.png",
+              "darkImageUrl": "https://cdn.number26.de/feed/account-icons/all_activity_dark.png",
+              "__typename": "TransactionsListImage"
+            },
+            "tracking": {
+              "action": "feed.account-switcher_value",
+              "category": "engagement",
+              "label": "ALL",
+              "trackingValue": null,
+              "property": null,
+              "__typename": "TransactionsListTracking"
+            },
+            "__typename": "TransactionsListActivitiesValues"
+          },
+          {
+            "title": "Hauptkonto",
+            "selected": false,
+            "accountId": "00000000-0000-4000-8000-000000000001",
+            "image": {
+              "type": "SYSTEM",
+              "lightImageUrl": "https://cdn.number26.de/spaces/default-images/main_account.jpg",
+              "darkImageUrl": "https://cdn.number26.de/spaces/default-images/main_account_dark.jpg",
+              "__typename": "TransactionsListImage"
+            },
+            "tracking": {
+              "action": "feed.account-switcher_value",
+              "category": "engagement",
+              "label": "MAIN",
+              "trackingValue": null,
+              "property": null,
+              "__typename": "TransactionsListTracking"
+            },
+            "__typename": "TransactionsListActivitiesValues"
+          },
+          {
+            "title": "Space 01",
+            "selected": true,
+            "accountId": "00000000-0000-4000-8000-000000000002",
+            "image": {
+              "type": "SYSTEM",
+              "lightImageUrl": "https://cdn.number26.de/spaces/default-images/speaker.jpg",
+              "darkImageUrl": "https://cdn.number26.de/spaces/default-images/speaker_dark.jpg",
+              "__typename": "TransactionsListImage"
+            },
+            "tracking": {
+              "action": "feed.account-switcher_value",
+              "category": "engagement",
+              "label": "SPACE",
+              "trackingValue": null,
+              "property": null,
+              "__typename": "TransactionsListTracking"
+            },
+            "__typename": "TransactionsListActivitiesValues"
+          },
+          {
+            "title": "Space 02",
+            "selected": false,
+            "accountId": "00000000-0000-4000-8000-000000000003",
+            "image": {
+              "type": "SYSTEM",
+              "lightImageUrl": "https://cdn.number26.de/spaces/default-images/social_mirrorball.jpg",
+              "darkImageUrl": "https://cdn.number26.de/spaces/default-images/social_mirrorball_dark.jpg",
+              "__typename": "TransactionsListImage"
+            },
+            "tracking": {
+              "action": "feed.account-switcher_value",
+              "category": "engagement",
+              "label": "SPACE",
+              "trackingValue": null,
+              "property": null,
+              "__typename": "TransactionsListTracking"
+            },
+            "__typename": "TransactionsListActivitiesValues"
+          }
+        ],
+        "tracking": {
+          "action": "feed.account-switcher_clicked",
+          "category": "engagement",
+          "label": null,
+          "trackingValue": null,
+          "property": null,
+          "__typename": "TransactionsListTracking"
+        },
+        "__typename": "TransactionsListActivities"
+      },
+      "searchButton": {
+        "text": "Suchen & Filtern",
+        "action": {
+          "tracking": {
+            "action": "search_clicked",
+            "category": "engagement",
+            "label": "SPACE",
+            "trackingValue": null,
+            "property": null,
+            "__typename": "TransactionsListTracking"
+          },
+          "uri": "/transactions/search?accountIds=00000000-0000-4000-8000-000000000002&activity=MAIN&accountId=00000000-0000-4000-8000-000000000002&source=TRANSACTIONS_MODULE_SPACE_VIEW",
+          "__typename": "TransactionsListAction"
+        },
+        "__typename": "TransactionsListSearch"
+      },
+      "modules": [
+        {
+          "__typename": "FeedTimelineModule",
+          "paginationKey": "eyJ0cmFuc2FjdGlvbiI6eyJsYXN0SWQiOiIwMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwNDEifSwibGFzdEJhbGFuY2UiOjI5Mi4yMywibGFzdEl0ZW1UcyI6MTczNzM2MjQ0MzU3MiwicGFnZUluZGV4IjowfQ==",
+          "timelineItems": [
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Donnerstag 12 Februar",
+              "timestamp": 1770850800000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000042",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000042?source=SPACE_TX_LIST",
+              "tintedSubtitle": null,
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "17547",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1770908203217,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 1794.29,
+                "currency": "EUR",
+                "title": "Aktueller Kontostand",
+                "money": {
+                  "unscaledAmount": "179429",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Donnerstag 15 Januar",
+              "timestamp": 1768431600000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000043",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000043?source=SPACE_TX_LIST",
+              "tintedSubtitle": null,
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "13089",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1768486946589,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 1629.63,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "162963",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Montag 22 Dezember",
+              "timestamp": 1766358000000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000044",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000044?source=SPACE_TX_LIST",
+              "tintedSubtitle": null,
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "21693",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1766398239599,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 1415.71,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "141571",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Freitag 14 November",
+              "timestamp": 1763074800000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000045",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000045?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 01",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "8815",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1763113794415,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 1249.94,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "124994",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Donnerstag 16 Oktober",
+              "timestamp": 1760565600000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000046",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000046?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 02",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "12533",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1760627693753,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 1186.7,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "118670",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Freitag 19 September",
+              "timestamp": 1758232800000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000047",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000047?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 03",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "13795",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1758288023862,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 857.18,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "85718",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Donnerstag 14 August",
+              "timestamp": 1755122400000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000048",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000048?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 04",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "9139",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1755174907448,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 834.4,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "83440",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Donnerstag 17 Juli",
+              "timestamp": 1752703200000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000049",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000049?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 05",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "16829",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1752757372545,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 719.64,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "71964",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Dienstag 8 Juli",
+              "timestamp": 1751925600000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000050",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Gegenpartei 11",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000050?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 06",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "STANDARD",
+                "money": {
+                  "unscaledAmount": "-8182",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1751993682293,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 511.09,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "51109",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Donnerstag 19 Juni",
+              "timestamp": 1750284000000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000051",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000051?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 07",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "11234",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1750335861196,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 600.67,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "60067",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Donnerstag 15 Mai",
+              "timestamp": 1747260000000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000052",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000052?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 08",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "778",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1747313306734,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 548.31,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "54831",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Freitag 18 April",
+              "timestamp": 1744927200000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000053",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000053?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 09",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "7335",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1744965333479,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 527.05,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "52705",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "März 2025",
+              "timestamp": null,
+              "type": "TRANSACTION_YEAR"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Donnerstag 20 März",
+              "timestamp": 1742425200000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000054",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000054?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 10",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "9520",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1742480460890,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 425.71,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "42571",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Donnerstag 13 Februar",
+              "timestamp": 1739401200000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000055",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000055?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 11",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "1737",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1739453592874,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 369.26,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "36926",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            },
+            {
+              "__typename": "FeedTimelineGroupHeading",
+              "title": "Montag 20 Januar",
+              "timestamp": 1737327600000,
+              "type": "TRANSACTION_GROUP"
+            },
+            {
+              "externalId": "00000000-0000-4000-8000-000000000041",
+              "accountId": "00000000-0000-4000-8000-000000000002",
+              "title": "Von Hauptkonto",
+              "deeplink": "/transactions/feed/00000000-0000-4000-8000-000000000002/00000000-0000-4000-8000-000000000041?source=SPACE_TX_LIST",
+              "tintedSubtitle": {
+                "elements": [
+                  {
+                    "tint": null,
+                    "value": "Verwendungszweck 12",
+                    "__typename": "FeedTintedItemSubtitleElements"
+                  }
+                ],
+                "__typename": "FeedTintedItemSubtitle"
+              },
+              "secondarySubtitle": null,
+              "styledAmount": {
+                "value": null,
+                "appearance": "HIGHLIGHTED",
+                "money": {
+                  "unscaledAmount": "3623",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedStyledAmount"
+              },
+              "type": "TRANSACTION",
+              "timestamp": 1737362443572,
+              "customReferenceText": null,
+              "category": "micro-v2-miscellaneous",
+              "highlight": null,
+              "balance": {
+                "amount": 367.31,
+                "currency": "EUR",
+                "title": "Kontostand am {{date}}",
+                "money": {
+                  "unscaledAmount": "36731",
+                  "currency": {
+                    "code": "EUR",
+                    "decimals": 2,
+                    "__typename": "FeedAmountMoneyCurrency"
+                  },
+                  "__typename": "FeedAmountMoney"
+                },
+                "__typename": "FeedBalance"
+              },
+              "icon": {
+                "type": "CATEGORY",
+                "url": "https://cdn.number26.de/spaces/rounded-images/main_account.png",
+                "darkUrl": "https://cdn.number26.de/spaces/rounded-images/main_account_dark.png",
+                "value": null,
+                "statusIcon": null,
+                "__typename": "FeedTimelineItemIcon"
+              },
+              "secondaryAmount": null,
+              "__typename": "FeedTimelineTransaction"
+            }
+          ]
+        }
+      ],
+      "__typename": "TransactionsList"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "data": [
+    {
+      "type": "mfa-methods",
+      "id": "6eec1ced-4cc6-4868-9cff-ff1566bce006",
+      "attributes": {
+        "deviceName": "iPhone",
+        "enrolledAt": "2021-12-31T17:21:59.148Z",
+        "locked": false,
+        "methodType": "seal_one",
+        "methodTypeOrder3ds": 1,
+        "owners": {
+          "7754d94c-3ffc-4f1d-8dbf-81fc1c1fa36b": {
+            "ownerSince": "2021-12-31T17:21:59.148Z"
+          }
+        },
+        "portfolio": "dkb",
+        "preferredDevice": false,
+        "remainingChallenges": 5,
+        "remainingValidationAttempts": 3,
+        "sealOneId": "1XD4X-EAOJ6-5PY6J"
+      }
+    },
+    {
+      "type": "mfa-methods",
+      "id": "f60fa399-0fba-4d28-9566-e8610098f3cb",
+      "attributes": {
+        "deviceName": "iPhone",
+        "enrolledAt": "2021-03-25T12:13:54.412Z",
+        "locked": false,
+        "methodType": "seal_one",
+        "methodTypeOrder3ds": 1,
+        "owners": {
+          "7754d94c-3ffc-4f1d-8dbf-81fc1c1fa36b": {
+            "ownerSince": "2021-03-25T12:13:54.412Z"
+          }
+        },
+        "portfolio": "dkb",
+        "preferredDevice": false,
+        "remainingChallenges": 5,
+        "remainingValidationAttempts": 3,
+        "sealOneId": "42SP5-DGAFU-0BVIW"
+      }
+    },
+    {
+      "type": "mfa-methods",
+      "id": "eee587a2-9b71-41fd-aba0-33029037c40a",
+      "attributes": {
+        "deviceName": "iPhone",
+        "enrolledAt": "2023-01-06T12:52:02.290Z",
+        "locked": false,
+        "methodType": "seal_one",
+        "methodTypeOrder3ds": 1,
+        "owners": {
+          "7754d94c-3ffc-4f1d-8dbf-81fc1c1fa36b": {
+            "ownerSince": "2023-01-06T12:52:02.290Z"
+          }
+        },
+        "portfolio": "dkb",
+        "preferredDevice": false,
+        "remainingChallenges": 5,
+        "remainingValidationAttempts": 3,
+        "sealOneId": "COD6E-EGFZC-6NM69"
+      }
+    }
+  ],
+  "included": []
+}

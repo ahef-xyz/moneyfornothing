@@ -1,0 +1,15 @@
+{
+  "data": {
+    "type": "product-types",
+    "id": "7754d94c-3ffc-4f1d-8dbf-81fc1c1fa36b",
+    "attributes": {
+      "brokerageAccount": false,
+      "checkingAccount": true,
+      "creditCard": false,
+      "debitCard": true,
+      "investmentAccount": false,
+      "loan": false
+    }
+  },
+  "included": []
+}

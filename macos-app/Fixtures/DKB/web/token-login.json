@@ -1,0 +1,12 @@
+{
+  "access_token": "<redacted>",
+  "refresh_token_expires_in": "86399",
+  "refresh_token": "<redacted>",
+  "token_factor_type": "1fa",
+  "anonymous_user_id": "<redacted>",
+  "scope": "device_7a0a5483-ba3d-4bbd-bd32-719f556330da mfa modules openid password-change user",
+  "id_token": "<redacted>",
+  "mfa_id": "<redacted>",
+  "token_type": "Bearer",
+  "expires_in": 300
+}

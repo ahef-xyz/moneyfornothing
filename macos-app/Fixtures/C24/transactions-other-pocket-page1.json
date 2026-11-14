@@ -1,0 +1,1565 @@
+{
+  "criteria": {
+    "account_numbers": [
+      "7108564637"
+    ],
+    "search_type": "fields_search",
+    "mambu_account_ids": [
+      "944d2b338427628"
+    ],
+    "include_auth_holds": true,
+    "include_adjusted": false,
+    "include_details": true
+  },
+  "pagination": {
+    "limit": 30,
+    "offset": 0,
+    "more": true
+  },
+  "transactions": [
+    {
+      "type": "SCT - incoming",
+      "preliminary": false,
+      "id": "6d81036d7",
+      "tapas_transaction_guid": "afb1edf9-d690-4381-9dba-f61a50044e7d",
+      "key": "ec6adce836ca32ec1a98910cae3408f1",
+      "amount": "32.88",
+      "date": "2026-02-16T11:37:31+01:00",
+      "sort_date": "2026-02-16T11:37:31+01:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 05",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 40"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.02.2026"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00206355589447365698"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFFXXX"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "c153eef13",
+      "tapas_transaction_guid": "3acbb139-cae5-41b1-ac3f-90800753380f",
+      "key": "a68b679ab9e11a4fa05fe288034e00e8",
+      "return_status": "allowed",
+      "amount": "-24.65",
+      "date": "2026-02-16T09:43:26+01:00",
+      "sort_date": "2026-02-16T09:43:26+01:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 30",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 47,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/nordwest_zeitung.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/nordwest_zeitung.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/nordwest_zeitung.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/nordwest_zeitung.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/nordwest_zeitung.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 41"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.02.2026"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00446443872967276382"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "3d66ec8dbc-0d3b-bb"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "E69a949c99a77e46f9"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 03"
+        }
+      ]
+    },
+    {
+      "type": "SCC - ECOM",
+      "preliminary": false,
+      "id": "f8d1adef0",
+      "tapas_transaction_guid": "acb5d762-be25-46ee-a4f1-534f42fb1c01",
+      "key": "fab48a2cf5e044c3db9e077698e8a863",
+      "amount": "-53.78",
+      "date": "2026-02-16T14:03:08+01:00",
+      "sort_date": "2026-02-16T05:36:13+01:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "logical_card_id": "56b92930-d12b-4730-ab97-79751f7623a6",
+      "card_design": 1070,
+      "counterpart": "Gegenpartei 31",
+      "points": 2,
+      "category_id": 223,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/apple.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/apple.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/apple.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/apple.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/apple.png"
+      },
+      "cashflow_excluded": false,
+      "allow_transfer": false,
+      "account_bank": "C24 Bank",
+      "digital_chargeback_option": true,
+      "auth_hold_key": "e170f4c9a17235d40c9",
+      "merchant_country": "IRL",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Karte",
+          "content": "332 25a2349873"
+        },
+        {
+          "title": "Datum des Karteneinsatzes",
+          "content": "16.02.2026 05:36 Uhr"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.02.2026"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 04"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "preliminary": false,
+      "id": "f5af2d2c4",
+      "tapas_transaction_guid": "f0cd7fc7-8f26-4471-bb3a-0218d58d9adf",
+      "key": "1d48585624e2e1eb05e5abc3290ff561",
+      "amount": "73.89",
+      "date": "2026-02-12T09:52:53+01:00",
+      "sort_date": "2026-02-12T09:52:53+01:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "ent_to_end_id": "81E42D720C4",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 42"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "12.02.2026"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00486456963205570137"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFF"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "2c0808cff",
+      "tapas_transaction_guid": "1e7e214a-6715-415e-9ab1-04bf642fc3d0",
+      "key": "a182391e26943119f6afd111be6597c5",
+      "return_status": "allowed",
+      "amount": "-19.91",
+      "date": "2026-02-12T02:15:39+01:00",
+      "sort_date": "2026-02-12T02:15:39+01:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 32",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 44,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/netflix.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/netflix.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/netflix.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/netflix.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/netflix.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 43"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "12.02.2026"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00131574227489191686"
+        },
+        {
+          "title": "BIC",
+          "content": "CHASDEFXXXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "00-8c63-470e-a559e5"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "96efA74a49f734724e"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 05"
+        }
+      ]
+    },
+    {
+      "type": "SCC - ECOM",
+      "preliminary": false,
+      "id": "48f7cd1e7",
+      "tapas_transaction_guid": "b180e250-b6f0-4968-9e16-304485115df2",
+      "key": "148a9a89941d88a25c33579d2d3141a8",
+      "amount": "-53.78",
+      "date": "2026-01-16T14:05:21+02:00",
+      "sort_date": "2026-01-16T05:34:30+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "logical_card_id": "56b92930-d12b-4730-ab97-79751f7623a6",
+      "card_design": 1070,
+      "counterpart": "Gegenpartei 31",
+      "points": 2,
+      "category_id": 223,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/apple.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/apple.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/apple.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/apple.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/apple.png"
+      },
+      "cashflow_excluded": false,
+      "allow_transfer": false,
+      "account_bank": "C24 Bank",
+      "digital_chargeback_option": true,
+      "auth_hold_key": "03d0b08b38be5cf195b",
+      "merchant_country": "IRL",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Karte",
+          "content": "332 25a2349873"
+        },
+        {
+          "title": "Datum des Karteneinsatzes",
+          "content": "16.01.2026 05:34 Uhr"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.01.2026"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 04"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "54d95831c",
+      "tapas_transaction_guid": "4e9abb19-1cb8-421d-a094-2b6723aed0cc",
+      "key": "8931189f580cbe903b363eaea91cd3f9",
+      "return_status": "allowed",
+      "amount": "-24.65",
+      "date": "2026-01-16T04:39:00+02:00",
+      "sort_date": "2026-01-16T04:39:00+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 30",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 47,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/nordwest_zeitung.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/nordwest_zeitung.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/nordwest_zeitung.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/nordwest_zeitung.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/nordwest_zeitung.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 44"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.01.2026"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00446443872967276382"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "3d66ec8dbc-0d3b-bb"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "E69a949c99a77e46f9"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 03"
+        }
+      ]
+    },
+    {
+      "type": "SCT - incoming",
+      "preliminary": false,
+      "id": "1bec56b87",
+      "tapas_transaction_guid": "7aa86284-4580-4621-b825-3f9dea9f1f7e",
+      "key": "252153ae2ee93ce953b2f0c0954a4e0c",
+      "amount": "32.88",
+      "date": "2026-01-15T09:44:07+02:00",
+      "sort_date": "2026-01-15T09:44:07+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 05",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 40"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "15.01.2026"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00206355589447365698"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFFXXX"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "preliminary": false,
+      "id": "817b64ccd",
+      "tapas_transaction_guid": "d084bde2-eeac-48c4-bfcd-60944c91ad64",
+      "key": "664091ef086a57934df4d7724dd6fb00",
+      "amount": "73.89",
+      "date": "2026-01-14T11:34:57+02:00",
+      "sort_date": "2026-01-14T11:34:57+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "ent_to_end_id": "81E42D720C4",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 42"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.01.2026"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00486456963205570137"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFF"
+        }
+      ]
+    },
+    {
+      "type": "tax",
+      "preliminary": false,
+      "id": "d42e8149e",
+      "tapas_transaction_guid": "a6f67c27-92d2-412b-9d5a-dc80cef52cac",
+      "key": "1875525b26588a5550fa0a2c4f0d6bc5",
+      "amount": "-0.01",
+      "date": "2026-01-14T05:40:03+02:00",
+      "sort_date": "2026-01-14T05:40:03+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "ent_to_end_id": "c82459954c983911180e62d61c9f3341",
+      "counterpart": "C24 Bank",
+      "allow_transfer": false,
+      "points": null,
+      "category_id": 28,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/c24bank.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/c24bank.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/c24bank.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/c24bank.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/c24bank.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 11"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.01.2026"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 01"
+        }
+      ]
+    },
+    {
+      "type": "Interest Applied",
+      "preliminary": false,
+      "id": "c27d27aee",
+      "tapas_transaction_guid": "63640592-a579-4dc2-92a6-a35969d21fe1",
+      "key": "5b339dc2ec4d2b947faabc76223ebabf",
+      "allow_transfer": false,
+      "amount": "0.09",
+      "date": "2026-01-14T00:00:00+02:00",
+      "sort_date": "2026-01-14T00:00:00+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "C24 Bank",
+      "category_id": 104,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/c24bank.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/c24bank.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/c24bank.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/c24bank.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/c24bank.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Habenzinsen",
+          "content": "0,09 €"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.01.2026"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "1e1ab47bc",
+      "tapas_transaction_guid": "4956bdc8-ce19-40d0-a163-627d0458f756",
+      "key": "f1a1b1a0fa702d4ef8bff5a647352d1a",
+      "return_status": "allowed",
+      "amount": "-19.91",
+      "date": "2026-01-13T04:24:28+02:00",
+      "sort_date": "2026-01-13T04:24:28+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 32",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 44,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/netflix.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/netflix.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/netflix.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/netflix.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/netflix.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 43"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "13.01.2026"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00131574227489191686"
+        },
+        {
+          "title": "BIC",
+          "content": "CHASDEFXXXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "00-8c63-470e-a559e5"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "96efA74a49f734724e"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 05"
+        }
+      ]
+    },
+    {
+      "type": "SCC - ECOM",
+      "preliminary": false,
+      "id": "39099b8be",
+      "tapas_transaction_guid": "4dfbc24f-7be8-47b7-99f9-3bd3b37d9276",
+      "key": "9b56a2f08182c093a918b87273497afe",
+      "amount": "-53.78",
+      "date": "2025-12-17T14:04:49+02:00",
+      "sort_date": "2025-12-17T05:35:57+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "logical_card_id": "56b92930-d12b-4730-ab97-79751f7623a6",
+      "card_design": 1070,
+      "counterpart": "Gegenpartei 31",
+      "points": 2,
+      "category_id": 223,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/apple.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/apple.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/apple.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/apple.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/apple.png"
+      },
+      "cashflow_excluded": false,
+      "allow_transfer": false,
+      "account_bank": "C24 Bank",
+      "digital_chargeback_option": true,
+      "auth_hold_key": "d3083172fd7467b3caa",
+      "merchant_country": "IRL",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Karte",
+          "content": "332 25a2349873"
+        },
+        {
+          "title": "Datum des Karteneinsatzes",
+          "content": "17.12.2025 05:35 Uhr"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "17.12.2025"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 04"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "37077743b",
+      "tapas_transaction_guid": "f0f1e67c-a86b-4972-a9ad-73a5afedce59",
+      "key": "2738c398c7d62695d544f863542618bb",
+      "return_status": "expired",
+      "amount": "-24.65",
+      "date": "2025-12-17T04:47:14+02:00",
+      "sort_date": "2025-12-17T04:47:14+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 30",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 47,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/nordwest_zeitung.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/nordwest_zeitung.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/nordwest_zeitung.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/nordwest_zeitung.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/nordwest_zeitung.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 45"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "17.12.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00446443872967276382"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "3d66ec8dbc-0d3b-bb"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "E69a949c99a77e46f9"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 03"
+        }
+      ]
+    },
+    {
+      "type": "SCT - incoming",
+      "preliminary": false,
+      "id": "8a2512da0",
+      "tapas_transaction_guid": "be509463-9928-4d7e-9518-4e96a8dd06a2",
+      "key": "9d0ed7928db29eeca1d9611caf309b22",
+      "amount": "42.06",
+      "date": "2025-12-16T09:43:22+02:00",
+      "sort_date": "2025-12-16T09:43:22+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 05",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 40"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.12.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00206355589447365698"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFFXXX"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "133e375e3",
+      "tapas_transaction_guid": "fbdaaf45-28b6-4c72-b5db-555e0151d2dc",
+      "key": "f1bcddbc30bea6f5f539832710794da9",
+      "return_status": "expired",
+      "amount": "-19.91",
+      "date": "2025-12-15T04:27:35+02:00",
+      "sort_date": "2025-12-15T04:27:35+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 32",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 44,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/netflix.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/netflix.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/netflix.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/netflix.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/netflix.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 43"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "15.12.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00131574227489191686"
+        },
+        {
+          "title": "BIC",
+          "content": "CHASDEFXXXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "00-8c63-470e-a559e5"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "96efA74a49f734724e"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 05"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "preliminary": false,
+      "id": "ba4fa7ced",
+      "tapas_transaction_guid": "6c6b63e7-5e98-4f0e-a392-462b6c566354",
+      "key": "1d780c3288eea9b9badb9796ec28e591",
+      "amount": "57.19",
+      "date": "2025-12-13T17:51:55+02:00",
+      "sort_date": "2025-12-13T17:51:55+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "ent_to_end_id": "81E42D720C4",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 42"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "13.12.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00486456963205570137"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFF"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "9646f3ab1",
+      "tapas_transaction_guid": "63e0c5c7-56e8-4930-a1b6-4a8b8c3d3eb5",
+      "key": "bcf3512a0cb3f02f7ab7ac6d6ec3ec13",
+      "return_status": "expired",
+      "amount": "-24.65",
+      "date": "2025-11-18T05:43:15+02:00",
+      "sort_date": "2025-11-18T05:43:15+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 30",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 47,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/nordwest_zeitung.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/nordwest_zeitung.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/nordwest_zeitung.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/nordwest_zeitung.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/nordwest_zeitung.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 46"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "18.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00446443872967276382"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "3d66ec8dbc-0d3b-bb"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "E69a949c99a77e46f9"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 03"
+        }
+      ]
+    },
+    {
+      "type": "SCT - incoming",
+      "preliminary": false,
+      "id": "42d5bd38b",
+      "tapas_transaction_guid": "5f574b13-e2a7-418d-8184-482c119f0aa4",
+      "key": "bbedfba91382a22d8df841d3853fa240",
+      "amount": "42.06",
+      "date": "2025-11-17T13:24:07+02:00",
+      "sort_date": "2025-11-17T13:24:07+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 05",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 40"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "17.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00206355589447365698"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFFXXX"
+        }
+      ]
+    },
+    {
+      "type": "SCC - ECOM",
+      "preliminary": false,
+      "id": "eb668de65",
+      "tapas_transaction_guid": "c588ccf7-e3c1-402d-9049-57bf21fbaec5",
+      "key": "2245d5cc0aa0f8adb8a378ed60596e24",
+      "amount": "-53.78",
+      "date": "2025-11-16T14:02:49+02:00",
+      "sort_date": "2025-11-16T05:34:52+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "logical_card_id": "56b92930-d12b-4730-ab97-79751f7623a6",
+      "card_design": 1070,
+      "counterpart": "Gegenpartei 31",
+      "points": 2,
+      "category_id": 223,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/apple.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/apple.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/apple.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/apple.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/apple.png"
+      },
+      "cashflow_excluded": false,
+      "allow_transfer": false,
+      "account_bank": "C24 Bank",
+      "digital_chargeback_option": true,
+      "auth_hold_key": "524da89609d0600b3eb",
+      "merchant_country": "IRL",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Karte",
+          "content": "332 25a2349873"
+        },
+        {
+          "title": "Datum des Karteneinsatzes",
+          "content": "16.11.2025 05:34 Uhr"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.11.2025"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 04"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "preliminary": false,
+      "id": "33e59fd73",
+      "tapas_transaction_guid": "8561a767-36a8-4906-bfa2-519b73e5a2ce",
+      "key": "03a4d4c48ce43aece8438057655d076f",
+      "amount": "57.19",
+      "date": "2025-11-13T23:44:58+02:00",
+      "sort_date": "2025-11-13T23:44:58+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "ent_to_end_id": "81E42D720C4",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 42"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "13.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00486456963205570137"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFF"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "bfd4b4d93",
+      "tapas_transaction_guid": "4be349d1-f247-4c03-8c61-db74e6f00874",
+      "key": "3c3aa548b43276507eb5570b59fbd950",
+      "return_status": "expired",
+      "amount": "-19.91",
+      "date": "2025-11-12T03:21:34+02:00",
+      "sort_date": "2025-11-12T03:21:34+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 32",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 44,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/netflix.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/netflix.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/netflix.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/netflix.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/netflix.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 43"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "12.11.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00131574227489191686"
+        },
+        {
+          "title": "BIC",
+          "content": "CHASDEFXXXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "00-8c63-470e-a559e5"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "96efA74a49f734724e"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 05"
+        }
+      ]
+    },
+    {
+      "type": "SCC - ECOM",
+      "preliminary": false,
+      "id": "8f90541a2",
+      "tapas_transaction_guid": "82aae04f-de3c-4260-889f-27a452aa66ee",
+      "key": "f65bdda604522976c6502a80338dcc6b",
+      "amount": "-53.78",
+      "date": "2025-10-16T14:03:12+02:00",
+      "sort_date": "2025-10-16T05:34:25+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "logical_card_id": "56b92930-d12b-4730-ab97-79751f7623a6",
+      "card_design": 1070,
+      "counterpart": "Gegenpartei 31",
+      "points": 2,
+      "category_id": 223,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/apple.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/apple.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/apple.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/apple.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/apple.png"
+      },
+      "cashflow_excluded": false,
+      "allow_transfer": false,
+      "account_bank": "C24 Bank",
+      "digital_chargeback_option": false,
+      "auth_hold_key": "55632cdf168858a71fc",
+      "merchant_country": "IRL",
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Karte",
+          "content": "332 25a2349873"
+        },
+        {
+          "title": "Datum des Karteneinsatzes",
+          "content": "16.10.2025 05:34 Uhr"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.10.2025"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 04"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "b90699481",
+      "tapas_transaction_guid": "11cb91ec-0c75-4742-88e8-0cd3a5c99938",
+      "key": "5aa614021b1f4382231ca2b50a93ade8",
+      "return_status": "expired",
+      "amount": "-24.65",
+      "date": "2025-10-16T04:43:10+02:00",
+      "sort_date": "2025-10-16T04:43:10+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 30",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 47,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/nordwest_zeitung.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/nordwest_zeitung.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/nordwest_zeitung.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/nordwest_zeitung.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/nordwest_zeitung.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 47"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00446443872967276382"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "3d66ec8dbc-0d3b-bb"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "E69a949c99a77e46f9"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 03"
+        }
+      ]
+    },
+    {
+      "type": "SCT - incoming",
+      "preliminary": false,
+      "id": "c0b14da51",
+      "tapas_transaction_guid": "96c6abdb-4563-4af5-afdc-485fc5720a2d",
+      "key": "23e2cda61d2a0307549e3348c2e1539a",
+      "amount": "42.06",
+      "date": "2025-10-15T11:26:14+02:00",
+      "sort_date": "2025-10-15T11:26:14+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 05",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "image": null,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 40"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "15.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00206355589447365698"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFFXXX"
+        }
+      ]
+    },
+    {
+      "type": "tax",
+      "preliminary": false,
+      "id": "ac028bb30",
+      "tapas_transaction_guid": "238f1b98-36f5-46fe-b2a2-f466ab516eac",
+      "key": "15c2dceec45be1c5661bd3683d0f48b3",
+      "amount": "-0.01",
+      "date": "2025-10-14T11:17:14+02:00",
+      "sort_date": "2025-10-14T11:17:14+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "ent_to_end_id": "ab306f7c4d70eee12ce1fd873a211279",
+      "counterpart": "C24 Bank",
+      "allow_transfer": false,
+      "points": null,
+      "category_id": 28,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/c24bank.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/c24bank.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/c24bank.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/c24bank.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/c24bank.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 11"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.10.2025"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 01"
+        }
+      ]
+    },
+    {
+      "type": "sctinst",
+      "preliminary": false,
+      "id": "ccc38185c",
+      "tapas_transaction_guid": "ca9ee74a-d050-4be2-ab38-47ba1c1a5477",
+      "key": "74193bab6a4b115fed92ff091db2ae51",
+      "amount": "57.19",
+      "date": "2025-10-14T08:52:49+02:00",
+      "sort_date": "2025-10-14T08:52:49+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "ent_to_end_id": "81E42D720C4",
+      "counterpart": "Gegenpartei 02",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 119,
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 42"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00486456963205570137"
+        },
+        {
+          "title": "BIC",
+          "content": "INGDDEFF"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "635011eec",
+      "tapas_transaction_guid": "7bc8b2a6-a20a-438a-b4ad-179cf62f4c92",
+      "key": "17fffb109fe5e7ce8359ceaa51a6b03f",
+      "return_status": "expired",
+      "amount": "-19.91",
+      "date": "2025-10-14T03:38:22+02:00",
+      "sort_date": "2025-10-14T03:38:22+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 32",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 44,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/netflix.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/netflix.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/netflix.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/netflix.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/netflix.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 43"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.10.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00131574227489191686"
+        },
+        {
+          "title": "BIC",
+          "content": "CHASDEFXXXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "00-8c63-470e-a559e5"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "96efA74a49f734724e"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 05"
+        }
+      ]
+    },
+    {
+      "type": "Interest Applied",
+      "preliminary": false,
+      "id": "0c7281683",
+      "tapas_transaction_guid": "51d820fd-0437-46dd-8d09-79f442b16827",
+      "key": "5c6583d722c3646bb3eb1bea20231eae",
+      "allow_transfer": false,
+      "amount": "0.04",
+      "date": "2025-10-14T00:00:00+02:00",
+      "sort_date": "2025-10-14T00:00:00+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "C24 Bank",
+      "category_id": 104,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/c24bank.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/c24bank.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/c24bank.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/c24bank.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/c24bank.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Habenzinsen",
+          "content": "0,04 €"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "14.10.2025"
+        }
+      ]
+    },
+    {
+      "type": "SDD - Incoming",
+      "preliminary": false,
+      "id": "0254dfcc0",
+      "tapas_transaction_guid": "d2237f9c-d9b2-46c0-9c63-ee2480601ce6",
+      "key": "2141a679b82729af25aecd0c19e86800",
+      "return_status": "expired",
+      "amount": "-24.65",
+      "date": "2025-09-16T06:05:15+02:00",
+      "sort_date": "2025-09-16T06:05:15+02:00",
+      "source_system": "CURRENT_ACCOUNT",
+      "account_name": "Konto 04",
+      "account_number": "7108564637",
+      "counterpart": "Gegenpartei 30",
+      "allow_transfer": true,
+      "points": null,
+      "category_id": 47,
+      "icon": {
+        "hdpi": "images/counterpart-logos/drawable-hdpi/nordwest_zeitung.png",
+        "mdpi": "images/counterpart-logos/drawable-mdpi/nordwest_zeitung.png",
+        "svg": null,
+        "xhdpi": "images/counterpart-logos/drawable-xhdpi/nordwest_zeitung.png",
+        "xxhdpi": "images/counterpart-logos/drawable-xxhdpi/nordwest_zeitung.png",
+        "xxxhdpi": "images/counterpart-logos/drawable-xxxhdpi/nordwest_zeitung.png"
+      },
+      "cashflow_excluded": false,
+      "auth_hold_key": null,
+      "data": [
+        {
+          "title": "Konto",
+          "content": "925"
+        },
+        {
+          "title": "Verwendungszweck",
+          "content": "Verwendungszweck 48"
+        },
+        {
+          "title": "Buchungsdatum",
+          "content": "16.09.2025"
+        },
+        {
+          "title": "IBAN",
+          "content": "DE00446443872967276382"
+        },
+        {
+          "title": "BIC",
+          "content": "OLBODEH2XXX"
+        },
+        {
+          "title": "Mandatsreferenz",
+          "content": "3d66ec8dbc-0d3b-bb"
+        },
+        {
+          "title": "Gläubiger ID",
+          "content": "E69a949c99a77e46f9"
+        },
+        {
+          "title": "Beschreibung",
+          "content": "Beschreibung 03"
+        }
+      ]
+    }
+  ]
+}

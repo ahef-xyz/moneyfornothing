@@ -1,0 +1,374 @@
+{
+  "data": [
+    {
+      "type": "accountTransaction",
+      "id": "6436-58-90-86.11.78.787695",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2026-01-15",
+        "valueDate": "2026-01-15",
+        "description": "Verwendungszweck 018",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "9866-63-17-22.04.94.177197",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-10-15",
+        "valueDate": "2025-10-15",
+        "description": "Verwendungszweck 019",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "9228-17-27-30.86.77.554376",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-07-16",
+        "valueDate": "2025-07-16",
+        "description": "Verwendungszweck 020",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "4309-54-47-72.92.43.412248",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-04-15",
+        "valueDate": "2025-04-17",
+        "description": "Verwendungszweck 021",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "0546-59-99-07.35.74.725880",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-01-15",
+        "valueDate": "2025-01-15",
+        "description": "Verwendungszweck 022",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "9079-88-18-00.51.70.044690",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2025-01-02",
+        "valueDate": "2025-01-02",
+        "transactionType": "ONLINE-UEBERWEISUNG",
+        "transactionTypeCode": "177",
+        "businessTransactionCode": "NTRF+177+9310+997",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "-20.44"
+        },
+        "creditor": {
+          "name": "Max Mustermann",
+          "creditorAccount": {
+            "accountNr": "8956282840",
+            "blz": "12030000",
+            "iban": "DE00711914069711055041"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "debtor": {
+          "name": "Max Mustermann",
+          "debtorAccount": {
+            "accountNr": "6258467589",
+            "blz": "12030000",
+            "iban": "DE00106754415476194559"
+          },
+          "agent": {
+            "bic": "BYLADEM1001"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "7877-87-01-49.68.76.774059",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-10-15",
+        "valueDate": "2024-10-15",
+        "description": "Verwendungszweck 023",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "1381-79-96-50.20.08.938414",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-07-16",
+        "valueDate": "2024-07-16",
+        "description": "Verwendungszweck 024",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "7388-24-30-59.25.63.615870",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-04-15",
+        "valueDate": "2024-04-17",
+        "description": "Verwendungszweck 025",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "7087-93-67-14.75.95.206812",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2024-01-16",
+        "valueDate": "2024-01-16",
+        "description": "Verwendungszweck 026",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "9772-29-57-65.12.60.549808",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2023-10-16",
+        "valueDate": "2023-10-16",
+        "description": "Verwendungszweck 027",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    },
+    {
+      "type": "accountTransaction",
+      "id": "4166-15-53-01.42.79.437192",
+      "attributes": {
+        "status": "booked",
+        "bookingDate": "2023-07-18",
+        "valueDate": "2023-07-17",
+        "description": "Verwendungszweck 028",
+        "transactionType": "RECHNUNG",
+        "transactionTypeCode": "805",
+        "businessTransactionCode": "NMSC+805+6666+000",
+        "amount": {
+          "currencyCode": "EUR",
+          "value": "0.00"
+        },
+        "creditor": {
+          "name": "Musterhandel GmbH",
+          "creditorAccount": {
+            "accountNr": "8841802730"
+          }
+        },
+        "debtor": {
+          "name": "Musterhandel GmbH",
+          "debtorAccount": {
+            "accountNr": "6258467589"
+          }
+        },
+        "isRevocable": false
+      }
+    }
+  ],
+  "included": []
+}

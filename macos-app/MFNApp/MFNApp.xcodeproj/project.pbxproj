@@ -1,0 +1,441 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000D01 /* MFNCore in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B01 /* MFNCore */; };
+		A00000000000000000000D02 /* MFNMock in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B02 /* MFNMock */; };
+		A00000000000000000000D03 /* MFNStore in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B03 /* MFNStore */; };
+		A00000000000000000000D04 /* MFNScrape in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B04 /* MFNScrape */; };
+		A00000000000000000000D05 /* MFNEasybank in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B05 /* MFNEasybank */; };
+		A00000000000000000000D06 /* MFNC24 in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B06 /* MFNC24 */; };
+		A00000000000000000000D07 /* MFNTradeRepublic in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B07 /* MFNTradeRepublic */; };
+		A00000000000000000000D08 /* MFNN26 in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B08 /* MFNN26 */; };
+		A00000000000000000000D09 /* MFNIntelligence in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B09 /* MFNIntelligence */; };
+		A00000000000000000000D0A /* MFNDKB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0A /* MFNDKB */; };
+		A00000000000000000000D0C /* MFNFinTS in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0C /* MFNFinTS */; };
+		A00000000000000000000D0D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0D /* Sparkle */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A00000000000000000000501 /* MFN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MFN.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000502 /* MFN.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MFN.entitlements; sourceTree = "<group>"; };
+		A00000000000000000000503 /* MFN.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = MFN.xcconfig; sourceTree = "<group>"; };
+		A00000000000000000000504 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A00000000000000000000301 /* MFNApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MFNApp;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A00000000000000000000901 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000D01 /* MFNCore in Frameworks */,
+				A00000000000000000000D02 /* MFNMock in Frameworks */,
+				A00000000000000000000D03 /* MFNStore in Frameworks */,
+				A00000000000000000000D04 /* MFNScrape in Frameworks */,
+				A00000000000000000000D05 /* MFNEasybank in Frameworks */,
+				A00000000000000000000D06 /* MFNC24 in Frameworks */,
+				A00000000000000000000D08 /* MFNN26 in Frameworks */,
+				A00000000000000000000D0A /* MFNDKB in Frameworks */,
+				A00000000000000000000D0C /* MFNFinTS in Frameworks */,
+				A00000000000000000000D09 /* MFNIntelligence in Frameworks */,
+				A00000000000000000000D07 /* MFNTradeRepublic in Frameworks */,
+				A00000000000000000000D0D /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000201 = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000502 /* MFN.entitlements */,
+				A00000000000000000000402 /* Config */,
+				A00000000000000000000301 /* MFNApp */,
+				A00000000000000000000401 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000000401 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000501 /* MFN.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000402 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000503 /* MFN.xcconfig */,
+				A00000000000000000000504 /* Info.plist */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00000000000000000000601 /* MFN */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000000701 /* Build configuration list for PBXNativeTarget "MFN" */;
+			buildPhases = (
+				A00000000000000000000801 /* Sources */,
+				A00000000000000000000901 /* Frameworks */,
+				A00000000000000000000A01 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A00000000000000000000301 /* MFNApp */,
+			);
+			name = MFN;
+			packageProductDependencies = (
+				A00000000000000000000B01 /* MFNCore */,
+				A00000000000000000000B02 /* MFNMock */,
+				A00000000000000000000B03 /* MFNStore */,
+				A00000000000000000000B04 /* MFNScrape */,
+				A00000000000000000000B05 /* MFNEasybank */,
+				A00000000000000000000B06 /* MFNC24 */,
+				A00000000000000000000B08 /* MFNN26 */,
+				A00000000000000000000B0A /* MFNDKB */,
+				A00000000000000000000B0C /* MFNFinTS */,
+				A00000000000000000000B0D /* Sparkle */,
+				A00000000000000000000B09 /* MFNIntelligence */,
+				A00000000000000000000B07 /* MFNTradeRepublic */,
+			);
+			productName = MFN;
+			productReference = A00000000000000000000501 /* MFN.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000101 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					A00000000000000000000601 = {
+						CreatedOnToolsVersion = 27.2;
+					};
+				};
+			};
+			buildConfigurationList = A00000000000000000001101 /* Build configuration list for PBXProject "MFNApp" */;
+			developmentRegion = de;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				de,
+				Base,
+			);
+			mainGroup = A00000000000000000000201;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A00000000000000000000F01 /* XCLocalSwiftPackageReference "../Packages/MFNCore" */,
+				A00000000000000000000F02 /* XCLocalSwiftPackageReference "../Packages/MFNMock" */,
+				A00000000000000000000F03 /* XCLocalSwiftPackageReference "../Packages/MFNScrape" */,
+				A00000000000000000000F04 /* XCLocalSwiftPackageReference "../Packages/MFNEasybank" */,
+				A00000000000000000000F05 /* XCLocalSwiftPackageReference "../Packages/MFNC24" */,
+				A00000000000000000000F07 /* XCLocalSwiftPackageReference "../Packages/MFNN26" */,
+				A00000000000000000000F09 /* XCLocalSwiftPackageReference "../Packages/MFNDKB" */,
+				A00000000000000000000F0B /* XCLocalSwiftPackageReference "../Packages/MFNFinTS" */,
+				A00000000000000000000F08 /* XCLocalSwiftPackageReference "../Packages/MFNIntelligence" */,
+				A00000000000000000000F06 /* XCLocalSwiftPackageReference "../Packages/MFNTradeRepublic" */,
+				A00000000000000000000F0C /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A00000000000000000000401 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00000000000000000000601 /* MFN */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A00000000000000000000A01 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A00000000000000000000801 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A00000000000000000001201 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A00000000000000000001301 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A00000000000000000001401 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000503 /* MFN.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MFN.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MoneyForNothing;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "MoneyForNothing entsperrt deine Finanzdaten mit Touch ID.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		A00000000000000000001501 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000503 /* MFN.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MFN.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MoneyForNothing;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "MoneyForNothing entsperrt deine Finanzdaten mit Touch ID.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A00000000000000000000701 /* Build configuration list for PBXNativeTarget "MFN" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000001401 /* Debug */,
+				A00000000000000000001501 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A00000000000000000001101 /* Build configuration list for PBXProject "MFNApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000001201 /* Debug */,
+				A00000000000000000001301 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A00000000000000000000F01 /* XCLocalSwiftPackageReference "../Packages/MFNCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNCore;
+		};
+		A00000000000000000000F02 /* XCLocalSwiftPackageReference "../Packages/MFNMock" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNMock;
+		};
+		A00000000000000000000F03 /* XCLocalSwiftPackageReference "../Packages/MFNScrape" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNScrape;
+		};
+		A00000000000000000000F04 /* XCLocalSwiftPackageReference "../Packages/MFNEasybank" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNEasybank;
+		};
+		A00000000000000000000F05 /* XCLocalSwiftPackageReference "../Packages/MFNC24" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNC24;
+		};
+		A00000000000000000000F06 /* XCLocalSwiftPackageReference "../Packages/MFNTradeRepublic" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNTradeRepublic;
+		};
+		A00000000000000000000F07 /* XCLocalSwiftPackageReference "../Packages/MFNN26" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNN26;
+		};
+		A00000000000000000000F08 /* XCLocalSwiftPackageReference "../Packages/MFNIntelligence" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNIntelligence;
+		};
+		A00000000000000000000F09 /* XCLocalSwiftPackageReference "../Packages/MFNDKB" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNDKB;
+		};
+		A00000000000000000000F0B /* XCLocalSwiftPackageReference "../Packages/MFNFinTS" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNFinTS;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A00000000000000000000F0C /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.10.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A00000000000000000000B01 /* MFNCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F01 /* XCLocalSwiftPackageReference "../Packages/MFNCore" */;
+			productName = MFNCore;
+		};
+		A00000000000000000000B02 /* MFNMock */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F02 /* XCLocalSwiftPackageReference "../Packages/MFNMock" */;
+			productName = MFNMock;
+		};
+		A00000000000000000000B03 /* MFNStore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F01 /* XCLocalSwiftPackageReference "../Packages/MFNCore" */;
+			productName = MFNStore;
+		};
+		A00000000000000000000B04 /* MFNScrape */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F03 /* XCLocalSwiftPackageReference "../Packages/MFNScrape" */;
+			productName = MFNScrape;
+		};
+		A00000000000000000000B05 /* MFNEasybank */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F04 /* XCLocalSwiftPackageReference "../Packages/MFNEasybank" */;
+			productName = MFNEasybank;
+		};
+		A00000000000000000000B06 /* MFNC24 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F05 /* XCLocalSwiftPackageReference "../Packages/MFNC24" */;
+			productName = MFNC24;
+		};
+		A00000000000000000000B07 /* MFNTradeRepublic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F06 /* XCLocalSwiftPackageReference "../Packages/MFNTradeRepublic" */;
+			productName = MFNTradeRepublic;
+		};
+		A00000000000000000000B08 /* MFNN26 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F07 /* XCLocalSwiftPackageReference "../Packages/MFNN26" */;
+			productName = MFNN26;
+		};
+		A00000000000000000000B09 /* MFNIntelligence */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F08 /* XCLocalSwiftPackageReference "../Packages/MFNIntelligence" */;
+			productName = MFNIntelligence;
+		};
+		A00000000000000000000B0A /* MFNDKB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F09 /* XCLocalSwiftPackageReference "../Packages/MFNDKB" */;
+			productName = MFNDKB;
+		};
+		A00000000000000000000B0C /* MFNFinTS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F0B /* XCLocalSwiftPackageReference "../Packages/MFNFinTS" */;
+			productName = MFNFinTS;
+		};
+		A00000000000000000000B0D /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F0C /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A00000000000000000000101 /* Project object */;
+}

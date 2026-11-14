@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:MFNApp/MFNApp.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNCore">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNMock">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNConformance">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNFinTS">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNScrape">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNTradeRepublic">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNC24">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNEasybank">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNN26">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNDKB">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/MFNIntelligence">
+   </FileRef>
+</Workspace>

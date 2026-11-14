@@ -1,0 +1,175 @@
+{
+  "data": [
+    {
+      "id": "cb76e441-cb18-4037-85df-90355d8e8a9d",
+      "type": "debitCard",
+      "attributes": {
+        "activationDate": "2024-06-22",
+        "creationDate": "2024-06-20",
+        "engravedLine1": "MAX MUSTERMANN",
+        "expiryDate": "2029-07-15",
+        "failedPinAttempts": 0,
+        "holder": {
+          "person": {
+            "firstName": "Max",
+            "lastName": "Mustermann"
+          }
+        },
+        "limit": {
+          "identifier": "LE1001",
+          "categories": [
+            {
+              "name": "Erika Musterfrau",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "999999999.99"
+              }
+            },
+            {
+              "name": "Max Mustermann",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "2900.00"
+              }
+            },
+            {
+              "name": "Lena Beispiel",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "173209.82"
+              }
+            },
+            {
+              "name": "Jonas Platzhalter",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "2000.00"
+              }
+            },
+            {
+              "name": "Mia Testkundin",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "2000.00"
+              }
+            }
+          ]
+        },
+        "maskedPan": "0991XX******4278",
+        "network": "visa",
+        "product": {
+          "superProductId": "Debit",
+          "displayName": "Visa Debitkarte",
+          "institute": "DKB",
+          "productType": "DebitPhysical",
+          "ownerType": "PRIVATE",
+          "id": "Jaigj",
+          "type": "DebitPhysical"
+        },
+        "referenceAccount": {
+          "iban": "DE00711914069711055041",
+          "bic": "BYLADEM1001"
+        },
+        "status": {
+          "category": "active"
+        }
+      },
+      "relationships": {
+        "owner": {
+          "data": {
+            "id": "7754d94c-3ffc-4f1d-8dbf-81fc1c1fa36b",
+            "type": "user"
+          }
+        }
+      }
+    },
+    {
+      "id": "b9f5bead-d854-4bb8-b093-cdbc4ea22145",
+      "type": "debitCard",
+      "attributes": {
+        "activationDate": "2021-09-13",
+        "creationDate": "2021-08-24",
+        "engravedLine1": "MAX MUSTERMANN ",
+        "expiryDate": "2026-12-15",
+        "failedPinAttempts": 0,
+        "holder": {
+          "person": {
+            "firstName": "Max",
+            "lastName": "Mustermann"
+          }
+        },
+        "limit": {
+          "identifier": "LE1001",
+          "categories": [
+            {
+              "name": "Erika Musterfrau",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "999999999.99"
+              }
+            },
+            {
+              "name": "Max Mustermann",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "2900.00"
+              }
+            },
+            {
+              "name": "Lena Beispiel",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "173209.82"
+              }
+            },
+            {
+              "name": "Jonas Platzhalter",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "2000.00"
+              }
+            },
+            {
+              "name": "Mia Testkundin",
+              "amount": {
+                "currencyCode": "EUR",
+                "value": "2000.00"
+              }
+            }
+          ]
+        },
+        "maskedPan": "0991XX******4278",
+        "network": "visa",
+        "product": {
+          "superProductId": "Debit",
+          "displayName": "Visa Debitkarte",
+          "institute": "DKB",
+          "productType": "DebitPhysical",
+          "ownerType": "PRIVATE",
+          "id": "Jaigj",
+          "type": "DebitPhysical"
+        },
+        "referenceAccount": {
+          "iban": "DE00245442831624936444",
+          "bic": "BYLADEM1001"
+        },
+        "status": {
+          "category": "active"
+        }
+      },
+      "relationships": {
+        "legitimates": {
+          "data": [
+            {
+              "id": "7754d94c-3ffc-4f1d-8dbf-81fc1c1fa36b",
+              "type": "user"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "meta": {
+    "messages": []
+  }
+}

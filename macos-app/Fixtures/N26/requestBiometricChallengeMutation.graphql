@@ -1,0 +1,34 @@
+mutation requestBiometricChallengeMutation($username: String!, $password: String!, $fp: String, $fpc: String, $requestId: String) {
+  requestBiometricChallenge(
+    username: $username
+    password: $password
+    fp: $fp
+    fpc: $fpc
+    requestId: $requestId
+  ) {
+    status
+    shouldDelay
+    challengeId
+    challengeType
+    challengeStep
+    challengeData {
+      obfuscatedPhoneNumber
+      remainingResendCodeCount
+      waitingTimeInSeconds
+      __typename
+    }
+    errors {
+      translationKey
+      message
+      field
+      userMessage {
+        title
+        detail
+        __typename
+      }
+      __typename
+    }
+    redirectUrl
+    __typename
+  }
+}

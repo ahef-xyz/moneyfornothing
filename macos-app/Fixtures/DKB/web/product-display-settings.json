@@ -1,0 +1,55 @@
+{
+  "data": [
+    {
+      "id": "9f84e4c9-372a-435b-8e6f-3201f16933a4",
+      "type": "productDisplaySettings",
+      "attributes": {
+        "clientTypeSpecificSettings": {},
+        "portfolio": "dkb",
+        "productGroups": {
+          "0022ba63-ed3c-4348-a2fa-ee1294d9e87c": {
+            "index": 1,
+            "name": "Gruppe 1",
+            "products": {
+              "accounts": {
+                "bb11d306-d250-4cb3-9865-9f52173dde49": {
+                  "index": 1
+                },
+                "15148500-0dac-4c62-8e3a-45abc2786d93": {
+                  "index": 0
+                }
+              }
+            }
+          },
+          "6d9bc396-8286-4c75-9746-f012076edf75": {
+            "index": 2,
+            "name": "Gruppe 2",
+            "products": {
+              "accounts": {
+                "f73c183a-19a4-47d5-8a15-15f404f38446": {
+                  "index": 0
+                }
+              }
+            }
+          },
+          "cb905096-0751-42a8-ae1d-2e7153e0b577": {
+            "index": 0,
+            "name": "Gruppe 3",
+            "products": {
+              "accounts": {
+                "1e879e4b-34e5-4eaa-b72d-9ab47f87fbb8": {
+                  "index": 0
+                }
+              }
+            }
+          }
+        },
+        "productSettings": {}
+      },
+      "links": {
+        "self": "https://api.dkb.de/config/users/me/product-display-settings/9f84e4c9-372a-435b-8e6f-3201f16933a4"
+      }
+    }
+  ],
+  "included": []
+}

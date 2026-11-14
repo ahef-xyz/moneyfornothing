@@ -1,0 +1,4 @@
+// Copy to FinTS.local.xcconfig (gitignored) and fill in your own FinTS product registration.
+// Register for free with the Deutsche Kreditwirtschaft (FinTS product registration, see README).
+// Without it the app sends a placeholder and ING/DKB reject FinTS access.
+MFN_FINTS_PRODUCT_ID = YOUR-PRODUCT-ID

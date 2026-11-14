@@ -1,0 +1,12 @@
+{
+  "access_token": "<redacted>",
+  "refresh_token_expires_in": "86399",
+  "refresh_token": "<redacted>",
+  "token_factor_type": "2fa",
+  "anonymous_user_id": "<redacted>",
+  "scope": "account device_8d226101-c27f-4803-8d8b-39a0859ebb6a device_sso mfa modules openid password-change user",
+  "id_token": "<redacted>",
+  "token_type": "Bearer",
+  "expires_in": 300,
+  "device_secret": "<redacted>"
+}

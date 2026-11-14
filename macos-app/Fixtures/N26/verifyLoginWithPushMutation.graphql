@@ -1,0 +1,20 @@
+mutation verifyLoginWithPushMutation {
+  verifyLoginWithPush {
+    status
+    errors {
+      translationKey
+      message
+      field
+      __typename
+    }
+    isAuthorizationPending
+    shouldAbortLoginAttempt
+    challengeType
+    rateLimit {
+      limit
+      current
+      __typename
+    }
+    __typename
+  }
+}

@@ -1,0 +1,44 @@
+# macOS
+.DS_Store
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved.orig
+
+# Website
+website/node_modules/
+website/dist/
+website/.astro/
+
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# Claude Code: local settings only (shared .claude/settings.json stays tracked)
+.claude/settings.local.json
+
+# Secrets: never commit raw (non-anonymized) fixtures or credentials
+macos-app/Fixtures/**/raw/
+*.env
+
+# Mapping real values → placeholders for scripts/fixtures-anonymize: contains real data, never commit
+*.anonymize-map
+
+# FinTS product registration number (DK terms: do not publish), see macos-app/MFNApp/Config/MFN.xcconfig
+macos-app/MFNApp/Config/FinTS.local.xcconfig
+
+# --- publish hygiene (never publish personal data or key material) ---
+*.har
+*.sqlite
+*.sqlite-*
+*.db
+ledger.key
+*.p12
+*.mobileprovision
+*.fints
+.env*

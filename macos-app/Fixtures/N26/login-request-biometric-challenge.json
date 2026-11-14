@@ -1,0 +1,15 @@
+{
+  "data": {
+    "requestBiometricChallenge": {
+      "status": "SUCCESS",
+      "shouldDelay": null,
+      "challengeId": null,
+      "challengeType": "PUSH",
+      "challengeStep": null,
+      "challengeData": null,
+      "errors": null,
+      "redirectUrl": null,
+      "__typename": "RequestBiometricChallenge"
+    }
+  }
+}

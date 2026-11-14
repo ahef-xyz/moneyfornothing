@@ -1,0 +1,2820 @@
+{
+ "version": 1,
+ "note": "Synthetic eval set for MFN categorization (CLAUDE.md §8). No real bookings: merchants are generic or public brands, all references, creditor IDs, mandates and amounts are random.",
+ "transactions": [
+  {
+   "id": "e075",
+   "merchant": "REWE Markt GmbH",
+   "purpose": "Kartenzahlung girocard REWE Markt GmbH Dortmund 05215181 05.07",
+   "amountCents": -6726,
+   "accountType": "giro",
+   "bookingDate": "2025-07-06",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e221",
+   "merchant": "Kita Sonnenschein e.V.",
+   "purpose": "EREF+6BV60SVAA00QK2 MREF+M3NQ2A855N1 CRED+DE97ZZZ00000068939 SVWZ+Kitabeitrag 11/2026 Essensgeld",
+   "amountCents": -21000,
+   "accountType": "giro",
+   "bookingDate": "2026-06-04",
+   "category": "kinder",
+   "creditorID": "DE97ZZZ00000068939",
+   "mref": "M3NQ2A855N1"
+  },
+  {
+   "id": "e152",
+   "merchant": "Kino Cinemaxx//Bremen/DE",
+   "purpose": "VISA Debitkartenumsatz 16.07. 21:53 Karte 1 Folgenr. 35",
+   "amountCents": -2469,
+   "accountType": "giro",
+   "bookingDate": "2026-04-05",
+   "category": "freizeit"
+  },
+  {
+   "id": "e282",
+   "merchant": "",
+   "purpose": "Abgeltungsteuer Kapitalertraege",
+   "amountCents": -1259,
+   "accountType": "depot",
+   "bookingDate": "2026-01-24",
+   "category": "steuern"
+  },
+  {
+   "id": "e129",
+   "merchant": "Waschstrasse Glanz//Hamburg/DE",
+   "purpose": "VISA Debitkartenumsatz 22.09. 21:36 Karte 1 Folgenr. 51",
+   "amountCents": -930,
+   "accountType": "giro",
+   "bookingDate": "2026-08-16",
+   "category": "auto"
+  },
+  {
+   "id": "e021",
+   "merchant": "",
+   "purpose": "Zinsen 07/2026 Tagesgeld",
+   "amountCents": 5466,
+   "accountType": "tagesgeld",
+   "bookingDate": "2025-11-13",
+   "category": "zinsen"
+  },
+  {
+   "id": "e026",
+   "merchant": "",
+   "purpose": "Ertragsgutschrift Ausschuettung ISIN IE00B4L5Y983",
+   "amountCents": 3244,
+   "accountType": "depot",
+   "bookingDate": "2026-09-30",
+   "category": "zinsen"
+  },
+  {
+   "id": "e231",
+   "merchant": "Deutsches Rotes Kreuz",
+   "purpose": "Spende 2025 Danke",
+   "amountCents": -2761,
+   "accountType": "giro",
+   "bookingDate": "2026-08-21",
+   "category": "geschenke_spenden"
+  },
+  {
+   "id": "e238",
+   "merchant": "Eigenes Konto",
+   "purpose": "Umbuchung auf Tagesgeld",
+   "amountCents": -59762,
+   "accountType": "giro",
+   "bookingDate": "2025-09-08",
+   "category": "umbuchung"
+  },
+  {
+   "id": "e112",
+   "merchant": "DB Vertrieb GmbH",
+   "purpose": "Fahrschein HE95BL8G DB Fernverkehr",
+   "amountCents": -5923,
+   "accountType": "giro",
+   "bookingDate": "2026-06-18",
+   "category": "oepnv"
+  },
+  {
+   "id": "e249",
+   "merchant": "Scalable Capital",
+   "purpose": "Sparplan 06/2026",
+   "amountCents": -22251,
+   "accountType": "giro",
+   "bookingDate": "2026-06-11",
+   "category": "sparen_anlegen"
+  },
+  {
+   "id": "e137",
+   "merchant": "Lime",
+   "purpose": "Lime Ride 63VVEDVW",
+   "amountCents": -681,
+   "accountType": "giro",
+   "bookingDate": "2026-05-13",
+   "category": "taxi_sharing"
+  },
+  {
+   "id": "e210",
+   "merchant": "Fielmann//Mainz/DE",
+   "purpose": "VISA Debitkartenumsatz 24.05. 10:49 Karte 1 Folgenr. 55",
+   "amountCents": -9891,
+   "accountType": "giro",
+   "bookingDate": "2025-12-17",
+   "category": "gesundheit"
+  },
+  {
+   "id": "e296",
+   "merchant": "Buergeramt Musterstadt",
+   "purpose": "Gebuehr Personalausweis",
+   "amountCents": -3700,
+   "accountType": "giro",
+   "bookingDate": "2025-08-03",
+   "category": "sonstiges"
+  },
+  {
+   "id": "e025",
+   "merchant": "",
+   "purpose": "Ertragsgutschrift Ausschuettung ISIN IE00B4L5Y983",
+   "amountCents": 4786,
+   "accountType": "depot",
+   "bookingDate": "2026-09-06",
+   "category": "zinsen"
+  },
+  {
+   "id": "e286",
+   "merchant": "",
+   "purpose": "Auszahlung Geldautomat Commerzbank 56725263",
+   "amountCents": -15543,
+   "accountType": "giro",
+   "bookingDate": "2026-03-11",
+   "category": "bargeld"
+  },
+  {
+   "id": "e049",
+   "merchant": "Vattenfall Europe Sales GmbH",
+   "purpose": "EREF+ZMARM6V1N8DBD5 MREF+M3D0SS02TE5 CRED+DE57ZZZ00006600190 SVWZ+Abschlag Gas 04/2026 VK 56534038",
+   "amountCents": -9500,
+   "accountType": "giro",
+   "bookingDate": "2025-10-09",
+   "category": "nebenkosten",
+   "creditorID": "DE57ZZZ00006600190",
+   "mref": "M3D0SS02TE5"
+  },
+  {
+   "id": "e211",
+   "merchant": "Allianz Versicherungs-AG",
+   "purpose": "EREF+0W2CCQ8Q5PR9CE MREF+MK5MEMACB72 CRED+DE17ZZZ00003563145 SVWZ+Haftpflicht Beitrag 2025 Vers-Nr 30582102",
+   "amountCents": -6800,
+   "accountType": "giro",
+   "bookingDate": "2026-02-04",
+   "category": "versicherung",
+   "creditorID": "DE17ZZZ00003563145",
+   "mref": "MK5MEMACB72"
+  },
+  {
+   "id": "e273",
+   "merchant": "",
+   "purpose": "Depotgebuehr Q13339701",
+   "amountCents": -1465,
+   "accountType": "depot",
+   "bookingDate": "2025-07-22",
+   "category": "gebuehren"
+  },
+  {
+   "id": "e280",
+   "merchant": "Stadtkasse Musterstadt",
+   "purpose": "Grundsteuer 2025 Kassenzeichen 14271469",
+   "amountCents": -12181,
+   "accountType": "giro",
+   "bookingDate": "2026-01-12",
+   "category": "steuern"
+  },
+  {
+   "id": "e018",
+   "merchant": "Deutsche Bahn Fernverkehr",
+   "purpose": "EREF+HG4444GEZ2JVL0 SVWZ+Fahrgastrechte Entschaedigung R8GNQDL0",
+   "amountCents": 3723,
+   "accountType": "giro",
+   "bookingDate": "2026-02-11",
+   "category": "erstattung"
+  },
+  {
+   "id": "e102",
+   "merchant": "DOUGLAS HAMBURG",
+   "purpose": "",
+   "amountCents": -6156,
+   "accountType": "card",
+   "bookingDate": "2025-09-19",
+   "category": "drogerie"
+  },
+  {
+   "id": "e205",
+   "merchant": "Zahnarztpraxis Dr. Beispiel",
+   "purpose": "Rechnung 36813921 Zahnreinigung",
+   "amountCents": -9411,
+   "accountType": "giro",
+   "bookingDate": "2025-06-02",
+   "category": "gesundheit"
+  },
+  {
+   "id": "e024",
+   "merchant": "Trade Republic",
+   "purpose": "Zinszahlung",
+   "amountCents": 2386,
+   "accountType": "giro",
+   "bookingDate": "2026-04-28",
+   "category": "zinsen"
+  },
+  {
+   "id": "e292",
+   "merchant": "Deutsche Post AG",
+   "purpose": "Briefmarken Online 95750494",
+   "amountCents": -1759,
+   "accountType": "giro",
+   "bookingDate": "2025-10-24",
+   "category": "sonstiges"
+  },
+  {
+   "id": "e196",
+   "merchant": "PayPal Europe S.a.r.l. et Cie S.C.A",
+   "purpose": "PP.85118603.PP . Ihr Einkauf bei eBay",
+   "amountCents": -6602,
+   "accountType": "giro",
+   "bookingDate": "2025-11-17",
+   "category": "online_shopping"
+  },
+  {
+   "id": "e125",
+   "merchant": "Autohaus Beispiel Service//Mainz/DE",
+   "purpose": "VISA Debitkartenumsatz 24.05. 17:34 Karte 1 Folgenr. 62",
+   "amountCents": -47154,
+   "accountType": "giro",
+   "bookingDate": "2026-05-03",
+   "category": "auto"
+  },
+  {
+   "id": "e218",
+   "merchant": "ERGO Lebensversicherung",
+   "purpose": "EREF+MLMDEQEK92L3XQ MREF+MRD83KF8520 CRED+DE31ZZZ00005943207 SVWZ+BU-Versicherung Beitrag 80690269",
+   "amountCents": -6230,
+   "accountType": "giro",
+   "bookingDate": "2026-01-07",
+   "category": "versicherung",
+   "creditorID": "DE31ZZZ00005943207",
+   "mref": "MRD83KF8520"
+  },
+  {
+   "id": "e229",
+   "merchant": "Deutsches Rotes Kreuz",
+   "purpose": "Spende 2025 Danke",
+   "amountCents": -2323,
+   "accountType": "giro",
+   "bookingDate": "2025-06-26",
+   "category": "geschenke_spenden"
+  },
+  {
+   "id": "e036",
+   "merchant": "Muster Hausverwaltung",
+   "purpose": "EREF+0F3PWV9USN7QNN SVWZ+Nebenkostenguthaben 2026 Whg 3",
+   "amountCents": 22939,
+   "accountType": "giro",
+   "bookingDate": "2025-11-06",
+   "category": "einnahmen_sonstige"
+  },
+  {
+   "id": "e149",
+   "merchant": "Eventim",
+   "purpose": "CTS EVENTIM Tickets 47755469",
+   "amountCents": -6207,
+   "accountType": "card",
+   "bookingDate": "2026-01-07",
+   "category": "freizeit"
+  },
+  {
+   "id": "e188",
+   "merchant": "Saturn Electro//Leipzig/DE",
+   "purpose": "VISA Debitkartenumsatz 18.02. 15:15 Karte 1 Folgenr. 69",
+   "amountCents": -21096,
+   "accountType": "giro",
+   "bookingDate": "2026-09-16",
+   "category": "elektronik"
+  },
+  {
+   "id": "e014",
+   "merchant": "Zalando SE",
+   "purpose": "EREF+LNJEU714KU6QDQ SVWZ+Rueckerstattung Retoure 09501513",
+   "amountCents": 10771,
+   "accountType": "giro",
+   "bookingDate": "2026-04-19",
+   "category": "erstattung"
+  },
+  {
+   "id": "e097",
+   "merchant": "ROSSMANN//Bremen/DE",
+   "purpose": "VISA Debitkartenumsatz 22.03. 09:22 Karte 1 Folgenr. 81",
+   "amountCents": -2235,
+   "accountType": "giro",
+   "bookingDate": "2025-10-04",
+   "category": "drogerie"
+  },
+  {
+   "id": "e053",
+   "merchant": "Berliner Wasserbetriebe",
+   "purpose": "EREF+Z3LCT38MLSBYAU MREF+MCVHBCBMUX4 CRED+DE25ZZZ00005217677 SVWZ+Wasser Abschlag 10/2026",
+   "amountCents": -3100,
+   "accountType": "giro",
+   "bookingDate": "2026-08-11",
+   "category": "nebenkosten",
+   "creditorID": "DE25ZZZ00005217677",
+   "mref": "MCVHBCBMUX4"
+  },
+  {
+   "id": "e233",
+   "merchant": "Aerzte ohne Grenzen e.V.",
+   "purpose": "Spende Nothilfe 58166026",
+   "amountCents": -6986,
+   "accountType": "giro",
+   "bookingDate": "2025-05-11",
+   "category": "geschenke_spenden"
+  },
+  {
+   "id": "e128",
+   "merchant": "ADAC e.V.",
+   "purpose": "ADAC Mitgliedsbeitrag 2025",
+   "amountCents": -12791,
+   "accountType": "giro",
+   "bookingDate": "2025-05-17",
+   "category": "auto"
+  },
+  {
+   "id": "e123",
+   "merchant": "HUK-COBURG Kfz",
+   "purpose": "EREF+UCN6Q5LULSSJCL MREF+MNDQEF567N3 CRED+DE10ZZZ00003500377 SVWZ+Kfz-Versicherung Beitrag 2025 Vertr 33398730",
+   "amountCents": -6420,
+   "accountType": "giro",
+   "bookingDate": "2025-06-16",
+   "category": "auto",
+   "creditorID": "DE10ZZZ00003500377",
+   "mref": "MNDQEF567N3"
+  },
+  {
+   "id": "e248",
+   "merchant": "",
+   "purpose": "Sparplan Ausfuehrung ISIN IE00B4L5Y983 Stk 1,234",
+   "amountCents": -20541,
+   "accountType": "depot",
+   "bookingDate": "2025-09-10",
+   "category": "sparen_anlegen"
+  },
+  {
+   "id": "e118",
+   "merchant": "FlixBus",
+   "purpose": "FlixBus Buchung 91036495",
+   "amountCents": -1724,
+   "accountType": "giro",
+   "bookingDate": "2026-10-19",
+   "category": "oepnv"
+  },
+  {
+   "id": "e164",
+   "merchant": "Urban Sports Club",
+   "purpose": "Urban Sports Club Membership 06/2026",
+   "amountCents": -5900,
+   "accountType": "giro",
+   "bookingDate": "2025-08-31",
+   "category": "sport"
+  },
+  {
+   "id": "e073",
+   "merchant": "REWE Markt GmbH",
+   "purpose": "Kartenzahlung girocard REWE Markt GmbH Dortmund 05691967 25.04",
+   "amountCents": -3372,
+   "accountType": "giro",
+   "bookingDate": "2026-05-26",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e234",
+   "merchant": "Lisa Beispiel",
+   "purpose": "Geburtstagsgeschenk Oma",
+   "amountCents": -2659,
+   "accountType": "giro",
+   "bookingDate": "2025-09-06",
+   "category": "geschenke_spenden"
+  },
+  {
+   "id": "e295",
+   "merchant": "Schluesseldienst Schnell//Muenchen/DE",
+   "purpose": "VISA Debitkartenumsatz 01.10. 21:51 Karte 1 Folgenr. 97",
+   "amountCents": -9221,
+   "accountType": "giro",
+   "bookingDate": "2026-06-24",
+   "category": "sonstiges"
+  },
+  {
+   "id": "e083",
+   "merchant": "KAUFLAND LEIPZIG",
+   "purpose": "",
+   "amountCents": -5126,
+   "accountType": "card",
+   "bookingDate": "2025-05-09",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e166",
+   "merchant": "Lufthansa",
+   "purpose": "Lufthansa Ticket 220-82914158",
+   "amountCents": -23313,
+   "accountType": "card",
+   "bookingDate": "2026-06-02",
+   "category": "reisen"
+  },
+  {
+   "id": "e226",
+   "merchant": "Musikschule Beispielstadt",
+   "purpose": "EREF+H8X7DHJ74286D0 MREF+MWT45ZM4VMD CRED+DE25ZZZ00009513976 SVWZ+Unterrichtsgebuehr 01/2026",
+   "amountCents": -6500,
+   "accountType": "giro",
+   "bookingDate": "2026-03-29",
+   "category": "kinder",
+   "creditorID": "DE25ZZZ00009513976",
+   "mref": "MWT45ZM4VMD"
+  },
+  {
+   "id": "e147",
+   "merchant": "Spiegel-Verlag",
+   "purpose": "EREF+RCCGPGTVDZH7JF MREF+MXEFPZ5RTEN CRED+DE35ZZZ00000618758 SVWZ+SPIEGEL+ Digital Abo 70810967",
+   "amountCents": -1999,
+   "accountType": "giro",
+   "bookingDate": "2025-12-22",
+   "category": "abos",
+   "creditorID": "DE35ZZZ00000618758",
+   "mref": "MXEFPZ5RTEN"
+  },
+  {
+   "id": "e161",
+   "merchant": "Decathlon//Hannover/DE",
+   "purpose": "VISA Debitkartenumsatz 01.07. 08:27 Karte 1 Folgenr. 09",
+   "amountCents": -9022,
+   "accountType": "giro",
+   "bookingDate": "2025-12-19",
+   "category": "sport"
+  },
+  {
+   "id": "e251",
+   "merchant": "Bausparkasse Schwaebisch Hall",
+   "purpose": "EREF+ZQSA9JE1KKXQ8W MREF+MNJM24M0L1H CRED+DE61ZZZ00007996801 SVWZ+Bausparvertrag 31259997 Sparrate",
+   "amountCents": -5000,
+   "accountType": "giro",
+   "bookingDate": "2025-10-06",
+   "category": "sparen_anlegen",
+   "creditorID": "DE61ZZZ00007996801",
+   "mref": "MNJM24M0L1H"
+  },
+  {
+   "id": "e091",
+   "merchant": "Lieferando.de",
+   "purpose": "Lieferando Bestellung 95870872",
+   "amountCents": -2899,
+   "accountType": "giro",
+   "bookingDate": "2026-09-02",
+   "category": "restaurant"
+  },
+  {
+   "id": "e220",
+   "merchant": "Kita Sonnenschein e.V.",
+   "purpose": "EREF+1UYA57L74T19X9 MREF+M3NQ2A855N1 CRED+DE97ZZZ00000068939 SVWZ+Kitabeitrag 12/2026 Essensgeld",
+   "amountCents": -21000,
+   "accountType": "giro",
+   "bookingDate": "2026-03-07",
+   "category": "kinder",
+   "creditorID": "DE97ZZZ00000068939",
+   "mref": "M3NQ2A855N1"
+  },
+  {
+   "id": "e275",
+   "merchant": "Finanzamt Musterstadt",
+   "purpose": "Einkommensteuer Vorauszahlung StNr 17515105",
+   "amountCents": -105168,
+   "accountType": "giro",
+   "bookingDate": "2026-08-20",
+   "category": "steuern"
+  },
+  {
+   "id": "e213",
+   "merchant": "HUK24 AG",
+   "purpose": "EREF+08XZ5J2B0BX64L MREF+M3PTGX5YYY9 CRED+DE90ZZZ00009938548 SVWZ+Hausrat Beitrag 08/2025",
+   "amountCents": -1450,
+   "accountType": "giro",
+   "bookingDate": "2026-04-15",
+   "category": "versicherung",
+   "creditorID": "DE90ZZZ00009938548",
+   "mref": "M3PTGX5YYY9"
+  },
+  {
+   "id": "e093",
+   "merchant": "Cafe am Markt//Dortmund/DE",
+   "purpose": "VISA Debitkartenumsatz 17.03. 09:43 Karte 1 Folgenr. 57",
+   "amountCents": -1130,
+   "accountType": "giro",
+   "bookingDate": "2026-05-03",
+   "category": "restaurant"
+  },
+  {
+   "id": "e289",
+   "merchant": "",
+   "purpose": "Bargeldeinzahlung Automat",
+   "amountCents": 45598,
+   "accountType": "giro",
+   "bookingDate": "2025-05-06",
+   "category": "bargeld"
+  },
+  {
+   "id": "e268",
+   "merchant": "",
+   "purpose": "Auslandseinsatzentgelt 1,75 %",
+   "amountCents": -333,
+   "accountType": "card",
+   "bookingDate": "2025-10-12",
+   "category": "gebuehren"
+  },
+  {
+   "id": "e278",
+   "merchant": "Bundeskasse Kfz-Steuer",
+   "purpose": "EREF+FJ29N8WU1KEYPQ MREF+M2JBD5572UD CRED+DE18ZZZ00007241687 SVWZ+Kfz-Steuer KENNZ X0K1CQBP",
+   "amountCents": -12000,
+   "accountType": "giro",
+   "bookingDate": "2026-01-06",
+   "category": "steuern",
+   "creditorID": "DE18ZZZ00007241687",
+   "mref": "M2JBD5572UD"
+  },
+  {
+   "id": "e262",
+   "merchant": "Klarna",
+   "purpose": "Klarna Ratenkauf Rate 19602634",
+   "amountCents": -5103,
+   "accountType": "giro",
+   "bookingDate": "2025-05-28",
+   "category": "kredit"
+  },
+  {
+   "id": "e198",
+   "merchant": "Otto GmbH",
+   "purpose": "OTTO Bestellung 53235068",
+   "amountCents": -9292,
+   "accountType": "giro",
+   "bookingDate": "2026-06-12",
+   "category": "online_shopping"
+  },
+  {
+   "id": "e092",
+   "merchant": "Lieferando.de",
+   "purpose": "Lieferando Bestellung 48162754",
+   "amountCents": -2228,
+   "accountType": "giro",
+   "bookingDate": "2025-05-25",
+   "category": "restaurant"
+  },
+  {
+   "id": "e219",
+   "merchant": "ADAC Versicherung",
+   "purpose": "EREF+BJPZEPP4Y7FKF8 MREF+M0WZQ0PU7YZ CRED+DE54ZZZ00009320989 SVWZ+Auslandskrankenversicherung 2025",
+   "amountCents": -2490,
+   "accountType": "giro",
+   "bookingDate": "2026-06-16",
+   "category": "versicherung",
+   "creditorID": "DE54ZZZ00009320989",
+   "mref": "M0WZQ0PU7YZ"
+  },
+  {
+   "id": "e223",
+   "merchant": "Familienkasse",
+   "purpose": "EREF+TPE7144QR9TPSY SVWZ+Kindergeld 05/2026 KG-Nr 62539740",
+   "amountCents": 25086,
+   "accountType": "giro",
+   "bookingDate": "2026-08-30",
+   "category": "kinder"
+  },
+  {
+   "id": "e116",
+   "merchant": "HVV Hamburger Verkehrsverbund",
+   "purpose": "HVV Ticket App 32891766",
+   "amountCents": -401,
+   "accountType": "giro",
+   "bookingDate": "2026-04-02",
+   "category": "oepnv"
+  },
+  {
+   "id": "e023",
+   "merchant": "Trade Republic",
+   "purpose": "Zinszahlung",
+   "amountCents": 1557,
+   "accountType": "giro",
+   "bookingDate": "2026-06-10",
+   "category": "zinsen"
+  },
+  {
+   "id": "e246",
+   "merchant": "Max Mustermann",
+   "purpose": "Einzahlung Trade Republic",
+   "amountCents": -25165,
+   "accountType": "giro",
+   "bookingDate": "2026-07-28",
+   "category": "umbuchung"
+  },
+  {
+   "id": "e085",
+   "merchant": "Pizzeria Da Mario//Dresden/DE",
+   "purpose": "VISA Debitkartenumsatz 14.03. 12:15 Karte 1 Folgenr. 49",
+   "amountCents": -3915,
+   "accountType": "giro",
+   "bookingDate": "2026-03-26",
+   "category": "restaurant"
+  },
+  {
+   "id": "e029",
+   "merchant": "Kleinanzeigen Kaeuferin",
+   "purpose": "EREF+3QHREZ9VX77SWT SVWZ+Kleinanzeigen Fahrrad",
+   "amountCents": 15359,
+   "accountType": "giro",
+   "bookingDate": "2026-09-22",
+   "category": "einnahmen_sonstige"
+  },
+  {
+   "id": "e133",
+   "merchant": "FREE NOW",
+   "purpose": "FREENOW Fahrt 97576128",
+   "amountCents": -2418,
+   "accountType": "giro",
+   "bookingDate": "2026-05-15",
+   "category": "taxi_sharing"
+  },
+  {
+   "id": "e045",
+   "merchant": "Sparkasse Beispielstadt",
+   "purpose": "EREF+H1AA1GNUYYSCVH MREF+M8JAN2GFX2K CRED+DE92ZZZ00002590934 SVWZ+Darlehen 61632008 Rate Baufinanzierung",
+   "amountCents": -125000,
+   "accountType": "giro",
+   "bookingDate": "2025-09-16",
+   "category": "miete",
+   "creditorID": "DE92ZZZ00002590934",
+   "mref": "M8JAN2GFX2K"
+  },
+  {
+   "id": "e257",
+   "merchant": "DKB AG",
+   "purpose": "Kreditkartenabrechnung 07/2025 VISA",
+   "amountCents": -42018,
+   "accountType": "giro",
+   "bookingDate": "2025-07-16",
+   "category": "kredit"
+  },
+  {
+   "id": "e042",
+   "merchant": "Wohnbau Beispiel eG",
+   "purpose": "EREF+QNZ7RBRYUVL3GT MREF+MDGK9KNPQ3Y CRED+DE63ZZZ00002285920 SVWZ+Nutzungsentgelt 02 2026",
+   "amountCents": -74500,
+   "accountType": "giro",
+   "bookingDate": "2026-08-04",
+   "category": "miete",
+   "creditorID": "DE63ZZZ00002285920",
+   "mref": "MDGK9KNPQ3Y"
+  },
+  {
+   "id": "e276",
+   "merchant": "Rundfunk ARD ZDF DRadio",
+   "purpose": "EREF+CJTWKTJ4643LHU MREF+MKN0K62ZDB7 CRED+DE55ZZZ00004815844 SVWZ+Rundfunkbeitrag 12/2026 Beitragsnr 66713984",
+   "amountCents": -5508,
+   "accountType": "giro",
+   "bookingDate": "2026-04-12",
+   "category": "steuern",
+   "creditorID": "DE55ZZZ00004815844",
+   "mref": "MKN0K62ZDB7"
+  },
+  {
+   "id": "e072",
+   "merchant": "Depot Wohnaccessoires//Hamburg/DE",
+   "purpose": "VISA Debitkartenumsatz 28.06. 20:19 Karte 1 Folgenr. 43",
+   "amountCents": -3092,
+   "accountType": "giro",
+   "bookingDate": "2026-05-18",
+   "category": "haushalt"
+  },
+  {
+   "id": "e173",
+   "merchant": "HOTEL ALPENBLICK HAMBURG",
+   "purpose": "",
+   "amountCents": -39030,
+   "accountType": "card",
+   "bookingDate": "2025-08-24",
+   "category": "reisen"
+  },
+  {
+   "id": "e115",
+   "merchant": "BVG Berliner Verkehrsbetriebe",
+   "purpose": "EREF+5LV1KXRDG5ZQSZ MREF+MX1A8PFFDG5 CRED+DE84ZZZ00006803954 SVWZ+Deutschlandticket Abo 03/2025",
+   "amountCents": -5800,
+   "accountType": "giro",
+   "bookingDate": "2026-04-05",
+   "category": "oepnv",
+   "creditorID": "DE84ZZZ00006803954",
+   "mref": "MX1A8PFFDG5"
+  },
+  {
+   "id": "e064",
+   "merchant": "IKEA Deutschland//Dortmund/DE",
+   "purpose": "VISA Debitkartenumsatz 09.01. 21:38 Karte 1 Folgenr. 81",
+   "amountCents": -2925,
+   "accountType": "giro",
+   "bookingDate": "2026-08-22",
+   "category": "haushalt"
+  },
+  {
+   "id": "e242",
+   "merchant": "Max Mustermann",
+   "purpose": "Uebertrag Gemeinschaftskonto 02/2025",
+   "amountCents": -54049,
+   "accountType": "giro",
+   "bookingDate": "2026-03-07",
+   "category": "umbuchung"
+  },
+  {
+   "id": "e013",
+   "merchant": "Techniker Krankenkasse",
+   "purpose": "EREF+W9N4KL96H8FF8Z SVWZ+Erstattung Bonusprogramm 2025",
+   "amountCents": 10782,
+   "accountType": "giro",
+   "bookingDate": "2025-07-28",
+   "category": "erstattung"
+  },
+  {
+   "id": "e202",
+   "merchant": "Apotheke am Rathaus",
+   "purpose": "Kartenzahlung girocard Apotheke am Rathaus Hamburg 49391184 09.11",
+   "amountCents": -3559,
+   "accountType": "giro",
+   "bookingDate": "2026-10-17",
+   "category": "gesundheit"
+  },
+  {
+   "id": "e252",
+   "merchant": "Bausparkasse Schwaebisch Hall",
+   "purpose": "EREF+A60M6MPK8V01TM MREF+MNJM24M0L1H CRED+DE61ZZZ00007996801 SVWZ+Bausparvertrag 77786276 Sparrate",
+   "amountCents": -5000,
+   "accountType": "giro",
+   "bookingDate": "2025-07-09",
+   "category": "sparen_anlegen",
+   "creditorID": "DE61ZZZ00007996801",
+   "mref": "MNJM24M0L1H"
+  },
+  {
+   "id": "e132",
+   "merchant": "FREE NOW",
+   "purpose": "FREENOW Fahrt 26348836",
+   "amountCents": -2201,
+   "accountType": "giro",
+   "bookingDate": "2026-06-27",
+   "category": "taxi_sharing"
+  },
+  {
+   "id": "e032",
+   "merchant": "PayPal Europe S.a.r.l. et Cie S.C.A",
+   "purpose": "EREF+LWV04QL7SS06J3 SVWZ+PayPal Guthaben Auszahlung 21810220",
+   "amountCents": 19531,
+   "accountType": "giro",
+   "bookingDate": "2026-01-14",
+   "category": "einnahmen_sonstige"
+  },
+  {
+   "id": "e074",
+   "merchant": "REWE Markt GmbH",
+   "purpose": "Kartenzahlung girocard REWE Markt GmbH Hannover 55226129 28.07",
+   "amountCents": -2846,
+   "accountType": "giro",
+   "bookingDate": "2025-12-27",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e215",
+   "merchant": "Techniker Krankenkasse",
+   "purpose": "EREF+HR1ADE3QU0B1GU MREF+M6HSWL1KFDH CRED+DE31ZZZ00002750028 SVWZ+Beitrag freiwillige Versicherung 03/2025",
+   "amountCents": -24500,
+   "accountType": "giro",
+   "bookingDate": "2026-10-22",
+   "category": "versicherung",
+   "creditorID": "DE31ZZZ00002750028",
+   "mref": "M6HSWL1KFDH"
+  },
+  {
+   "id": "e193",
+   "merchant": "AMAZON PAYMENTS EUROPE S.C.A.",
+   "purpose": "302-90722931 AMZN Mktp DE",
+   "amountCents": -6047,
+   "accountType": "giro",
+   "bookingDate": "2025-10-19",
+   "category": "online_shopping"
+  },
+  {
+   "id": "e142",
+   "merchant": "Spotify AB",
+   "purpose": "Spotify P36623134 Premium",
+   "amountCents": -1099,
+   "accountType": "card",
+   "bookingDate": "2026-05-24",
+   "category": "abos"
+  },
+  {
+   "id": "e027",
+   "merchant": "",
+   "purpose": "Dividende ISIN DE0007164600",
+   "amountCents": 6684,
+   "accountType": "depot",
+   "bookingDate": "2026-08-20",
+   "category": "zinsen"
+  },
+  {
+   "id": "e067",
+   "merchant": "OBI Markt//Leipzig/DE",
+   "purpose": "VISA Debitkartenumsatz 25.09. 17:49 Karte 1 Folgenr. 61",
+   "amountCents": -12694,
+   "accountType": "giro",
+   "bookingDate": "2025-11-04",
+   "category": "haushalt"
+  },
+  {
+   "id": "e139",
+   "merchant": "Netflix International B.V.",
+   "purpose": "EREF+YQR4JADQMD4L9U MREF+M4B4T8AENKA CRED+DE91ZZZ00001901122 SVWZ+Netflix Monatsabo QQUWL8AY",
+   "amountCents": -1399,
+   "accountType": "giro",
+   "bookingDate": "2025-06-26",
+   "category": "abos",
+   "creditorID": "DE91ZZZ00001901122",
+   "mref": "M4B4T8AENKA"
+  },
+  {
+   "id": "e298",
+   "merchant": "Waescherei Blitzblank",
+   "purpose": "Reinigung Anzug",
+   "amountCents": -1697,
+   "accountType": "giro",
+   "bookingDate": "2026-01-26",
+   "category": "sonstiges"
+  },
+  {
+   "id": "e011",
+   "merchant": "AMAZON PAYMENTS EUROPE S.C.A.",
+   "purpose": "EREF+AZZKKSPZFR13V6 SVWZ+Erstattung Bestellung 302-91258167",
+   "amountCents": 1429,
+   "accountType": "giro",
+   "bookingDate": "2025-08-18",
+   "category": "erstattung"
+  },
+  {
+   "id": "e143",
+   "merchant": "Disney Plus",
+   "purpose": "Disney+ Abo",
+   "amountCents": -999,
+   "accountType": "card",
+   "bookingDate": "2026-01-24",
+   "category": "abos"
+  },
+  {
+   "id": "e077",
+   "merchant": "ALDI SUED//Dortmund/DE",
+   "purpose": "VISA Debitkartenumsatz 21.12. 11:47 Karte 1 Folgenr. 56",
+   "amountCents": -5204,
+   "accountType": "giro",
+   "bookingDate": "2025-11-15",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e222",
+   "merchant": "Familienkasse",
+   "purpose": "EREF+38YVWLQVV23TH8 SVWZ+Kindergeld 04/2025 KG-Nr 77124825",
+   "amountCents": 25272,
+   "accountType": "giro",
+   "bookingDate": "2025-06-22",
+   "category": "kinder"
+  },
+  {
+   "id": "e114",
+   "merchant": "BVG Berliner Verkehrsbetriebe",
+   "purpose": "EREF+9BN8996VS5WKW2 MREF+MX1A8PFFDG5 CRED+DE84ZZZ00006803954 SVWZ+Deutschlandticket Abo 08/2026",
+   "amountCents": -5800,
+   "accountType": "giro",
+   "bookingDate": "2026-05-23",
+   "category": "oepnv",
+   "creditorID": "DE84ZZZ00006803954",
+   "mref": "MX1A8PFFDG5"
+  },
+  {
+   "id": "e076",
+   "merchant": "ALDI SUED//Dresden/DE",
+   "purpose": "VISA Debitkartenumsatz 20.10. 08:43 Karte 1 Folgenr. 23",
+   "amountCents": -3149,
+   "accountType": "giro",
+   "bookingDate": "2025-06-27",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e240",
+   "merchant": "Eigenes Konto",
+   "purpose": "Uebertrag vom Girokonto",
+   "amountCents": 43149,
+   "accountType": "tagesgeld",
+   "bookingDate": "2026-05-30",
+   "category": "umbuchung"
+  },
+  {
+   "id": "e172",
+   "merchant": "Airbnb",
+   "purpose": "AIRBNB * HM41B0JHQU",
+   "amountCents": -79866,
+   "accountType": "card",
+   "bookingDate": "2026-02-14",
+   "category": "reisen"
+  },
+  {
+   "id": "e099",
+   "merchant": "ROSSMANN//Koeln/DE",
+   "purpose": "VISA Debitkartenumsatz 25.12. 17:00 Karte 1 Folgenr. 99",
+   "amountCents": -1656,
+   "accountType": "giro",
+   "bookingDate": "2026-03-12",
+   "category": "drogerie"
+  },
+  {
+   "id": "e111",
+   "merchant": "JET Tankstelle//Koeln/DE",
+   "purpose": "VISA Debitkartenumsatz 10.03. 14:17 Karte 1 Folgenr. 95",
+   "amountCents": -3543,
+   "accountType": "giro",
+   "bookingDate": "2026-08-03",
+   "category": "tanken"
+  },
+  {
+   "id": "e294",
+   "merchant": "Schluesseldienst Schnell//Muenchen/DE",
+   "purpose": "VISA Debitkartenumsatz 18.08. 15:33 Karte 1 Folgenr. 81",
+   "amountCents": -10629,
+   "accountType": "giro",
+   "bookingDate": "2026-01-16",
+   "category": "sonstiges"
+  },
+  {
+   "id": "e088",
+   "merchant": "Starbucks Coffee//Berlin/DE",
+   "purpose": "VISA Debitkartenumsatz 12.04. 14:50 Karte 1 Folgenr. 30",
+   "amountCents": -745,
+   "accountType": "giro",
+   "bookingDate": "2026-08-12",
+   "category": "restaurant"
+  },
+  {
+   "id": "e263",
+   "merchant": "Klarna",
+   "purpose": "Klarna Ratenkauf Rate 10654113",
+   "amountCents": -8976,
+   "accountType": "giro",
+   "bookingDate": "2026-09-06",
+   "category": "kredit"
+  },
+  {
+   "id": "e285",
+   "merchant": "",
+   "purpose": "Auszahlung Geldautomat Commerzbank 10667772",
+   "amountCents": -14767,
+   "accountType": "giro",
+   "bookingDate": "2025-11-05",
+   "category": "bargeld"
+  },
+  {
+   "id": "e182",
+   "merchant": "Deichmann Schuhe//Hamburg/DE",
+   "purpose": "VISA Debitkartenumsatz 13.09. 21:08 Karte 1 Folgenr. 95",
+   "amountCents": -3952,
+   "accountType": "giro",
+   "bookingDate": "2025-06-02",
+   "category": "kleidung"
+  },
+  {
+   "id": "e127",
+   "merchant": "ADAC e.V.",
+   "purpose": "ADAC Mitgliedsbeitrag 2026",
+   "amountCents": -9458,
+   "accountType": "giro",
+   "bookingDate": "2025-11-05",
+   "category": "auto"
+  },
+  {
+   "id": "e017",
+   "merchant": "Finanzamt Musterstadt",
+   "purpose": "EREF+NF2TWR13UNA55Q SVWZ+Einkommensteuer 2026 Erstattung StNr 53383999",
+   "amountCents": 45158,
+   "accountType": "giro",
+   "bookingDate": "2026-02-18",
+   "category": "erstattung"
+  },
+  {
+   "id": "e288",
+   "merchant": "",
+   "purpose": "Bargeld REWE Cashback",
+   "amountCents": -7599,
+   "accountType": "giro",
+   "bookingDate": "2025-10-24",
+   "category": "bargeld"
+  },
+  {
+   "id": "e063",
+   "merchant": "O2 Telefonica Germany",
+   "purpose": "EREF+6D7W9CQR6J0CDP MREF+MWVNVG7BVRG CRED+DE85ZZZ00003616000 SVWZ+o2 Mobilfunk 02539704",
+   "amountCents": -2954,
+   "accountType": "giro",
+   "bookingDate": "2026-02-17",
+   "category": "internet_telefon",
+   "creditorID": "DE85ZZZ00003616000",
+   "mref": "MWVNVG7BVRG"
+  },
+  {
+   "id": "e200",
+   "merchant": "Temu",
+   "purpose": "TEMU.COM 28QXR8ZY",
+   "amountCents": -4293,
+   "accountType": "card",
+   "bookingDate": "2025-08-20",
+   "category": "online_shopping"
+  },
+  {
+   "id": "e098",
+   "merchant": "ROSSMANN//Koeln/DE",
+   "purpose": "VISA Debitkartenumsatz 01.07. 08:58 Karte 1 Folgenr. 65",
+   "amountCents": -3488,
+   "accountType": "giro",
+   "bookingDate": "2025-07-14",
+   "category": "drogerie"
+  },
+  {
+   "id": "e267",
+   "merchant": "",
+   "purpose": "Auslandseinsatzentgelt 1,75 %",
+   "amountCents": -54,
+   "accountType": "card",
+   "bookingDate": "2025-10-08",
+   "category": "gebuehren"
+  },
+  {
+   "id": "e291",
+   "merchant": "",
+   "purpose": "ATM Withdrawal Lisboa",
+   "amountCents": -4788,
+   "accountType": "card",
+   "bookingDate": "2026-04-06",
+   "category": "bargeld"
+  },
+  {
+   "id": "e084",
+   "merchant": "Baeckerei Beispiel//Leipzig/DE",
+   "purpose": "VISA Debitkartenumsatz 05.07. 11:51 Karte 1 Folgenr. 75",
+   "amountCents": -303,
+   "accountType": "giro",
+   "bookingDate": "2026-07-08",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e197",
+   "merchant": "Otto GmbH",
+   "purpose": "OTTO Bestellung 19984611",
+   "amountCents": -13148,
+   "accountType": "giro",
+   "bookingDate": "2025-08-21",
+   "category": "online_shopping"
+  },
+  {
+   "id": "e156",
+   "merchant": "Steam Games",
+   "purpose": "STEAMGAMES.COM 28488512",
+   "amountCents": -2450,
+   "accountType": "card",
+   "bookingDate": "2026-01-20",
+   "category": "freizeit"
+  },
+  {
+   "id": "e208",
+   "merchant": "Physiotherapie Beweglich",
+   "purpose": "Rechnung Krankengymnastik 84486177",
+   "amountCents": -4153,
+   "accountType": "giro",
+   "bookingDate": "2026-06-13",
+   "category": "gesundheit"
+  },
+  {
+   "id": "e047",
+   "merchant": "Stadtwerke Musterstadt",
+   "purpose": "EREF+XG950J65KN4MNU MREF+M5Y1HRFH46T CRED+DE75ZZZ00003478860 SVWZ+Abschlag Strom 08/2026 Vertragskonto 40335942",
+   "amountCents": -6800,
+   "accountType": "giro",
+   "bookingDate": "2025-12-23",
+   "category": "nebenkosten",
+   "creditorID": "DE75ZZZ00003478860",
+   "mref": "M5Y1HRFH46T"
+  },
+  {
+   "id": "e009",
+   "merchant": "Beispiel Logistik AG",
+   "purpose": "EREF+2G7BJYSX8CTX3L SVWZ+Entgeltabrechnung 02 2025",
+   "amountCents": 213107,
+   "accountType": "giro",
+   "bookingDate": "2025-05-22",
+   "category": "gehalt"
+  },
+  {
+   "id": "e080",
+   "merchant": "LIDL DIENSTLEISTUNG",
+   "purpose": "Kartenzahlung girocard LIDL DIENSTLEISTUNG Bremen 94780636 15.09",
+   "amountCents": -1797,
+   "accountType": "giro",
+   "bookingDate": "2026-10-07",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e185",
+   "merchant": "MediaMarkt//Leipzig/DE",
+   "purpose": "VISA Debitkartenumsatz 02.12. 13:42 Karte 1 Folgenr. 45",
+   "amountCents": -11774,
+   "accountType": "giro",
+   "bookingDate": "2025-08-04",
+   "category": "elektronik"
+  },
+  {
+   "id": "e096",
+   "merchant": "dm-drogerie markt",
+   "purpose": "Kartenzahlung girocard dm-drogerie markt Mainz 76128500 02.06",
+   "amountCents": -660,
+   "accountType": "giro",
+   "bookingDate": "2026-05-03",
+   "category": "drogerie"
+  },
+  {
+   "id": "e194",
+   "merchant": "AMAZON PAYMENTS EUROPE S.C.A.",
+   "purpose": "302-46285290 AMZN Mktp DE",
+   "amountCents": -7202,
+   "accountType": "giro",
+   "bookingDate": "2025-10-17",
+   "category": "online_shopping"
+  },
+  {
+   "id": "e054",
+   "merchant": "Tibber Deutschland GmbH",
+   "purpose": "EREF+N3HXUQJB44P9RB MREF+MN1YUT8529E CRED+DE88ZZZ00002385876 SVWZ+Stromrechnung 01 2025",
+   "amountCents": -8077,
+   "accountType": "giro",
+   "bookingDate": "2026-05-02",
+   "category": "nebenkosten",
+   "creditorID": "DE88ZZZ00002385876",
+   "mref": "MN1YUT8529E"
+  },
+  {
+   "id": "e037",
+   "merchant": "Muster Hausverwaltung",
+   "purpose": "EREF+HWCUKSJDPHSS9Q SVWZ+Miete 12/2026 Whg 3 OG links",
+   "amountCents": -98000,
+   "accountType": "giro",
+   "bookingDate": "2026-07-01",
+   "category": "miete"
+  },
+  {
+   "id": "e001",
+   "merchant": "Muster Software GmbH",
+   "purpose": "EREF+M7PKLPSEEV6DFM SVWZ+Gehalt 12/2025 Personalnr 42975528",
+   "amountCents": 345392,
+   "accountType": "giro",
+   "bookingDate": "2026-01-02",
+   "category": "gehalt"
+  },
+  {
+   "id": "e071",
+   "merchant": "Hornbach Baumarkt//Leipzig/DE",
+   "purpose": "VISA Debitkartenumsatz 10.03. 20:18 Karte 1 Folgenr. 99",
+   "amountCents": -18389,
+   "accountType": "giro",
+   "bookingDate": "2025-07-16",
+   "category": "haushalt"
+  },
+  {
+   "id": "e034",
+   "merchant": "Vinted UAB",
+   "purpose": "EREF+G0H7J7XXUCUYVF SVWZ+Auszahlung Verkauf 32118213",
+   "amountCents": 1276,
+   "accountType": "giro",
+   "bookingDate": "2026-03-13",
+   "category": "einnahmen_sonstige"
+  },
+  {
+   "id": "e124",
+   "merchant": "HUK-COBURG Kfz",
+   "purpose": "EREF+4UCW5XVZJ5Z1Q8 MREF+MNDQEF567N3 CRED+DE10ZZZ00003500377 SVWZ+Kfz-Versicherung Beitrag 2025 Vertr 63185595",
+   "amountCents": -6420,
+   "accountType": "giro",
+   "bookingDate": "2026-07-07",
+   "category": "auto",
+   "creditorID": "DE10ZZZ00003500377",
+   "mref": "MNDQEF567N3"
+  },
+  {
+   "id": "e012",
+   "merchant": "Techniker Krankenkasse",
+   "purpose": "EREF+PLLFB154E6CE7X SVWZ+Erstattung Bonusprogramm 2025",
+   "amountCents": 12331,
+   "accountType": "giro",
+   "bookingDate": "2025-10-06",
+   "category": "erstattung"
+  },
+  {
+   "id": "e260",
+   "merchant": "Santander Consumer Bank",
+   "purpose": "EREF+DFZHU3K3FJ1PCX MREF+MVWUL70GZ7K CRED+DE46ZZZ00006789395 SVWZ+Rate Ratenkredit 87764939",
+   "amountCents": -18900,
+   "accountType": "giro",
+   "bookingDate": "2026-05-16",
+   "category": "kredit",
+   "creditorID": "DE46ZZZ00006789395",
+   "mref": "MVWUL70GZ7K"
+  },
+  {
+   "id": "e060",
+   "merchant": "1&1 Telecom GmbH",
+   "purpose": "EREF+YKPWMWQJK5H0FD MREF+MTQT605G4BB CRED+DE72ZZZ00000728084 SVWZ+1&1 DSL Rechnung 26443802",
+   "amountCents": -3999,
+   "accountType": "giro",
+   "bookingDate": "2026-07-19",
+   "category": "internet_telefon",
+   "creditorID": "DE72ZZZ00000728084",
+   "mref": "MTQT605G4BB"
+  },
+  {
+   "id": "e056",
+   "merchant": "Telekom Deutschland GmbH",
+   "purpose": "EREF+PL3AK8UEBADT63 MREF+MKM5E9CTYMJ CRED+DE19ZZZ00002123820 SVWZ+Rechnung 07/2026 Kundenkonto 18441337 MagentaZuhause",
+   "amountCents": -4495,
+   "accountType": "giro",
+   "bookingDate": "2026-09-15",
+   "category": "internet_telefon",
+   "creditorID": "DE19ZZZ00002123820",
+   "mref": "MKM5E9CTYMJ"
+  },
+  {
+   "id": "e174",
+   "merchant": "TUI Deutschland",
+   "purpose": "Anzahlung Pauschalreise 85227261",
+   "amountCents": -30879,
+   "accountType": "giro",
+   "bookingDate": "2026-08-13",
+   "category": "reisen"
+  },
+  {
+   "id": "e104",
+   "merchant": "ARAL Station//Koeln/DE",
+   "purpose": "VISA Debitkartenumsatz 15.05. 16:50 Karte 1 Folgenr. 87",
+   "amountCents": -8465,
+   "accountType": "giro",
+   "bookingDate": "2025-09-07",
+   "category": "tanken"
+  },
+  {
+   "id": "e177",
+   "merchant": "Zalando SE",
+   "purpose": "Zalando Bestellung 00380870",
+   "amountCents": -7452,
+   "accountType": "giro",
+   "bookingDate": "2025-11-26",
+   "category": "kleidung"
+  },
+  {
+   "id": "e146",
+   "merchant": "Audible GmbH",
+   "purpose": "EREF+77K1BQ1LSQJACW MREF+MEQCBA23JQR CRED+DE41ZZZ00003228949 SVWZ+Audible Mitgliedschaft CST5RP1R",
+   "amountCents": -995,
+   "accountType": "giro",
+   "bookingDate": "2025-07-23",
+   "category": "abos",
+   "creditorID": "DE41ZZZ00003228949",
+   "mref": "MEQCBA23JQR"
+  },
+  {
+   "id": "e243",
+   "merchant": "Max Mustermann",
+   "purpose": "Uebertrag Gemeinschaftskonto 09/2026",
+   "amountCents": -60638,
+   "accountType": "giro",
+   "bookingDate": "2026-02-18",
+   "category": "umbuchung"
+  },
+  {
+   "id": "e095",
+   "merchant": "dm-drogerie markt",
+   "purpose": "Kartenzahlung girocard dm-drogerie markt Hannover 17851047 12.06",
+   "amountCents": -2679,
+   "accountType": "giro",
+   "bookingDate": "2026-07-11",
+   "category": "drogerie"
+  },
+  {
+   "id": "e002",
+   "merchant": "Muster Software GmbH",
+   "purpose": "EREF+EPDUBWB4NR50L5 SVWZ+Gehalt 05/2025 Personalnr 72138761",
+   "amountCents": 332589,
+   "accountType": "giro",
+   "bookingDate": "2026-07-26",
+   "category": "gehalt"
+  },
+  {
+   "id": "e043",
+   "merchant": "Wohnbau Beispiel eG",
+   "purpose": "EREF+1U1MW24PJU5QTE MREF+MDGK9KNPQ3Y CRED+DE63ZZZ00002285920 SVWZ+Nutzungsentgelt 08 2025",
+   "amountCents": -74500,
+   "accountType": "giro",
+   "bookingDate": "2025-09-20",
+   "category": "miete",
+   "creditorID": "DE63ZZZ00002285920",
+   "mref": "MDGK9KNPQ3Y"
+  },
+  {
+   "id": "e016",
+   "merchant": "Finanzamt Musterstadt",
+   "purpose": "EREF+4PBZKWDK7MU9NW SVWZ+Einkommensteuer 2025 Erstattung StNr 92375216",
+   "amountCents": 99304,
+   "accountType": "giro",
+   "bookingDate": "2026-06-19",
+   "category": "erstattung"
+  },
+  {
+   "id": "e079",
+   "merchant": "EDEKA Center//Hannover/DE",
+   "purpose": "VISA Debitkartenumsatz 02.04. 17:43 Karte 1 Folgenr. 34",
+   "amountCents": -8098,
+   "accountType": "giro",
+   "bookingDate": "2025-08-17",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e225",
+   "merchant": "Smyths Toys//Berlin/DE",
+   "purpose": "VISA Debitkartenumsatz 19.11. 20:31 Karte 1 Folgenr. 90",
+   "amountCents": -6790,
+   "accountType": "giro",
+   "bookingDate": "2026-10-23",
+   "category": "kinder"
+  },
+  {
+   "id": "e113",
+   "merchant": "DB Vertrieb GmbH",
+   "purpose": "Fahrschein RA5BQBW0 DB Fernverkehr",
+   "amountCents": -13935,
+   "accountType": "giro",
+   "bookingDate": "2025-08-13",
+   "category": "oepnv"
+  },
+  {
+   "id": "e254",
+   "merchant": "",
+   "purpose": "Kauf ISIN US0378331005 Apple Inc",
+   "amountCents": -60081,
+   "accountType": "depot",
+   "bookingDate": "2026-10-02",
+   "category": "sparen_anlegen"
+  },
+  {
+   "id": "e134",
+   "merchant": "SHARE NOW GmbH",
+   "purpose": "SHARE NOW Miete 43955624",
+   "amountCents": -888,
+   "accountType": "giro",
+   "bookingDate": "2026-05-11",
+   "category": "taxi_sharing"
+  },
+  {
+   "id": "e141",
+   "merchant": "Spotify AB",
+   "purpose": "Spotify P74123196 Premium",
+   "amountCents": -1099,
+   "accountType": "card",
+   "bookingDate": "2026-03-12",
+   "category": "abos"
+  },
+  {
+   "id": "e183",
+   "merchant": "C&A Mode//Dresden/DE",
+   "purpose": "VISA Debitkartenumsatz 01.09. 16:11 Karte 1 Folgenr. 14",
+   "amountCents": -5358,
+   "accountType": "giro",
+   "bookingDate": "2026-03-16",
+   "category": "kleidung"
+  },
+  {
+   "id": "e241",
+   "merchant": "Eigenes Konto",
+   "purpose": "Uebertrag vom Girokonto",
+   "amountCents": 18030,
+   "accountType": "tagesgeld",
+   "bookingDate": "2025-10-20",
+   "category": "umbuchung"
+  },
+  {
+   "id": "e031",
+   "merchant": "Max Beispiel",
+   "purpose": "EREF+U06CW2BHUZRGW3 SVWZ+Anteil Ferienwohnung",
+   "amountCents": 39474,
+   "accountType": "giro",
+   "bookingDate": "2025-12-15",
+   "category": "einnahmen_sonstige"
+  },
+  {
+   "id": "e256",
+   "merchant": "DKB AG",
+   "purpose": "Kreditkartenabrechnung 07/2025 VISA",
+   "amountCents": -135719,
+   "accountType": "giro",
+   "bookingDate": "2025-05-17",
+   "category": "kredit"
+  },
+  {
+   "id": "e261",
+   "merchant": "Santander Consumer Bank",
+   "purpose": "EREF+1HTS25AMXZZSG0 MREF+MVWUL70GZ7K CRED+DE46ZZZ00006789395 SVWZ+Rate Ratenkredit 18408278",
+   "amountCents": -18900,
+   "accountType": "giro",
+   "bookingDate": "2026-10-13",
+   "category": "kredit",
+   "creditorID": "DE46ZZZ00006789395",
+   "mref": "MVWUL70GZ7K"
+  },
+  {
+   "id": "e160",
+   "merchant": "TSV Beispiel 1880 e.V.",
+   "purpose": "EREF+D09QXPVHCY7V55 MREF+MB6U2Z5GTTW CRED+DE78ZZZ00003526311 SVWZ+Vereinsbeitrag 2025 Mitgl 75356545",
+   "amountCents": -9600,
+   "accountType": "giro",
+   "bookingDate": "2026-01-29",
+   "category": "sport",
+   "creditorID": "DE78ZZZ00003526311",
+   "mref": "MB6U2Z5GTTW"
+  },
+  {
+   "id": "e255",
+   "merchant": "Max Mustermann",
+   "purpose": "VL Vermoegenswirksame Leistungen",
+   "amountCents": -4000,
+   "accountType": "giro",
+   "bookingDate": "2025-07-26",
+   "category": "sparen_anlegen"
+  },
+  {
+   "id": "e180",
+   "merchant": "Peek & Cloppenburg//Dortmund/DE",
+   "purpose": "VISA Debitkartenumsatz 13.03. 08:50 Karte 1 Folgenr. 87",
+   "amountCents": -22398,
+   "accountType": "giro",
+   "bookingDate": "2026-04-17",
+   "category": "kleidung"
+  },
+  {
+   "id": "e038",
+   "merchant": "Muster Hausverwaltung",
+   "purpose": "EREF+0CJ4RCRV9PN87P SVWZ+Miete 01/2026 Whg 3 OG links",
+   "amountCents": -98000,
+   "accountType": "giro",
+   "bookingDate": "2026-10-22",
+   "category": "miete"
+  },
+  {
+   "id": "e247",
+   "merchant": "",
+   "purpose": "Sparplan Ausfuehrung ISIN IE00B4L5Y983 Stk 1,234",
+   "amountCents": -16646,
+   "accountType": "depot",
+   "bookingDate": "2026-06-26",
+   "category": "sparen_anlegen"
+  },
+  {
+   "id": "e082",
+   "merchant": "KAUFLAND MAINZ",
+   "purpose": "",
+   "amountCents": -6034,
+   "accountType": "card",
+   "bookingDate": "2025-05-15",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e100",
+   "merchant": "Mueller Drogerie//Leipzig/DE",
+   "purpose": "VISA Debitkartenumsatz 25.02. 11:10 Karte 1 Folgenr. 76",
+   "amountCents": -2165,
+   "accountType": "giro",
+   "bookingDate": "2026-07-26",
+   "category": "drogerie"
+  },
+  {
+   "id": "e121",
+   "merchant": "ATU Auto-Teile-Unger//Dortmund/DE",
+   "purpose": "VISA Debitkartenumsatz 16.07. 12:43 Karte 1 Folgenr. 80",
+   "amountCents": -18028,
+   "accountType": "giro",
+   "bookingDate": "2025-07-09",
+   "category": "auto"
+  },
+  {
+   "id": "e061",
+   "merchant": "congstar",
+   "purpose": "EREF+KTD8XE4GK0LLV8 MREF+MDTA3RSHGEE CRED+DE17ZZZ00005090576 SVWZ+congstar Rechnung 01.2026",
+   "amountCents": -1329,
+   "accountType": "giro",
+   "bookingDate": "2026-03-07",
+   "category": "internet_telefon",
+   "creditorID": "DE17ZZZ00005090576",
+   "mref": "MDTA3RSHGEE"
+  },
+  {
+   "id": "e201",
+   "merchant": "Etsy Ireland",
+   "purpose": "Etsy Bestellung 57690899",
+   "amountCents": -6150,
+   "accountType": "card",
+   "bookingDate": "2026-06-19",
+   "category": "online_shopping"
+  },
+  {
+   "id": "e010",
+   "merchant": "AMAZON PAYMENTS EUROPE S.C.A.",
+   "purpose": "EREF+X775PKEVYG9LGE SVWZ+Erstattung Bestellung 302-07535607",
+   "amountCents": 8553,
+   "accountType": "giro",
+   "bookingDate": "2025-07-04",
+   "category": "erstattung"
+  },
+  {
+   "id": "e170",
+   "merchant": "Booking.com",
+   "purpose": "Booking.com Hotel Reservierung 10248964",
+   "amountCents": -35345,
+   "accountType": "card",
+   "bookingDate": "2025-07-26",
+   "category": "reisen"
+  },
+  {
+   "id": "e281",
+   "merchant": "Stadtkasse Musterstadt",
+   "purpose": "Grundsteuer 2025 Kassenzeichen 10046047",
+   "amountCents": -23347,
+   "accountType": "giro",
+   "bookingDate": "2026-05-08",
+   "category": "steuern"
+  },
+  {
+   "id": "e048",
+   "merchant": "Vattenfall Europe Sales GmbH",
+   "purpose": "EREF+E0TRPGTLKHV5QP MREF+M3D0SS02TE5 CRED+DE57ZZZ00006600190 SVWZ+Abschlag Gas 10/2025 VK 73440388",
+   "amountCents": -9500,
+   "accountType": "giro",
+   "bookingDate": "2026-02-10",
+   "category": "nebenkosten",
+   "creditorID": "DE57ZZZ00006600190",
+   "mref": "M3D0SS02TE5"
+  },
+  {
+   "id": "e216",
+   "merchant": "Techniker Krankenkasse",
+   "purpose": "EREF+WV50QKX21GE2R0 MREF+M6HSWL1KFDH CRED+DE31ZZZ00002750028 SVWZ+Beitrag freiwillige Versicherung 06/2025",
+   "amountCents": -24500,
+   "accountType": "giro",
+   "bookingDate": "2025-05-11",
+   "category": "versicherung",
+   "creditorID": "DE31ZZZ00002750028",
+   "mref": "M6HSWL1KFDH"
+  },
+  {
+   "id": "e266",
+   "merchant": "",
+   "purpose": "Kontofuehrungsentgelt 02/2025",
+   "amountCents": -495,
+   "accountType": "giro",
+   "bookingDate": "2025-12-09",
+   "category": "gebuehren"
+  },
+  {
+   "id": "e051",
+   "merchant": "E.ON Energie Deutschland",
+   "purpose": "EREF+02SUXLFV8C5J59 MREF+MRT7X4WFKU6 CRED+DE63ZZZ00000048932 SVWZ+Abschlagszahlung Strom VK 59280946",
+   "amountCents": -7200,
+   "accountType": "giro",
+   "bookingDate": "2026-06-27",
+   "category": "nebenkosten",
+   "creditorID": "DE63ZZZ00000048932",
+   "mref": "MRT7X4WFKU6"
+  },
+  {
+   "id": "e290",
+   "merchant": "",
+   "purpose": "Bargeldeinzahlung Automat",
+   "amountCents": 18057,
+   "accountType": "giro",
+   "bookingDate": "2026-10-15",
+   "category": "bargeld"
+  },
+  {
+   "id": "e253",
+   "merchant": "",
+   "purpose": "Kauf ISIN US0378331005 Apple Inc",
+   "amountCents": -54863,
+   "accountType": "depot",
+   "bookingDate": "2026-07-18",
+   "category": "sparen_anlegen"
+  },
+  {
+   "id": "e019",
+   "merchant": "",
+   "purpose": "Zinsen 02/2026 Tagesgeld",
+   "amountCents": 1551,
+   "accountType": "tagesgeld",
+   "bookingDate": "2025-12-21",
+   "category": "zinsen"
+  },
+  {
+   "id": "e181",
+   "merchant": "Deichmann Schuhe//Bremen/DE",
+   "purpose": "VISA Debitkartenumsatz 17.05. 13:31 Karte 1 Folgenr. 34",
+   "amountCents": -4973,
+   "accountType": "giro",
+   "bookingDate": "2026-09-06",
+   "category": "kleidung"
+  },
+  {
+   "id": "e138",
+   "merchant": "Taxi Funk Zentrale//Hannover/DE",
+   "purpose": "VISA Debitkartenumsatz 14.03. 10:40 Karte 1 Folgenr. 53",
+   "amountCents": -3706,
+   "accountType": "giro",
+   "bookingDate": "2025-08-17",
+   "category": "taxi_sharing"
+  },
+  {
+   "id": "e269",
+   "merchant": "",
+   "purpose": "Entgelt Girocard Jahresgebuehr",
+   "amountCents": -1200,
+   "accountType": "giro",
+   "bookingDate": "2026-01-08",
+   "category": "gebuehren"
+  },
+  {
+   "id": "e046",
+   "merchant": "Stadtwerke Musterstadt",
+   "purpose": "EREF+DJVNAYCPQUQF6N MREF+M5Y1HRFH46T CRED+DE75ZZZ00003478860 SVWZ+Abschlag Strom 02/2025 Vertragskonto 21240900",
+   "amountCents": -6800,
+   "accountType": "giro",
+   "bookingDate": "2025-11-12",
+   "category": "nebenkosten",
+   "creditorID": "DE75ZZZ00003478860",
+   "mref": "M5Y1HRFH46T"
+  },
+  {
+   "id": "e130",
+   "merchant": "Uber BV",
+   "purpose": "Uber Trip VGBFH7ZG",
+   "amountCents": -2103,
+   "accountType": "giro",
+   "bookingDate": "2026-05-22",
+   "category": "taxi_sharing"
+  },
+  {
+   "id": "e068",
+   "merchant": "Bauhaus",
+   "purpose": "Kartenzahlung girocard Bauhaus Hamburg 65353985 14.10",
+   "amountCents": -8162,
+   "accountType": "giro",
+   "bookingDate": "2025-05-31",
+   "category": "haushalt"
+  },
+  {
+   "id": "e151",
+   "merchant": "Kino Cinemaxx//Koeln/DE",
+   "purpose": "VISA Debitkartenumsatz 05.10. 19:42 Karte 1 Folgenr. 58",
+   "amountCents": -3489,
+   "accountType": "giro",
+   "bookingDate": "2025-10-21",
+   "category": "freizeit"
+  },
+  {
+   "id": "e179",
+   "merchant": "Peek & Cloppenburg//Mainz/DE",
+   "purpose": "VISA Debitkartenumsatz 09.05. 21:01 Karte 1 Folgenr. 74",
+   "amountCents": -18017,
+   "accountType": "giro",
+   "bookingDate": "2026-07-15",
+   "category": "kleidung"
+  },
+  {
+   "id": "e020",
+   "merchant": "",
+   "purpose": "Zinsen 11/2026 Tagesgeld",
+   "amountCents": 2479,
+   "accountType": "tagesgeld",
+   "bookingDate": "2026-03-20",
+   "category": "zinsen"
+  },
+  {
+   "id": "e117",
+   "merchant": "HVV Hamburger Verkehrsverbund",
+   "purpose": "HVV Ticket App 07875801",
+   "amountCents": -569,
+   "accountType": "giro",
+   "bookingDate": "2025-06-29",
+   "category": "oepnv"
+  },
+  {
+   "id": "e131",
+   "merchant": "Uber BV",
+   "purpose": "Uber Trip 38ZG04N7",
+   "amountCents": -3065,
+   "accountType": "giro",
+   "bookingDate": "2026-01-10",
+   "category": "taxi_sharing"
+  },
+  {
+   "id": "e040",
+   "merchant": "Muster Hausverwaltung",
+   "purpose": "EREF+AVU02RN86DJMZZ SVWZ+Miete 04/2026 Whg 3 OG links",
+   "amountCents": -98000,
+   "accountType": "giro",
+   "bookingDate": "2025-12-31",
+   "category": "miete"
+  },
+  {
+   "id": "e217",
+   "merchant": "ERGO Lebensversicherung",
+   "purpose": "EREF+CE8NZJCV4L0SR4 MREF+MRD83KF8520 CRED+DE31ZZZ00005943207 SVWZ+BU-Versicherung Beitrag 17174904",
+   "amountCents": -6230,
+   "accountType": "giro",
+   "bookingDate": "2026-03-30",
+   "category": "versicherung",
+   "creditorID": "DE31ZZZ00005943207",
+   "mref": "MRD83KF8520"
+  },
+  {
+   "id": "e244",
+   "merchant": "C24 Pocket",
+   "purpose": "Pocket Umbuchung Urlaub",
+   "amountCents": -20489,
+   "accountType": "giro",
+   "bookingDate": "2026-10-12",
+   "category": "umbuchung"
+  },
+  {
+   "id": "e135",
+   "merchant": "SHARE NOW GmbH",
+   "purpose": "SHARE NOW Miete 60324439",
+   "amountCents": -1871,
+   "accountType": "giro",
+   "bookingDate": "2026-05-04",
+   "category": "taxi_sharing"
+  },
+  {
+   "id": "e206",
+   "merchant": "Shop Apotheke",
+   "purpose": "Shop Apotheke Bestellung 41074518",
+   "amountCents": -1002,
+   "accountType": "giro",
+   "bookingDate": "2026-03-02",
+   "category": "gesundheit"
+  },
+  {
+   "id": "e041",
+   "merchant": "Wohnbau Beispiel eG",
+   "purpose": "EREF+99V4TWJUNBBS1Y MREF+MDGK9KNPQ3Y CRED+DE63ZZZ00002285920 SVWZ+Nutzungsentgelt 12 2026",
+   "amountCents": -74500,
+   "accountType": "giro",
+   "bookingDate": "2026-06-02",
+   "category": "miete",
+   "creditorID": "DE63ZZZ00002285920",
+   "mref": "MDGK9KNPQ3Y"
+  },
+  {
+   "id": "e277",
+   "merchant": "Rundfunk ARD ZDF DRadio",
+   "purpose": "EREF+QGUEU39HWS7H9G MREF+MKN0K62ZDB7 CRED+DE55ZZZ00004815844 SVWZ+Rundfunkbeitrag 12/2026 Beitragsnr 85571931",
+   "amountCents": -5508,
+   "accountType": "giro",
+   "bookingDate": "2026-03-03",
+   "category": "steuern",
+   "creditorID": "DE55ZZZ00004815844",
+   "mref": "MKN0K62ZDB7"
+  },
+  {
+   "id": "e287",
+   "merchant": "",
+   "purpose": "Bargeld REWE Cashback",
+   "amountCents": -8253,
+   "accountType": "giro",
+   "bookingDate": "2025-12-29",
+   "category": "bargeld"
+  },
+  {
+   "id": "e239",
+   "merchant": "Eigenes Konto",
+   "purpose": "Umbuchung auf Tagesgeld",
+   "amountCents": -53394,
+   "accountType": "giro",
+   "bookingDate": "2026-06-17",
+   "category": "umbuchung"
+  },
+  {
+   "id": "e214",
+   "merchant": "HUK24 AG",
+   "purpose": "EREF+GFHC5NP3G9LRDE MREF+M3PTGX5YYY9 CRED+DE90ZZZ00009938548 SVWZ+Hausrat Beitrag 03/2025",
+   "amountCents": -1450,
+   "accountType": "giro",
+   "bookingDate": "2026-09-01",
+   "category": "versicherung",
+   "creditorID": "DE90ZZZ00009938548",
+   "mref": "M3PTGX5YYY9"
+  },
+  {
+   "id": "e089",
+   "merchant": "MCDONALDS KOELN",
+   "purpose": "",
+   "amountCents": -1090,
+   "accountType": "card",
+   "bookingDate": "2026-05-17",
+   "category": "restaurant"
+  },
+  {
+   "id": "e150",
+   "merchant": "Eventim",
+   "purpose": "CTS EVENTIM Tickets 41394704",
+   "amountCents": -13741,
+   "accountType": "card",
+   "bookingDate": "2025-12-30",
+   "category": "freizeit"
+  },
+  {
+   "id": "e212",
+   "merchant": "Allianz Versicherungs-AG",
+   "purpose": "EREF+YQ8UCZJL8A8SE6 MREF+MK5MEMACB72 CRED+DE17ZZZ00003563145 SVWZ+Haftpflicht Beitrag 2026 Vers-Nr 42989290",
+   "amountCents": -6800,
+   "accountType": "giro",
+   "bookingDate": "2026-07-09",
+   "category": "versicherung",
+   "creditorID": "DE17ZZZ00003563145",
+   "mref": "MK5MEMACB72"
+  },
+  {
+   "id": "e106",
+   "merchant": "Shell Deutschland//Bremen/DE",
+   "purpose": "VISA Debitkartenumsatz 25.11. 10:59 Karte 1 Folgenr. 68",
+   "amountCents": -7347,
+   "accountType": "giro",
+   "bookingDate": "2026-01-16",
+   "category": "tanken"
+  },
+  {
+   "id": "e162",
+   "merchant": "Decathlon//Hannover/DE",
+   "purpose": "VISA Debitkartenumsatz 01.05. 10:09 Karte 1 Folgenr. 32",
+   "amountCents": -5834,
+   "accountType": "giro",
+   "bookingDate": "2026-07-02",
+   "category": "sport"
+  },
+  {
+   "id": "e228",
+   "merchant": "Jako-o Kinderbekleidung//Dresden/DE",
+   "purpose": "VISA Debitkartenumsatz 20.04. 19:19 Karte 1 Folgenr. 34",
+   "amountCents": -5034,
+   "accountType": "giro",
+   "bookingDate": "2026-02-03",
+   "category": "kinder"
+  },
+  {
+   "id": "e044",
+   "merchant": "Wohnbau Beispiel eG",
+   "purpose": "EREF+R9J9E9KWRUJPW6 MREF+MDGK9KNPQ3Y CRED+DE63ZZZ00002285920 SVWZ+Nutzungsentgelt 04 2025",
+   "amountCents": -74500,
+   "accountType": "giro",
+   "bookingDate": "2026-06-14",
+   "category": "miete",
+   "creditorID": "DE63ZZZ00002285920",
+   "mref": "MDGK9KNPQ3Y"
+  },
+  {
+   "id": "e299",
+   "merchant": "Notar Beispiel",
+   "purpose": "Kostenrechnung 94940890",
+   "amountCents": -24587,
+   "accountType": "giro",
+   "bookingDate": "2026-02-03",
+   "category": "sonstiges"
+  },
+  {
+   "id": "e069",
+   "merchant": "Bauhaus",
+   "purpose": "Kartenzahlung girocard Bauhaus Muenchen 40424161 11.10",
+   "amountCents": -9590,
+   "accountType": "giro",
+   "bookingDate": "2026-09-19",
+   "category": "haushalt"
+  },
+  {
+   "id": "e090",
+   "merchant": "MCDONALDS DORTMUND",
+   "purpose": "",
+   "amountCents": -2000,
+   "accountType": "card",
+   "bookingDate": "2026-08-05",
+   "category": "restaurant"
+  },
+  {
+   "id": "e008",
+   "merchant": "Bundesagentur fuer Arbeit",
+   "purpose": "EREF+78ACJHJ1J1V7LJ SVWZ+Elterngeld Leistung 12/2026 Kd-Nr 92501388",
+   "amountCents": 179318,
+   "accountType": "giro",
+   "bookingDate": "2026-02-02",
+   "category": "gehalt"
+  },
+  {
+   "id": "e165",
+   "merchant": "Kletterhalle Boulderwelt//Bremen/DE",
+   "purpose": "VISA Debitkartenumsatz 15.06. 17:58 Karte 1 Folgenr. 11",
+   "amountCents": -1548,
+   "accountType": "giro",
+   "bookingDate": "2025-10-13",
+   "category": "sport"
+  },
+  {
+   "id": "e003",
+   "merchant": "Muster Software GmbH",
+   "purpose": "EREF+BR9K1C6QMQX1E4 SVWZ+Gehalt 07/2025 Personalnr 04045628",
+   "amountCents": 325268,
+   "accountType": "giro",
+   "bookingDate": "2025-06-03",
+   "category": "gehalt"
+  },
+  {
+   "id": "e236",
+   "merchant": "Wikimedia Foerdergesellschaft",
+   "purpose": "Spende Wikipedia",
+   "amountCents": -2850,
+   "accountType": "giro",
+   "bookingDate": "2026-08-13",
+   "category": "geschenke_spenden"
+  },
+  {
+   "id": "e081",
+   "merchant": "LIDL DIENSTLEISTUNG",
+   "purpose": "Kartenzahlung girocard LIDL DIENSTLEISTUNG Berlin 71860010 03.01",
+   "amountCents": -2012,
+   "accountType": "giro",
+   "bookingDate": "2026-01-29",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e184",
+   "merchant": "MediaMarkt//Muenchen/DE",
+   "purpose": "VISA Debitkartenumsatz 11.11. 12:04 Karte 1 Folgenr. 30",
+   "amountCents": -31785,
+   "accountType": "giro",
+   "bookingDate": "2025-12-07",
+   "category": "elektronik"
+  },
+  {
+   "id": "e195",
+   "merchant": "PayPal Europe S.a.r.l. et Cie S.C.A",
+   "purpose": "PP.11825424.PP . Ihr Einkauf bei eBay",
+   "amountCents": -3163,
+   "accountType": "giro",
+   "bookingDate": "2026-02-26",
+   "category": "online_shopping"
+  },
+  {
+   "id": "e176",
+   "merchant": "H&M//Hannover/DE",
+   "purpose": "VISA Debitkartenumsatz 26.06. 12:54 Karte 1 Folgenr. 83",
+   "amountCents": -8153,
+   "accountType": "giro",
+   "bookingDate": "2026-05-16",
+   "category": "kleidung"
+  },
+  {
+   "id": "e105",
+   "merchant": "Shell Deutschland//Dresden/DE",
+   "purpose": "VISA Debitkartenumsatz 18.12. 13:29 Karte 1 Folgenr. 95",
+   "amountCents": -7363,
+   "accountType": "giro",
+   "bookingDate": "2026-07-23",
+   "category": "tanken"
+  },
+  {
+   "id": "e258",
+   "merchant": "easybank AG",
+   "purpose": "Ausgleich Kreditkarte Abrechnung 18188489",
+   "amountCents": -70197,
+   "accountType": "giro",
+   "bookingDate": "2026-04-19",
+   "category": "kredit"
+  },
+  {
+   "id": "e028",
+   "merchant": "Kleinanzeigen Kaeuferin",
+   "purpose": "EREF+C25ULCW5542K1W SVWZ+Kleinanzeigen Fahrrad",
+   "amountCents": 11333,
+   "accountType": "giro",
+   "bookingDate": "2025-06-17",
+   "category": "einnahmen_sonstige"
+  },
+  {
+   "id": "e030",
+   "merchant": "Max Beispiel",
+   "purpose": "EREF+JMZREG2R8TZFRZ SVWZ+Anteil Ferienwohnung",
+   "amountCents": 20657,
+   "accountType": "giro",
+   "bookingDate": "2026-08-01",
+   "category": "einnahmen_sonstige"
+  },
+  {
+   "id": "e101",
+   "merchant": "Mueller Drogerie//Muenchen/DE",
+   "purpose": "VISA Debitkartenumsatz 11.03. 18:04 Karte 1 Folgenr. 71",
+   "amountCents": -1686,
+   "accountType": "giro",
+   "bookingDate": "2026-02-15",
+   "category": "drogerie"
+  },
+  {
+   "id": "e207",
+   "merchant": "Shop Apotheke",
+   "purpose": "Shop Apotheke Bestellung 96270780",
+   "amountCents": -5094,
+   "accountType": "giro",
+   "bookingDate": "2026-05-25",
+   "category": "gesundheit"
+  },
+  {
+   "id": "e107",
+   "merchant": "TOTALENERGIES DRESDEN",
+   "purpose": "",
+   "amountCents": -6105,
+   "accountType": "card",
+   "bookingDate": "2025-07-17",
+   "category": "tanken"
+  },
+  {
+   "id": "e284",
+   "merchant": "",
+   "purpose": "Bargeldauszahlung GAA Sparkasse 31509862",
+   "amountCents": -20991,
+   "accountType": "giro",
+   "bookingDate": "2026-02-21",
+   "category": "bargeld"
+  },
+  {
+   "id": "e270",
+   "merchant": "",
+   "purpose": "Entgelt Girocard Jahresgebuehr",
+   "amountCents": -1200,
+   "accountType": "giro",
+   "bookingDate": "2026-09-24",
+   "category": "gebuehren"
+  },
+  {
+   "id": "e057",
+   "merchant": "Vodafone GmbH",
+   "purpose": "EREF+4BWTRNWPFPA2U7 MREF+M307B7AWAUS CRED+DE62ZZZ00006841302 SVWZ+Vodafone Mobilfunk Rechnung 84754472",
+   "amountCents": -3788,
+   "accountType": "giro",
+   "bookingDate": "2025-11-06",
+   "category": "internet_telefon",
+   "creditorID": "DE62ZZZ00006841302",
+   "mref": "M307B7AWAUS"
+  },
+  {
+   "id": "e070",
+   "merchant": "Hornbach Baumarkt//Hannover/DE",
+   "purpose": "VISA Debitkartenumsatz 13.11. 13:10 Karte 1 Folgenr. 32",
+   "amountCents": -4455,
+   "accountType": "giro",
+   "bookingDate": "2025-09-02",
+   "category": "haushalt"
+  },
+  {
+   "id": "e232",
+   "merchant": "Aerzte ohne Grenzen e.V.",
+   "purpose": "Spende Nothilfe 03984612",
+   "amountCents": -8892,
+   "accountType": "giro",
+   "bookingDate": "2026-04-24",
+   "category": "geschenke_spenden"
+  },
+  {
+   "id": "e148",
+   "merchant": "Eventim",
+   "purpose": "CTS EVENTIM Tickets 68848963",
+   "amountCents": -4824,
+   "accountType": "card",
+   "bookingDate": "2025-11-08",
+   "category": "freizeit"
+  },
+  {
+   "id": "e154",
+   "merchant": "Thalia Buchhandlung//Berlin/DE",
+   "purpose": "VISA Debitkartenumsatz 10.11. 16:57 Karte 1 Folgenr. 35",
+   "amountCents": -1790,
+   "accountType": "giro",
+   "bookingDate": "2025-11-20",
+   "category": "freizeit"
+  },
+  {
+   "id": "e169",
+   "merchant": "Booking.com",
+   "purpose": "Booking.com Hotel Reservierung 98543212",
+   "amountCents": -46709,
+   "accountType": "card",
+   "bookingDate": "2026-02-07",
+   "category": "reisen"
+  },
+  {
+   "id": "e237",
+   "merchant": "Jan Beispiel",
+   "purpose": "Hochzeitsgeschenk",
+   "amountCents": -6102,
+   "accountType": "giro",
+   "bookingDate": "2025-10-28",
+   "category": "geschenke_spenden"
+  },
+  {
+   "id": "e293",
+   "merchant": "Deutsche Post AG",
+   "purpose": "Briefmarken Online 18320287",
+   "amountCents": -1156,
+   "accountType": "giro",
+   "bookingDate": "2026-01-26",
+   "category": "sonstiges"
+  },
+  {
+   "id": "e300",
+   "merchant": "Fundbuero",
+   "purpose": "Verwahrgebuehr",
+   "amountCents": -1115,
+   "accountType": "giro",
+   "bookingDate": "2026-07-26",
+   "category": "sonstiges"
+  },
+  {
+   "id": "e250",
+   "merchant": "Scalable Capital",
+   "purpose": "Sparplan 02/2026",
+   "amountCents": -26196,
+   "accountType": "giro",
+   "bookingDate": "2025-06-01",
+   "category": "sparen_anlegen"
+  },
+  {
+   "id": "e126",
+   "merchant": "Autohaus Beispiel Service//Berlin/DE",
+   "purpose": "VISA Debitkartenumsatz 18.06. 12:41 Karte 1 Folgenr. 41",
+   "amountCents": -44906,
+   "accountType": "giro",
+   "bookingDate": "2026-05-03",
+   "category": "auto"
+  },
+  {
+   "id": "e171",
+   "merchant": "Airbnb",
+   "purpose": "AIRBNB * HMWC0MP78K",
+   "amountCents": -79838,
+   "accountType": "card",
+   "bookingDate": "2026-01-03",
+   "category": "reisen"
+  },
+  {
+   "id": "e015",
+   "merchant": "Zalando SE",
+   "purpose": "EREF+BXR54SG4SU1HVG SVWZ+Rueckerstattung Retoure 00409986",
+   "amountCents": 9561,
+   "accountType": "giro",
+   "bookingDate": "2025-11-05",
+   "category": "erstattung"
+  },
+  {
+   "id": "e087",
+   "merchant": "Starbucks Coffee//Hannover/DE",
+   "purpose": "VISA Debitkartenumsatz 12.06. 17:04 Karte 1 Folgenr. 64",
+   "amountCents": -753,
+   "accountType": "giro",
+   "bookingDate": "2025-05-15",
+   "category": "restaurant"
+  },
+  {
+   "id": "e065",
+   "merchant": "IKEA Deutschland//Hamburg/DE",
+   "purpose": "VISA Debitkartenumsatz 20.12. 15:08 Karte 1 Folgenr. 45",
+   "amountCents": -17352,
+   "accountType": "giro",
+   "bookingDate": "2025-05-25",
+   "category": "haushalt"
+  },
+  {
+   "id": "e004",
+   "merchant": "Stadtklinik Nord gGmbH",
+   "purpose": "EREF+M3DM08BQCZEYW7 SVWZ+LOHN/GEHALT 10.2025",
+   "amountCents": 282530,
+   "accountType": "giro",
+   "bookingDate": "2026-07-08",
+   "category": "gehalt"
+  },
+  {
+   "id": "e035",
+   "merchant": "Vinted UAB",
+   "purpose": "EREF+6HLAZH603G43C3 SVWZ+Auszahlung Verkauf 64674762",
+   "amountCents": 5650,
+   "accountType": "giro",
+   "bookingDate": "2026-10-16",
+   "category": "einnahmen_sonstige"
+  },
+  {
+   "id": "e190",
+   "merchant": "Apple Store",
+   "purpose": "Apple Store Online Bestellung W92087904",
+   "amountCents": -99008,
+   "accountType": "card",
+   "bookingDate": "2025-11-04",
+   "category": "elektronik"
+  },
+  {
+   "id": "e058",
+   "merchant": "Vodafone GmbH",
+   "purpose": "EREF+G2QHRBMYL5BYCE MREF+M307B7AWAUS CRED+DE62ZZZ00006841302 SVWZ+Vodafone Mobilfunk Rechnung 66198644",
+   "amountCents": -3919,
+   "accountType": "giro",
+   "bookingDate": "2025-06-01",
+   "category": "internet_telefon",
+   "creditorID": "DE62ZZZ00006841302",
+   "mref": "M307B7AWAUS"
+  },
+  {
+   "id": "e039",
+   "merchant": "Muster Hausverwaltung",
+   "purpose": "EREF+RRNMH0DCPCLW4Q SVWZ+Miete 11/2025 Whg 3 OG links",
+   "amountCents": -98000,
+   "accountType": "giro",
+   "bookingDate": "2025-08-26",
+   "category": "miete"
+  },
+  {
+   "id": "e033",
+   "merchant": "PayPal Europe S.a.r.l. et Cie S.C.A",
+   "purpose": "EREF+BUA0QXBPL61LB8 SVWZ+PayPal Guthaben Auszahlung 32882510",
+   "amountCents": 4221,
+   "accountType": "giro",
+   "bookingDate": "2025-11-08",
+   "category": "einnahmen_sonstige"
+  },
+  {
+   "id": "e168",
+   "merchant": "Lufthansa",
+   "purpose": "Lufthansa Ticket 220-86286952",
+   "amountCents": -20849,
+   "accountType": "card",
+   "bookingDate": "2025-06-19",
+   "category": "reisen"
+  },
+  {
+   "id": "e086",
+   "merchant": "Pizzeria Da Mario//Bremen/DE",
+   "purpose": "VISA Debitkartenumsatz 02.04. 15:42 Karte 1 Folgenr. 71",
+   "amountCents": -4699,
+   "accountType": "giro",
+   "bookingDate": "2025-11-29",
+   "category": "restaurant"
+  },
+  {
+   "id": "e022",
+   "merchant": "Trade Republic",
+   "purpose": "Zinszahlung",
+   "amountCents": 1271,
+   "accountType": "giro",
+   "bookingDate": "2026-05-05",
+   "category": "zinsen"
+  },
+  {
+   "id": "e187",
+   "merchant": "Saturn Electro//Dortmund/DE",
+   "purpose": "VISA Debitkartenumsatz 22.06. 16:59 Karte 1 Folgenr. 44",
+   "amountCents": -25563,
+   "accountType": "giro",
+   "bookingDate": "2026-08-09",
+   "category": "elektronik"
+  },
+  {
+   "id": "e122",
+   "merchant": "ATU Auto-Teile-Unger//Bremen/DE",
+   "purpose": "VISA Debitkartenumsatz 26.06. 17:09 Karte 1 Folgenr. 52",
+   "amountCents": -37045,
+   "accountType": "giro",
+   "bookingDate": "2026-01-07",
+   "category": "auto"
+  },
+  {
+   "id": "e153",
+   "merchant": "Thalia Buchhandlung//Dortmund/DE",
+   "purpose": "VISA Debitkartenumsatz 01.10. 18:23 Karte 1 Folgenr. 17",
+   "amountCents": -1551,
+   "accountType": "giro",
+   "bookingDate": "2025-10-04",
+   "category": "freizeit"
+  },
+  {
+   "id": "e052",
+   "merchant": "Berliner Wasserbetriebe",
+   "purpose": "EREF+RUTWSBCG42CB7V MREF+MCVHBCBMUX4 CRED+DE25ZZZ00005217677 SVWZ+Wasser Abschlag 07/2025",
+   "amountCents": -3100,
+   "accountType": "giro",
+   "bookingDate": "2026-10-09",
+   "category": "nebenkosten",
+   "creditorID": "DE25ZZZ00005217677",
+   "mref": "MCVHBCBMUX4"
+  },
+  {
+   "id": "e224",
+   "merchant": "Smyths Toys//Dresden/DE",
+   "purpose": "VISA Debitkartenumsatz 19.11. 19:49 Karte 1 Folgenr. 80",
+   "amountCents": -7515,
+   "accountType": "giro",
+   "bookingDate": "2025-11-10",
+   "category": "kinder"
+  },
+  {
+   "id": "e005",
+   "merchant": "Stadtklinik Nord gGmbH",
+   "purpose": "EREF+YVRF0857G18V5E SVWZ+LOHN/GEHALT 09.2026",
+   "amountCents": 260748,
+   "accountType": "giro",
+   "bookingDate": "2025-05-02",
+   "category": "gehalt"
+  },
+  {
+   "id": "e110",
+   "merchant": "EnBW mobility+",
+   "purpose": "Ladevorgang 01599825 EnBW mobility+",
+   "amountCents": -2072,
+   "accountType": "giro",
+   "bookingDate": "2026-02-15",
+   "category": "tanken"
+  },
+  {
+   "id": "e155",
+   "merchant": "Staatliche Museen//Dortmund/DE",
+   "purpose": "VISA Debitkartenumsatz 05.05. 12:04 Karte 1 Folgenr. 85",
+   "amountCents": -2449,
+   "accountType": "giro",
+   "bookingDate": "2026-05-09",
+   "category": "freizeit"
+  },
+  {
+   "id": "e157",
+   "merchant": "McFIT GmbH",
+   "purpose": "EREF+N10UDK2013VNFP MREF+MHVX1BMLT6D CRED+DE41ZZZ00000084012 SVWZ+Mitgliedsbeitrag 02/2025",
+   "amountCents": -2990,
+   "accountType": "giro",
+   "bookingDate": "2026-06-15",
+   "category": "sport",
+   "creditorID": "DE41ZZZ00000084012",
+   "mref": "MHVX1BMLT6D"
+  },
+  {
+   "id": "e119",
+   "merchant": "FlixBus",
+   "purpose": "FlixBus Buchung 99203951",
+   "amountCents": -2260,
+   "accountType": "giro",
+   "bookingDate": "2026-08-22",
+   "category": "oepnv"
+  },
+  {
+   "id": "e140",
+   "merchant": "Netflix International B.V.",
+   "purpose": "EREF+7UB4NR7RBHKN12 MREF+M4B4T8AENKA CRED+DE91ZZZ00001901122 SVWZ+Netflix Monatsabo 35UW49X6",
+   "amountCents": -1399,
+   "accountType": "giro",
+   "bookingDate": "2025-05-18",
+   "category": "abos",
+   "creditorID": "DE91ZZZ00001901122",
+   "mref": "M4B4T8AENKA"
+  },
+  {
+   "id": "e271",
+   "merchant": "",
+   "purpose": "Fremdautomatengebuehr",
+   "amountCents": -399,
+   "accountType": "giro",
+   "bookingDate": "2025-06-13",
+   "category": "gebuehren"
+  },
+  {
+   "id": "e245",
+   "merchant": "C24 Pocket",
+   "purpose": "Pocket Umbuchung Urlaub",
+   "amountCents": -10501,
+   "accountType": "giro",
+   "bookingDate": "2026-04-20",
+   "category": "umbuchung"
+  },
+  {
+   "id": "e163",
+   "merchant": "Urban Sports Club",
+   "purpose": "Urban Sports Club Membership 01/2026",
+   "amountCents": -5900,
+   "accountType": "giro",
+   "bookingDate": "2026-07-13",
+   "category": "sport"
+  },
+  {
+   "id": "e199",
+   "merchant": "Temu",
+   "purpose": "TEMU.COM 2LSH0MLR",
+   "amountCents": -3046,
+   "accountType": "card",
+   "bookingDate": "2026-10-03",
+   "category": "online_shopping"
+  },
+  {
+   "id": "e136",
+   "merchant": "Lime",
+   "purpose": "Lime Ride L9RE3NAB",
+   "amountCents": -411,
+   "accountType": "giro",
+   "bookingDate": "2025-12-17",
+   "category": "taxi_sharing"
+  },
+  {
+   "id": "e227",
+   "merchant": "Musikschule Beispielstadt",
+   "purpose": "EREF+N2MGKBUDC8T9W8 MREF+MWT45ZM4VMD CRED+DE25ZZZ00009513976 SVWZ+Unterrichtsgebuehr 10/2026",
+   "amountCents": -6500,
+   "accountType": "giro",
+   "bookingDate": "2025-10-02",
+   "category": "kinder",
+   "creditorID": "DE25ZZZ00009513976",
+   "mref": "MWT45ZM4VMD"
+  },
+  {
+   "id": "e259",
+   "merchant": "easybank AG",
+   "purpose": "Ausgleich Kreditkarte Abrechnung 13603501",
+   "amountCents": -31282,
+   "accountType": "giro",
+   "bookingDate": "2026-03-24",
+   "category": "kredit"
+  },
+  {
+   "id": "e175",
+   "merchant": "H&M//Muenchen/DE",
+   "purpose": "VISA Debitkartenumsatz 08.10. 14:45 Karte 1 Folgenr. 08",
+   "amountCents": -5477,
+   "accountType": "giro",
+   "bookingDate": "2026-06-09",
+   "category": "kleidung"
+  },
+  {
+   "id": "e274",
+   "merchant": "Finanzamt Musterstadt",
+   "purpose": "Einkommensteuer Vorauszahlung StNr 88752105",
+   "amountCents": -50764,
+   "accountType": "giro",
+   "bookingDate": "2026-01-27",
+   "category": "steuern"
+  },
+  {
+   "id": "e145",
+   "merchant": "Audible GmbH",
+   "purpose": "EREF+PTCTVF6L0FCFH8 MREF+MEQCBA23JQR CRED+DE41ZZZ00003228949 SVWZ+Audible Mitgliedschaft T7170A5C",
+   "amountCents": -995,
+   "accountType": "giro",
+   "bookingDate": "2026-06-28",
+   "category": "abos",
+   "creditorID": "DE41ZZZ00003228949",
+   "mref": "MEQCBA23JQR"
+  },
+  {
+   "id": "e272",
+   "merchant": "",
+   "purpose": "Fremdautomatengebuehr",
+   "amountCents": -399,
+   "accountType": "giro",
+   "bookingDate": "2026-02-12",
+   "category": "gebuehren"
+  },
+  {
+   "id": "e283",
+   "merchant": "",
+   "purpose": "Bargeldauszahlung GAA Sparkasse 09908327",
+   "amountCents": -15338,
+   "accountType": "giro",
+   "bookingDate": "2025-07-11",
+   "category": "bargeld"
+  },
+  {
+   "id": "e265",
+   "merchant": "",
+   "purpose": "Kontofuehrungsentgelt 06/2025",
+   "amountCents": -495,
+   "accountType": "giro",
+   "bookingDate": "2026-06-20",
+   "category": "gebuehren"
+  },
+  {
+   "id": "e055",
+   "merchant": "Telekom Deutschland GmbH",
+   "purpose": "EREF+XUEJGYL0VFCLJJ MREF+MKM5E9CTYMJ CRED+DE19ZZZ00002123820 SVWZ+Rechnung 01/2026 Kundenkonto 74025036 MagentaZuhause",
+   "amountCents": -4495,
+   "accountType": "giro",
+   "bookingDate": "2026-03-27",
+   "category": "internet_telefon",
+   "creditorID": "DE19ZZZ00002123820",
+   "mref": "MKM5E9CTYMJ"
+  },
+  {
+   "id": "e007",
+   "merchant": "Bundesagentur fuer Arbeit",
+   "purpose": "EREF+2W698NW7H3M2JM SVWZ+Elterngeld Leistung 12/2026 Kd-Nr 76430320",
+   "amountCents": 130158,
+   "accountType": "giro",
+   "bookingDate": "2026-04-18",
+   "category": "gehalt"
+  },
+  {
+   "id": "e066",
+   "merchant": "OBI Markt//Leipzig/DE",
+   "purpose": "VISA Debitkartenumsatz 28.10. 12:36 Karte 1 Folgenr. 34",
+   "amountCents": -2408,
+   "accountType": "giro",
+   "bookingDate": "2026-04-22",
+   "category": "haushalt"
+  },
+  {
+   "id": "e186",
+   "merchant": "MediaMarkt//Koeln/DE",
+   "purpose": "VISA Debitkartenumsatz 24.11. 12:35 Karte 1 Folgenr. 26",
+   "amountCents": -59423,
+   "accountType": "giro",
+   "bookingDate": "2026-07-04",
+   "category": "elektronik"
+  },
+  {
+   "id": "e120",
+   "merchant": "MVG Automat//Hamburg/DE",
+   "purpose": "VISA Debitkartenumsatz 11.12. 16:34 Karte 1 Folgenr. 26",
+   "amountCents": -534,
+   "accountType": "giro",
+   "bookingDate": "2026-07-17",
+   "category": "oepnv"
+  },
+  {
+   "id": "e235",
+   "merchant": "Lisa Beispiel",
+   "purpose": "Geburtstagsgeschenk Oma",
+   "amountCents": -7627,
+   "accountType": "giro",
+   "bookingDate": "2026-10-04",
+   "category": "geschenke_spenden"
+  },
+  {
+   "id": "e159",
+   "merchant": "TSV Beispiel 1880 e.V.",
+   "purpose": "EREF+8C6FUEGYZKKE5H MREF+MB6U2Z5GTTW CRED+DE78ZZZ00003526311 SVWZ+Vereinsbeitrag 2025 Mitgl 11169575",
+   "amountCents": -9600,
+   "accountType": "giro",
+   "bookingDate": "2025-10-21",
+   "category": "sport",
+   "creditorID": "DE78ZZZ00003526311",
+   "mref": "MB6U2Z5GTTW"
+  },
+  {
+   "id": "e297",
+   "merchant": "Buergeramt Musterstadt",
+   "purpose": "Gebuehr Personalausweis",
+   "amountCents": -3700,
+   "accountType": "giro",
+   "bookingDate": "2026-08-24",
+   "category": "sonstiges"
+  },
+  {
+   "id": "e059",
+   "merchant": "1&1 Telecom GmbH",
+   "purpose": "EREF+2EJBC5QGZNQA36 MREF+MTQT605G4BB CRED+DE72ZZZ00000728084 SVWZ+1&1 DSL Rechnung 49156317",
+   "amountCents": -3999,
+   "accountType": "giro",
+   "bookingDate": "2025-10-19",
+   "category": "internet_telefon",
+   "creditorID": "DE72ZZZ00000728084",
+   "mref": "MTQT605G4BB"
+  },
+  {
+   "id": "e050",
+   "merchant": "E.ON Energie Deutschland",
+   "purpose": "EREF+LM44DT251Y23K1 MREF+MRT7X4WFKU6 CRED+DE63ZZZ00000048932 SVWZ+Abschlagszahlung Strom VK 82203520",
+   "amountCents": -7200,
+   "accountType": "giro",
+   "bookingDate": "2026-08-13",
+   "category": "nebenkosten",
+   "creditorID": "DE63ZZZ00000048932",
+   "mref": "MRT7X4WFKU6"
+  },
+  {
+   "id": "e178",
+   "merchant": "Zalando SE",
+   "purpose": "Zalando Bestellung 01115266",
+   "amountCents": -14890,
+   "accountType": "giro",
+   "bookingDate": "2026-02-21",
+   "category": "kleidung"
+  },
+  {
+   "id": "e158",
+   "merchant": "McFIT GmbH",
+   "purpose": "EREF+Y5CJBC7K5X5N7K MREF+MHVX1BMLT6D CRED+DE41ZZZ00000084012 SVWZ+Mitgliedsbeitrag 03/2025",
+   "amountCents": -2990,
+   "accountType": "giro",
+   "bookingDate": "2025-09-11",
+   "category": "sport",
+   "creditorID": "DE41ZZZ00000084012",
+   "mref": "MHVX1BMLT6D"
+  },
+  {
+   "id": "e062",
+   "merchant": "congstar",
+   "purpose": "EREF+FYEZDS7C2E4KGY MREF+MDTA3RSHGEE CRED+DE17ZZZ00005090576 SVWZ+congstar Rechnung 02.2025",
+   "amountCents": -1296,
+   "accountType": "giro",
+   "bookingDate": "2026-06-28",
+   "category": "internet_telefon",
+   "creditorID": "DE17ZZZ00005090576",
+   "mref": "MDTA3RSHGEE"
+  },
+  {
+   "id": "e209",
+   "merchant": "Physiotherapie Beweglich",
+   "purpose": "Rechnung Krankengymnastik 27544500",
+   "amountCents": -9014,
+   "accountType": "giro",
+   "bookingDate": "2025-09-10",
+   "category": "gesundheit"
+  },
+  {
+   "id": "e191",
+   "merchant": "JetBrains s.r.o.",
+   "purpose": "JetBrains Subscription 9NLXETHU",
+   "amountCents": -12386,
+   "accountType": "card",
+   "bookingDate": "2025-12-09",
+   "category": "elektronik"
+  },
+  {
+   "id": "e103",
+   "merchant": "ARAL Station//Bremen/DE",
+   "purpose": "VISA Debitkartenumsatz 22.02. 18:04 Karte 1 Folgenr. 04",
+   "amountCents": -6850,
+   "accountType": "giro",
+   "bookingDate": "2026-01-19",
+   "category": "tanken"
+  },
+  {
+   "id": "e189",
+   "merchant": "Apple Store",
+   "purpose": "Apple Store Online Bestellung W04758262",
+   "amountCents": -14236,
+   "accountType": "card",
+   "bookingDate": "2026-04-27",
+   "category": "elektronik"
+  },
+  {
+   "id": "e094",
+   "merchant": "dm-drogerie markt",
+   "purpose": "Kartenzahlung girocard dm-drogerie markt Muenchen 63786606 10.06",
+   "amountCents": -2454,
+   "accountType": "giro",
+   "bookingDate": "2026-07-08",
+   "category": "drogerie"
+  },
+  {
+   "id": "e279",
+   "merchant": "Bundeskasse Kfz-Steuer",
+   "purpose": "EREF+Z6RKU9M5788LFZ MREF+M2JBD5572UD CRED+DE18ZZZ00007241687 SVWZ+Kfz-Steuer KENNZ WKWGZ3MA",
+   "amountCents": -12000,
+   "accountType": "giro",
+   "bookingDate": "2025-05-17",
+   "category": "steuern",
+   "creditorID": "DE18ZZZ00007241687",
+   "mref": "M2JBD5572UD"
+  },
+  {
+   "id": "e144",
+   "merchant": "Disney Plus",
+   "purpose": "Disney+ Abo",
+   "amountCents": -999,
+   "accountType": "card",
+   "bookingDate": "2025-10-27",
+   "category": "abos"
+  },
+  {
+   "id": "e167",
+   "merchant": "Lufthansa",
+   "purpose": "Lufthansa Ticket 220-26092034",
+   "amountCents": -16211,
+   "accountType": "card",
+   "bookingDate": "2026-10-07",
+   "category": "reisen"
+  },
+  {
+   "id": "e230",
+   "merchant": "Deutsches Rotes Kreuz",
+   "purpose": "Spende 2026 Danke",
+   "amountCents": -2038,
+   "accountType": "giro",
+   "bookingDate": "2025-09-25",
+   "category": "geschenke_spenden"
+  },
+  {
+   "id": "e109",
+   "merchant": "EnBW mobility+",
+   "purpose": "Ladevorgang 40107328 EnBW mobility+",
+   "amountCents": -2672,
+   "accountType": "giro",
+   "bookingDate": "2025-11-09",
+   "category": "tanken"
+  },
+  {
+   "id": "e203",
+   "merchant": "Apotheke am Rathaus",
+   "purpose": "Kartenzahlung girocard Apotheke am Rathaus Dortmund 35718656 03.06",
+   "amountCents": -1222,
+   "accountType": "giro",
+   "bookingDate": "2025-06-13",
+   "category": "gesundheit"
+  },
+  {
+   "id": "e006",
+   "merchant": "Stadtklinik Nord gGmbH",
+   "purpose": "EREF+33LHR9N011TH9U SVWZ+LOHN/GEHALT 05.2025",
+   "amountCents": 263805,
+   "accountType": "giro",
+   "bookingDate": "2025-06-29",
+   "category": "gehalt"
+  },
+  {
+   "id": "e078",
+   "merchant": "EDEKA Center//Dortmund/DE",
+   "purpose": "VISA Debitkartenumsatz 27.01. 13:57 Karte 1 Folgenr. 70",
+   "amountCents": -1359,
+   "accountType": "giro",
+   "bookingDate": "2026-01-23",
+   "category": "lebensmittel"
+  },
+  {
+   "id": "e204",
+   "merchant": "Zahnarztpraxis Dr. Beispiel",
+   "purpose": "Rechnung 17961137 Zahnreinigung",
+   "amountCents": -11013,
+   "accountType": "giro",
+   "bookingDate": "2026-10-22",
+   "category": "gesundheit"
+  },
+  {
+   "id": "e264",
+   "merchant": "",
+   "purpose": "Ausgleich Abrechnung Kartenkonto",
+   "amountCents": 85557,
+   "accountType": "card",
+   "bookingDate": "2026-08-01",
+   "category": "kredit"
+  },
+  {
+   "id": "e108",
+   "merchant": "TOTALENERGIES MUENCHEN",
+   "purpose": "",
+   "amountCents": -6484,
+   "accountType": "card",
+   "bookingDate": "2026-01-18",
+   "category": "tanken"
+  },
+  {
+   "id": "e192",
+   "merchant": "Cyberport",
+   "purpose": "Cyberport Bestellung 48188872",
+   "amountCents": -43189,
+   "accountType": "giro",
+   "bookingDate": "2026-08-05",
+   "category": "elektronik"
+  }
+ ]
+}

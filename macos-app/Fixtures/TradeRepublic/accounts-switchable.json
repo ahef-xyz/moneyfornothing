@@ -1,0 +1,23 @@
+{
+  "accounts": [
+    {
+      "accountId": "b88c51cd-d8cd-4337-ad75-daa875ea93a1",
+      "accountType": "ADULT",
+      "accountName": "accountName 003",
+      "displayName": "accountName 003",
+      "profileAccessType": "EDITOR",
+      "status": "ACTIVE",
+      "personCustomers": [
+        {
+          "customerId": "ffa3b866-285f-4083-b3ba-d9a008a3197d",
+          "firstName": "firstName 005",
+          "lastName": "lastName 006"
+        }
+      ],
+      "bankingInfo": {
+        "iban": "DE00788283369602229881",
+        "bic": "TRBKDEBBXXX"
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "Item": {
+    "Password": "",
+    "Reference": "<entfernt>",
+    "IsSuccess": "False",
+    "Cached": false
+  },
+  "Result": {
+    "IsSuccess": true,
+    "HasWarning": false,
+    "HasSuccess": false,
+    "HasInformation": false,
+    "HasAnyResultElement": false
+  }
+}
