@@ -6,7 +6,13 @@ import MFNScrape
 ///
 /// - Login: headless web login in the app (`WebLoginSession` + `EasybankLoginScript`: stored
 ///   username + password, approval in the easybank app); cookies are reused until the bank rejects
-///   them. The connector never sees credentials and never retries a failed login.
+///   them. A session the bank rejects after it worked (timed out after inactivity) is discarded
+///   and replaced by a fresh login in the same sync; failing first and logging in on the next
+///   sync made every manual sync after a pause fail once. Automatic syncs never log in: the app's
+///   presenter throws `authRequired` there (`AuthInteraction`). The connector never sees
+///   credentials and never retries a failed login. A session refused on its first use after a
+///   login is `formatChanged`, not `authFailed`: the bank accepted the credentials, so they must
+///   not be blocked.
 /// - Accounts: `RetailLanding` → card accounts (partner cards book into the same card account).
 /// - Transactions + latest statement: `AccountTransactionHistory`, which needs **no OTP** and
 ///   covers the open billing cycle, pending items and the end of the last statement period.
@@ -18,12 +24,18 @@ public actor EasybankConnector: BankConnector {
 
     private let connectionID: ConnectionID
     private let session: WebLoginSession?
+    /// No presenter (tests, conformance): an expired session ends the sync with `sessionExpired`.
+    /// In the app there is always one; it refuses logins in automatic syncs itself.
+    private let canLogIn: Bool
     private let transport: any HTTPTransport
     private let policy: BackoffPolicy
     private let sleeper: any Sleeper
     private let now: @Sendable () -> Date
 
     private var client: ScrapeClient?
+    /// The current client's session came straight from a login and has not answered a request
+    /// yet. Reset after the first success: a later rejection is a timeout, not a bad session.
+    private var clientIsFresh = false
     /// `UniqueKey`/`PCID` from the web login (pseudo-cookies, sent only as headers).
     private var appValues: [SessionCookie] = []
     private var cardAccounts: [AccountID: EasybankMapper.CardAccount] = [:]
@@ -39,6 +51,7 @@ public actor EasybankConnector: BankConnector {
         now: @escaping @Sendable () -> Date = { Date() }
     ) {
         self.connectionID = connectionID
+        self.canLogIn = presenter != nil
         self.session = EasybankEndpoints.loginRequest().map {
             WebLoginSession(key: "easybank.\(connectionID.rawValue)", request: $0, presenter: presenter, store: store)
         }
@@ -104,14 +117,18 @@ public actor EasybankConnector: BankConnector {
         return history
     }
 
-    private func scrapeClient() async throws(ConnectorError) -> ScrapeClient {
-        if let client { return client }
+    private func scrapeClient(forceLogin: Bool = false) async throws(ConnectorError) -> ScrapeClient {
+        if let client, !forceLogin { return client }
         guard let session else { throw .formatChanged(detail: "Login-URL ungültig") }
-        var cookies = try await session.cookies()
+        let stored = forceLogin ? nil : try await session.storedCookies()
+        var fresh = stored == nil
+        var cookies = try await session.cookies(forceLogin: forceLogin)
         if !cookies.contains(where: { $0.name == EasybankEndpoints.uniqueKeyName }) {
             // Session from before protocol v3 (no UniqueKey): every call would fail, log in again.
             cookies = try await session.cookies(forceLogin: true)
+            fresh = true
         }
+        clientIsFresh = fresh
         appValues = cookies.filter { EasybankEndpoints.appValueNames.contains($0.name) }
         let plain = cookies.filter { !EasybankEndpoints.appValueNames.contains($0.name) }
         let client = ScrapeClient(cookies: plain, transport: transport, policy: policy, sleeper: sleeper)
@@ -122,22 +139,41 @@ public actor EasybankConnector: BankConnector {
     /// POSTs `body`, checks `Result.IsSuccess` and returns `Item`.
     private func post(_ path: String, body: JSONValue) async throws(ConnectorError) -> JSONValue {
         guard let url = EasybankEndpoints.url(path) else { throw .formatChanged(detail: "URL ungültig: \(path)") }
-        let client = try await scrapeClient()
-        let headers = EasybankEndpoints.headers(cookies: await client.currentCookies, appValues: appValues)
+        var client = try await scrapeClient()
         let envelope: EBEnvelope
         do {
-            envelope = try await client.post(url, json: body, as: EBEnvelope.self, headers: headers).value
-        } catch {
-            if error == .sessionExpired {
-                // The bank rejected the session: forget it, the next sync asks for a new web login.
+            envelope = try await send(body, to: url, with: client)
+        } catch .sessionExpired {
+            // The bank rejected the session: forget it.
+            let wasFresh = clientIsFresh
+            self.client = nil
+            try? await session?.invalidate()
+            // A session straight from the login is refused: no second login (lockout risk).
+            if wasFresh { throw Self.freshSessionRefused }
+            // A session that worked before timed out: log in again now instead of failing this
+            // sync and logging in on the next.
+            guard canLogIn else { throw .sessionExpired }
+            EasybankMapper.log.notice("easybank: gespeicherte Sitzung abgelaufen, neue Anmeldung")
+            client = try await scrapeClient(forceLogin: true)
+            do {
+                envelope = try await send(body, to: url, with: client)
+            } catch .sessionExpired {
                 self.client = nil
                 try? await session?.invalidate()
+                throw Self.freshSessionRefused
             }
-            throw error
         }
+        clientIsFresh = false
         try await session?.update(await client.currentCookies + appValues)
         guard envelope.result?.isSuccess != false else { throw .formatChanged(detail: "\(path): Result.IsSuccess = false") }
         guard let item = envelope.item else { throw .formatChanged(detail: "\(path): Feld fehlt Item") }
         return item
+    }
+
+    private static let freshSessionRefused = ConnectorError.formatChanged(detail: "Sitzung direkt nach der Anmeldung abgelehnt")
+
+    private func send(_ body: JSONValue, to url: URL, with client: ScrapeClient) async throws(ConnectorError) -> EBEnvelope {
+        let headers = EasybankEndpoints.headers(cookies: await client.currentCookies, appValues: appValues)
+        return try await client.post(url, json: body, as: EBEnvelope.self, headers: headers).value
     }
 }

@@ -301,6 +301,95 @@ private func day(_ iso: String) -> BankDay? { BankDay(iso: iso) }
         #expect(try store.load(Harness.sessionKey) == nil)
     }
 
+    /// Fresh login: the harness cookies with a new FedAuth.
+    static let freshFedAuth = "FEDAUTH-FRESH-VALUE-1234"
+    static var freshCookies: [SessionCookie] {
+        Harness.cookies.map { $0.name == "FedAuth" ? SessionCookie(name: "FedAuth", value: freshFedAuth, domain: $0.domain) : $0 }
+    }
+
+    /// Bank that refuses the old FedAuth (or every session, if `refusesAll`).
+    static func bank(refusesAll: Bool = false) -> ScriptedHTTPTransport {
+        ScriptedHTTPTransport { request, _ in
+            let cookie = request.value(forHTTPHeaderField: "Cookie") ?? ""
+            if refusesAll || !cookie.contains(freshFedAuth) { return ScriptedHTTPTransport.response(request.url, status: 401) }
+            switch request.url?.path() {
+            case EasybankEndpoints.retailLanding: return Harness.ok(request, body: try Harness.landing())
+            case EasybankEndpoints.accountTransactionHistory: return Harness.ok(request, body: try Harness.history())
+            default: return ScriptedHTTPTransport.response(request.url, status: 404)
+            }
+        }
+    }
+
+    @Test func expiredStoredSessionLogsInAgainInTheSameSync() async throws {
+        let store = InMemorySessionCookieStore([Harness.sessionKey: Harness.cookies])
+        let presenter = LoginPresenter(response: .webSession(Self.freshCookies))
+        let connector = Harness.connector(transport: Self.bank(), store: store, presenter: presenter)
+        let accounts = try await connector.accounts()
+        #expect(!accounts.isEmpty)
+        #expect(await presenter.count == 1)
+        #expect(try store.load(Harness.sessionKey)?.contains { $0.value == Self.freshFedAuth } == true)
+    }
+
+    @Test func freshSessionRefusedIsFormatChangedWithoutSecondLogin() async throws {
+        // The bank accepted the credentials, so the error must not block them (no authFailed).
+        let store = InMemorySessionCookieStore([Harness.sessionKey: Harness.cookies])
+        let presenter = LoginPresenter(response: .webSession(Self.freshCookies))
+        let connector = Harness.connector(transport: Self.bank(refusesAll: true), store: store, presenter: presenter)
+        do {
+            _ = try await connector.accounts()
+            Issue.record("kein Fehler")
+        } catch {
+            guard case .formatChanged = error else { Issue.record("\(error)"); return }
+        }
+        #expect(await presenter.count == 1)
+        #expect(try store.load(Harness.sessionKey) == nil)
+    }
+
+    @Test func sessionThatTimesOutLaterLogsInAgain() async throws {
+        // Login in one sync, success, then the session times out before the next: one more
+        // login, not "fresh session refused".
+        let store = InMemorySessionCookieStore()
+        let presenter = LoginPresenter(response: .webSession(Self.freshCookies))
+        let refuses = Flag()
+        let connector = Harness.connector(transport: ScriptedHTTPTransport { request, _ in
+            let cookie = request.value(forHTTPHeaderField: "Cookie") ?? ""
+            if refuses.isSet, cookie.contains(Self.freshFedAuth) {
+                refuses.clear()
+                return ScriptedHTTPTransport.response(request.url, status: 401)
+            }
+            return Harness.ok(request, body: try Harness.landing())
+        }, store: store, presenter: presenter)
+        _ = try await connector.accounts()
+        #expect(await presenter.count == 1)
+        refuses.set()
+        _ = try await connector.accounts()
+        #expect(await presenter.count == 2)
+    }
+
+    @Test func automaticSyncDoesNotLogInAfterTimeout() async throws {
+        // In the app the presenter refuses logins during automatic syncs (AuthInteraction).
+        let store = InMemorySessionCookieStore([Harness.sessionKey: Harness.cookies])
+        let presenter = LoginPresenter(response: .webSession(Self.freshCookies), respectsInteraction: true)
+        let connector = Harness.connector(transport: Self.bank(), store: store, presenter: presenter)
+        await AuthInteraction.$isAllowed.withValue(false) {
+            do {
+                _ = try await connector.accounts()
+                Issue.record("kein Fehler")
+            } catch {
+                guard case .authRequired? = error as? ConnectorError else { Issue.record("\(error)"); return }
+            }
+        }
+        #expect(await presenter.count == 0)
+    }
+
+    @Test func failedReLoginIsPassedOnWithoutRetry() async throws {
+        let store = InMemorySessionCookieStore([Harness.sessionKey: Harness.cookies])
+        let presenter = LoginPresenter(response: .webSession([]))
+        let connector = Harness.connector(transport: Self.bank(), store: store, presenter: presenter)
+        await #expect(throws: ConnectorError.authFailed) { _ = try await connector.accounts() }
+        #expect(await presenter.count == 1)
+    }
+
     @Test func otpRequiredOnHistoryIsReportedNotEmpty() async throws {
         let otp = try Fixtures.data(.easybank, "get-transactions-otp-required.json")
         let wrapped = Data(#"{"Item":{"InitialCallResponses":[{"Response":"#.utf8) + otp + Data("}]},\"Result\":{\"IsSuccess\":true}}".utf8)
@@ -386,4 +475,29 @@ private func day(_ iso: String) -> BankDay? { BankDay(iso: iso) }
         let money = try JSONDecoder().decode([EBMoney].self, from: Data(#"[{"Value":7418.98},{"Value":6677.082},{"Value":0.1},{"Value":-570.33}]"#.utf8))
         #expect(money.map(\.cents) == [741_898, 667_708, 10, -57_033])
     }
+}
+
+private actor LoginPresenter: AuthChallengePresenter {
+    let response: AuthResponse
+    /// Behaves like the app's presenter: no login while `AuthInteraction.isAllowed` is false.
+    let respectsInteraction: Bool
+    private(set) var count = 0
+    init(response: AuthResponse, respectsInteraction: Bool = false) {
+        self.response = response
+        self.respectsInteraction = respectsInteraction
+    }
+    func present(_ challenge: AuthChallenge) async throws -> AuthResponse {
+        if respectsInteraction, !AuthInteraction.isAllowed { throw ConnectorError.authRequired(challenge) }
+        count += 1
+        return response
+    }
+}
+
+/// Thread-safe switch for scripted transports.
+private final class Flag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+    var isSet: Bool { lock.withLock { value } }
+    func set() { lock.withLock { value = true } }
+    func clear() { lock.withLock { value = false } }
 }

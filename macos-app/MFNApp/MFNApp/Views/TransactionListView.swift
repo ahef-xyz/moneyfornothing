@@ -519,13 +519,15 @@ struct ShortfallNotice: View {
 private struct LedgerHeader: View {
     let ledger: LedgerContent
     @Environment(AppModel.self) private var model
-    @State private var copied = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var showsGiroCode = false
     /// Widths that decide whether the graph fits (`showsChart`).
     @State private var rowWidth: CGFloat = 0
     @State private var textIdealWidth: CGFloat = 0
     @State private var figuresWidth: CGFloat = 0
     @State private var chartWidth: CGFloat = 208
+    /// Widths of the action row with labels and icon-only (`actions`).
+    @State private var actionsWidth: CGFloat = 0
+    @State private var compactActionsWidth: CGFloat = 0
 
     private var connection: Connection? {
         ledger.account.flatMap { account in model.snapshot.connections.first { $0.id == account.connectionID } }
@@ -549,7 +551,9 @@ private struct LedgerHeader: View {
         guard rowWidth > 0 else { return true }
         let spacing: CGFloat = 14
         let badge: CGFloat = connection == nil ? 0 : 40 + spacing
-        let needed = badge + textIdealWidth + spacing + 12 + spacing + chartWidth + spacing + figuresWidth
+        // The action row can always fall back to icons, so only its compact width counts here.
+        let text = max(textIdealWidth, compactActionsWidth)
+        let needed = badge + text + spacing + 12 + spacing + chartWidth + spacing + figuresWidth
         return needed <= rowWidth
     }
 
@@ -561,10 +565,10 @@ private struct LedgerHeader: View {
             if let connection {
                 BankBadge(connection: connection, size: 40)
             }
-            textBlock
+            textBlock()
                 // Untruncated width, from an invisible copy that may grow past the row.
                 .background(alignment: .leading) {
-                    textBlock
+                    textBlock(measuring: true)
                         .fixedSize()
                         .hidden()
                         .accessibilityHidden(true)
@@ -582,7 +586,9 @@ private struct LedgerHeader: View {
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { rowWidth = $0 }
     }
 
-    private var textBlock: some View {
+    /// `measuring`: the invisible copy that sizes the row. It leaves out the action row, which
+    /// `actions` measures itself (with and without labels).
+    private func textBlock(measuring: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(ledger.title)
                 .font(.title2.weight(.semibold))
@@ -595,7 +601,61 @@ private struct LedgerHeader: View {
             activity
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            if !measuring, let account = ledger.account {
+                actions(for: account)
+                    .padding(.top, 4)
+            }
         }
+    }
+
+    /// Sync, account details, budget: own row under the facts, so they never squeeze them.
+    /// Icon-only when the labelled row does not fit the space the text block gets (tooltips keep
+    /// the names). Decided from measured widths, not `ViewThatFits`: one copy of the buttons
+    /// keeps the GiroCode popover anchored.
+    private func actions(for account: Account) -> some View {
+        actionButtons(for: account, compact: actionsWidth > textSpace, giroCode: $showsGiroCode)
+            .background(alignment: .leading) {
+                ZStack(alignment: .leading) {
+                    actionButtons(for: account, compact: false, giroCode: .constant(false), measuring: true)
+                        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { actionsWidth = $0 }
+                    actionButtons(for: account, compact: true, giroCode: .constant(false), measuring: true)
+                        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { compactActionsWidth = $0 }
+                }
+                .hidden()
+                .accessibilityHidden(true)
+            }
+    }
+
+    /// `measuring`: an invisible copy for `actions`; it must not announce sync progress.
+    private func actionButtons(for account: Account, compact: Bool, giroCode: Binding<Bool>, measuring: Bool = false) -> some View {
+        HStack(spacing: 8) {
+            AccountSyncButton(connectionID: account.connectionID, announces: !measuring)
+            AccountCopyMenu(account: account, balance: ledger.balance, bankName: connection?.displayName,
+                            showsGiroCode: giroCode)
+            if account.type != .depot {
+                let hasBudget = model.budget(for: account.id) != nil
+                Button {
+                    model.showBudgetEditor(for: account)
+                } label: {
+                    Label(hasBudget ? "Budget ändern …" : "Budget festlegen …", systemImage: "gauge.with.needle")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .help(hasBudget ? "Budget ändern oder entfernen" : "Ausgabenbudget für dieses Konto festlegen")
+            }
+        }
+        .labelStyle(CompactableLabelStyle(compact: compact))
+        .lineLimit(1)
+        .fixedSize()
+    }
+
+    /// Width the text block gets in the header row (same layout as `showsChart`).
+    private var textSpace: CGFloat {
+        guard rowWidth > 0 else { return .infinity }
+        let spacing: CGFloat = 14
+        let badge: CGFloat = connection == nil ? 0 : 40 + spacing
+        let chart: CGFloat = showsChart ? chartWidth + spacing : 0
+        return rowWidth - badge - spacing - 12 - spacing - chart - figuresWidth
     }
 
     /// Bank · type · IBAN (copyable) · card.
@@ -609,22 +669,6 @@ private struct LedgerHeader: View {
                     Text(IBANFormat.grouped(iban))
                         .monospaced()
                         .textSelection(.enabled)
-                    Button {
-                        NSPasteboard.general.copyConcealed(iban)
-                        copied = true
-                        Task { try? await Task.sleep(for: .seconds(1.5)); copied = false }
-                    } label: {
-                        // Both symbols always laid out, only one visible: swapping them must not
-                        // change the width (the line would shift).
-                        ZStack {
-                            Image(systemName: "doc.on.doc").opacity(copied ? 0 : 1)
-                            Image(systemName: "checkmark").opacity(copied ? 1 : 0)
-                        }
-                        .animation(reduceMotion ? nil : .easeInOut(duration: 0.15), value: copied)
-                    }
-                    .buttonStyle(.borderless)
-                    .help("IBAN kopieren")
-                    .accessibilityLabel("IBAN kopieren")
                 }
                 if let last4 = account.cardLast4 {
                     Text("·")
@@ -632,6 +676,10 @@ private struct LedgerHeader: View {
                 }
             }
             .lineLimit(1)
+            .contextMenu {
+                AccountCopyItems(account: account, balance: ledger.balance, bankName: connection?.displayName,
+                                 onShowGiroCode: { showsGiroCode = true })
+            }
         } else {
             Text(ledger.subtitle)
         }
@@ -656,19 +704,10 @@ private struct LedgerHeader: View {
                     Image(systemName: "calendar")
                 }
             }
-            if let account = ledger.account, let lastSync = model.snapshot.syncStates[account.connectionID]?.lastSuccess {
-                Label("abgeglichen \(DayFormat.syncTime(lastSync))", systemImage: "clock")
-            }
-            if let account = ledger.account, account.type != .depot {
-                let hasBudget = model.budget(for: account.id) != nil
-                Button {
-                    model.showBudgetEditor(for: account)
-                } label: {
-                    Label(hasBudget ? "Budget ändern …" : "Budget festlegen …", systemImage: "gauge.with.needle")
+            if let account = ledger.account {
+                if let lastSync = model.snapshot.syncStates[account.connectionID]?.lastSuccess {
+                    Label("abgeglichen \(DayFormat.syncTime(lastSync))", systemImage: "clock")
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .help(hasBudget ? "Budget ändern oder entfernen" : "Ausgabenbudget für dieses Konto festlegen")
             }
         }
         .monospacedDigit()
@@ -699,6 +738,19 @@ private struct LedgerHeader: View {
             } else if ledger.item == .allAccounts || ledger.item == .overview {
                 Figure(label: "Gesamt", cents: model.totalBalanceCents, currency: "EUR")
             }
+        }
+    }
+}
+
+/// Icon only when `compact`, otherwise title and icon.
+private struct CompactableLabelStyle: LabelStyle {
+    let compact: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        if compact {
+            IconOnlyLabelStyle().makeBody(configuration: configuration)
+        } else {
+            TitleAndIconLabelStyle().makeBody(configuration: configuration)
         }
     }
 }
