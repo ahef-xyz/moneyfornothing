@@ -91,6 +91,17 @@ extension MockDataset {
 }
 
 extension MockDataset {
+    /// Demo planned payments (added once to the demo ledger): one soon, one months ahead, so the
+    /// forecast panel has something to show.
+    public static func demoPlannedItems(today: BankDay = .today) -> [PlannedItem] {
+        [
+            PlannedItem(accountID: MockAccounts.ingGiro, day: today.adding(days: 19), amountCents: -118_000, title: "Autoreparatur"),
+            PlannedItem(accountID: MockAccounts.ingGiro, day: today.adding(days: 68), amountCents: -240_000, title: "Urlaub Anzahlung"),
+        ]
+    }
+}
+
+extension MockDataset {
     /// Demo depot history (added once to the demo ledger): one point per day for the last
     /// 18 months up to yesterday, a deterministic random walk that ends near today's value. The
     /// FinTS depot (DKB) has purchase values that grow with a monthly savings plan; Trade

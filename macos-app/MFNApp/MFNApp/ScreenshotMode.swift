@@ -9,7 +9,8 @@ import MFNCore
 ///
 /// then switch view and appearance in the running app with a distributed notification
 /// `xyz.ahef.mfn.screenshot` whose object is `<view>,<light|dark>`. `<view>`: `overview`, `all`,
-/// `review`, `pending` or an account ID (e.g. `mock-dkb-depot`). One launch, so the app lock asks
+/// `review`, `pending`, an account ID (e.g. `mock-dkb-depot`) or `forecast:<account ID>` (the
+/// account with its forecast sheet open). One launch, so the app lock asks
 /// only once. Only honoured together with `MFN_DEMO`, so real data never ends up in a screenshot;
 /// demo banks then sync without approval sheets (`AppModel.demo`).
 @MainActor
@@ -52,6 +53,14 @@ enum ScreenshotMode {
     private static func show(_ request: String?, in model: AppModel) {
         guard let parts = request?.split(separator: ","), parts.count == 2 else { return }
         NSApp.appearance = NSAppearance(named: parts[1] == "dark" ? .darkAqua : .aqua)
+        if parts[0].hasPrefix("forecast:") {
+            let id = AccountID(rawValue: String(parts[0].dropFirst("forecast:".count)))
+            model.selection = .account(id)
+            if model.forecastPanel?.account.id != id, let account = model.account(id) { model.showForecast(for: account) }
+            mainWindow?.makeKeyAndOrderFront(nil)
+            return
+        }
+        model.forecastPanel = nil
         model.selection = switch parts[0] {
         case "overview": .overview
         case "all": .allAccounts

@@ -49,6 +49,8 @@ final class AppModel {
     @ObservationIgnored private var ledgerBaseCache: (key: LedgerBaseKey, base: LedgerBase)?
     /// Booked transactions per lowercased counterpart (inspector history), built on first use.
     @ObservationIgnored private var historyCache: (revision: Int, byName: [String: [MFNCore.Transaction]])?
+    @ObservationIgnored private let forecastCache = SnapshotIndex.ForecastCache()
+    @ObservationIgnored private var plannedOverviewCache: (revision: Int, excluded: Set<AccountID>, value: PlannedOverview)?
     @ObservationIgnored private var budgetCache: (revision: Int, day: BankDay, statuses: [AccountID: BudgetStatus?]) = (-1, .today, [:])
     /// Accounts the user hid. A UI preference in `UserDefaults` (like the sidebar order): hidden
     /// accounts keep syncing, nothing is deleted.
@@ -287,6 +289,15 @@ final class AppModel {
                 }
                 UserDefaults.standard.set(true, forKey: budgetsKey)
             }
+            // Once: example planned payments on the salary account (deleting them later sticks).
+            let plannedKey = "demoPlannedItems.v1"
+            if !UserDefaults.standard.bool(forKey: plannedKey),
+               await store.snapshot().accounts.contains(where: { $0.id == MockAccounts.ingGiro }) {
+                for item in MockDataset.demoPlannedItems() {
+                    try await store.upsertPlannedItem(item)
+                }
+                UserDefaults.standard.set(true, forKey: plannedKey)
+            }
             let dataset = MockDataset.demo()
             // Once: depot history up to yesterday (the banks deliver none; syncs add today).
             let depotKey = "demoDepotHistory.v1"
@@ -496,12 +507,15 @@ final class AppModel {
         selectedPositionISIN = nil
         showsInspector = false
         budgetEditor = nil
+        forecastPanel = nil
         // The search text names counterparts; caches hold decrypted transactions.
         ledgerQuery.text = ""
         ledgerCache = nil
         ledgerBaseCache = nil
         historyCache = nil
         budgetCache = (-1, .today, [:])
+        plannedOverviewCache = nil
+        forecastCache.entries = [:]
         index = SnapshotIndex()
         initiators = [:]
         sharedAccounts = []
@@ -1195,6 +1209,93 @@ final class AppModel {
         }
     }
 
+    // MARK: - Forecast and planned items
+
+    /// The open forecast panel.
+    var forecastPanel: ForecastRequest?
+
+    func forecastBasis(of account: AccountID) -> SnapshotIndex.ForecastBasis? {
+        index.forecasts[account]
+    }
+
+    /// The user's planned items of an account, by day.
+    func plannedItems(for account: AccountID) -> [PlannedItem] {
+        index.ownItemsByAccount[account] ?? []
+    }
+
+    /// Sum of the self-planned payments still counted on an account (not the ones a booking
+    /// probably fulfilled), for "Verfügbar" in the header.
+    func ownPlannedCents(for account: AccountID) -> Int {
+        index.forecasts[account]?.ownPlannedCents ?? 0
+    }
+
+    /// Account the forecast command works on: the selected one, if it has a forecast.
+    var forecastAccount: Account? {
+        guard !lock.isLocked, case let .account(id)? = selection, index.forecasts[id] != nil else { return nil }
+        return account(id)
+    }
+
+    /// Opens the forecast panel; `editing` loads that planned item into its form.
+    func showForecast(for account: Account, editing: UUID? = nil) {
+        guard !lock.isLocked, store != nil, index.forecasts[account.id] != nil else { return }
+        forecastPanel = ForecastRequest(account: account, editing: editing)
+    }
+
+    /// Returns an error text for the panel, `nil` on success.
+    func savePlannedItem(_ item: PlannedItem) async -> String? {
+        guard let store else { return "MFN ist gesperrt." }
+        do {
+            try await store.upsertPlannedItem(item)
+            return nil
+        } catch {
+            return "Die geplante Buchung konnte nicht gespeichert werden: \(error)"
+        }
+    }
+
+    func removePlannedItem(_ id: UUID) async -> String? {
+        guard let store else { return "MFN ist gesperrt." }
+        do {
+            try await store.removePlannedItem(id)
+            return nil
+        } catch {
+            return "Die geplante Buchung konnte nicht entfernt werden: \(error)"
+        }
+    }
+
+    /// "Nein, kommt noch": the booking is something else, the item counts again.
+    func ignoreMatch(_ transaction: TransactionID, for item: PlannedItem) async -> String? {
+        var changed = item
+        changed.ignoredMatches.insert(transaction)
+        return await savePlannedItem(changed)
+    }
+
+    struct PlannedOverview {
+        var count = 0
+        var cents = 0
+        var next: PlannedItem?
+    }
+
+    /// Overview: self-planned payments still to come on accounts that count in totals. Cached per
+    /// snapshot (the overview reads it several times per redraw).
+    var plannedOverview: PlannedOverview {
+        if let cache = plannedOverviewCache, cache.revision == snapshotRevision, cache.excluded == excludedFromTotals { return cache.value }
+        var value = PlannedOverview()
+        var nextDay: BankDay?
+        for (account, basis) in index.forecasts where !excludedFromTotals.contains(account) {
+            for event in basis.forecast.events {
+                guard case let .manual(id) = event.source else { continue }
+                value.count += 1
+                value.cents += event.cents
+                if nextDay.map({ event.day < $0 }) ?? true {
+                    nextDay = event.day
+                    value.next = index.ownItemsByAccount[account]?.first { $0.id == id }
+                }
+            }
+        }
+        plannedOverviewCache = (snapshotRevision, excludedFromTotals, value)
+        return value
+    }
+
     // MARK: - Hidden accounts
 
     // Per profile (`LaunchProfile.scoped`): the test profile may hold the same real accounts
@@ -1263,7 +1364,7 @@ final class AppModel {
             }
         }
         snapshot = visible
-        index = SnapshotIndex(snapshot: visible, needsReview: needsReview)
+        index = SnapshotIndex(snapshot: visible, forecastCache: forecastCache, needsReview: needsReview)
         snapshotRevision &+= 1
     }
 
@@ -1456,6 +1557,7 @@ extension LedgerSnapshot {
         result.transactions.removeAll { hidden.contains($0.accountID) }
         result.cardStatements.removeAll { hidden.contains($0.accountID) }
         result.securities.removeAll { hidden.contains($0.accountID) }
+        result.plannedItems.removeAll { hidden.contains($0.accountID) }
         return result
     }
 }
@@ -1487,6 +1589,11 @@ struct SnapshotIndex {
     var day = BankDay.today
     /// Account header: balance of the last `overviewDays` days plus the forecast (EUR, not depots).
     var balanceCurves: [AccountID: BalanceCurve] = [:]
+    /// What the curves and shortfalls are built from, for the forecast panel (other horizons,
+    /// what-if) and the planned items of the list.
+    var forecasts: [AccountID: ForecastBasis] = [:]
+    /// The user's planned items per account, by day.
+    var ownItemsByAccount: [AccountID: [PlannedItem]] = [:]
     /// Giro and Tagesgeld accounts whose balance does not cover their planned payments.
     var shortfalls: [AccountID: Shortfall] = [:]
     /// Overview: the newest pending and booked transactions of all accounts, newest first. Planned
@@ -1506,20 +1613,53 @@ struct SnapshotIndex {
         var missingCents: Int
         /// Planned payments still to come (positive cents).
         var plannedOutCents: Int
+        /// Estimated monthly payments are part of it (not only announced and self-planned ones).
+        var estimated = false
         /// Formatted once per build (the sidebar shows it on every redraw).
         var dayText: String
         var missingText: String
     }
 
-    /// A planned payment for the forecast: overdue ones count as due today.
-    struct UpcomingPayment: Equatable {
-        var day: BankDay
-        var cents: Int
+    /// Everything the forecast of one account starts from.
+    struct ForecastBasis: Equatable {
+        /// Booked balance, and booked plus pending (where the forecast starts).
+        var bookedCents: Int
+        var startCents: Int
+        /// Announced, self-planned and estimated monthly payments up to `forecastMonths` ahead.
+        var forecast: AccountForecast
+        /// Where the header's curve and the shortfall warning end.
+        var horizon: BankDay
+        /// Sum of the self-planned payments still counted (not the ones a booking probably fulfilled).
+        var ownPlannedCents: Int
+    }
+
+    /// The panel can look this far ahead.
+    static let forecastMonths = 12
+
+    /// Forecasts of the last index build. The index is rebuilt on the main actor for every ledger
+    /// change (each sync write, each categorisation batch); most of them leave an account's
+    /// payments untouched, and its forecast (recurring series, matching) is then reused.
+    @MainActor
+    final class ForecastCache {
+        /// `key`: hash over everything the forecast reads (see `feed`), the planned items and the
+        /// days. Equal hashes are taken as equal inputs (64 bits, seeded per launch).
+        var entries: [AccountID: (key: Int, forecast: AccountForecast)] = [:]
+    }
+
+    /// The fields of a transaction `BalanceForecast` reads.
+    private static func feed(_ hasher: inout Hasher, _ transaction: MFNCore.Transaction) {
+        hasher.combine(transaction.id)
+        hasher.combine(transaction.amountCents)
+        hasher.combine(transaction.status)
+        hasher.combine(transaction.valueDate)
+        hasher.combine(transaction.bookingDate)
+        hasher.combine(transaction.counterpartName)
     }
 
     /// End-of-day balances of the last `overviewDays` days (booked, walked back from today's
-    /// balance) and the forecast from today: pending at once, then the planned payments until the
-    /// end of the month, at least 14 days, and at least until a shortfall day.
+    /// balance) and the forecast from today: pending at once, then the expected payments
+    /// (`BalanceForecast`) until the end of the month, at least 14 days, and at least until the
+    /// last announced or self-planned payment.
     struct BalanceCurve: Equatable {
         struct Point: Equatable, Identifiable {
             /// Running number: forecast points can share a day (unique ids for `ForEach`).
@@ -1565,7 +1705,7 @@ struct SnapshotIndex {
     init() {}
 
     @MainActor
-    init(snapshot: LedgerSnapshot, needsReview: (MFNCore.Transaction) -> Bool) {
+    init(snapshot: LedgerSnapshot, forecastCache: ForecastCache? = nil, needsReview: (MFNCore.Transaction) -> Bool) {
         transactionsByID.reserveCapacity(snapshot.transactions.count)
         position.reserveCapacity(snapshot.transactions.count)
         var relevant = 0
@@ -1583,12 +1723,12 @@ struct SnapshotIndex {
         let firstDay = today.adding(days: -(Self.overviewDays - 1))
         // Day → slot without calendar math per booking.
         let daySlots = Dictionary(uniqueKeysWithValues: (0..<Self.overviewDays).map { (firstDay.adding(days: $0), $0) })
-        let overdueFrom = today.adding(days: -Self.overdueDays)
-        let matchFrom = overdueFrom.adding(days: -Self.matchDays)
+        let historyFrom = today.adding(days: -BalanceForecast.historyDays)
         var dailyBookedNet: [AccountID: [Int]] = [:]
         var plannedByAccount: [AccountID: [MFNCore.Transaction]] = [:]
         var recentByAccount: [AccountID: [MFNCore.Transaction]] = [:]
         var pendingByAccount: [AccountID: Int] = [:]
+        var forecastInputs: [AccountID: Hasher] = [:]
         for (offset, transaction) in snapshot.transactions.enumerated() {
             // A duplicate ID (should not happen) is counted once, not twice.
             guard transactionsByID[transaction.id] == nil else { continue }
@@ -1600,13 +1740,15 @@ struct SnapshotIndex {
                 pendingCount += 1
                 pendingByAccount[transaction.accountID, default: 0] += transaction.amountCents
             }
-            if transaction.status == .planned, transaction.currency == "EUR", transaction.valueDate >= overdueFrom {
+            if transaction.status == .planned, transaction.currency == "EUR" {
                 plannedByAccount[transaction.accountID, default: []].append(transaction)
+                Self.feed(&forecastInputs[transaction.accountID, default: Hasher()], transaction)
             }
-            // Recent bookings: a planned payment the bank already booked is not counted again.
+            // Recent bookings: executed planned payments, monthly counterparts, fulfilled items.
             if transaction.status == .pending || transaction.status == .booked, transaction.currency == "EUR",
-               transaction.effectiveDate >= matchFrom {
+               transaction.effectiveDate >= historyFrom {
                 recentByAccount[transaction.accountID, default: []].append(transaction)
+                Self.feed(&forecastInputs[transaction.accountID, default: Hasher()], transaction)
             }
             if transaction.status == .pending || transaction.status == .booked {
                 Self.insertLatest(transaction, offset: offset, into: &latestAll, limit: Self.latestOverallLimit)
@@ -1658,69 +1800,63 @@ struct SnapshotIndex {
         likelyOutflow = AppModel.likelyCategories(counts: outflowCounts, inflow: false)
         latestOverall = latestAll.map(\.transaction)
 
-        // One upcoming list per account for both the shortfall and the curve, so they agree.
+        // One forecast per account for both the shortfall and the curve, so they agree.
+        ownItemsByAccount = Dictionary(grouping: snapshot.plannedItems, by: \.accountID)
+        let itemsByAccount = ownItemsByAccount
+        // First of next month minus one day (adding a month to the 31st would clamp first).
+        let next = today.year * 12 + today.month
+        let monthEnd = (BankDay(year: next / 12, month: next % 12 + 1, day: 1) ?? today.adding(days: 30)).adding(days: -1)
+        let until = today.adding(months: Self.forecastMonths)
+        var freshForecasts: [AccountID: (key: Int, forecast: AccountForecast)] = [:]
+        defer { forecastCache?.entries = freshForecasts }
         for account in snapshot.accounts where account.type != .depot {
             guard let balance = snapshot.balances[account.id], balance.currency == "EUR" else { continue }
-            let upcoming = Self.upcoming(plannedByAccount[account.id] ?? [], recent: recentByAccount[account.id] ?? [], today: today)
+            var inputs = forecastInputs[account.id] ?? Hasher()
+            inputs.combine(itemsByAccount[account.id] ?? [])
+            inputs.combine(today)
+            inputs.combine(until)
+            let key = inputs.finalize()
+            let forecast: AccountForecast
+            if let cached = forecastCache?.entries[account.id], cached.key == key {
+                forecast = cached.forecast
+            } else {
+                forecast = BalanceForecast.forecast(planned: plannedByAccount[account.id] ?? [], actual: recentByAccount[account.id] ?? [],
+                                                    items: itemsByAccount[account.id] ?? [], today: today, until: until)
+            }
+            freshForecasts[account.id] = (key, forecast)
             let start = balance.bookedCents + (pendingByAccount[account.id] ?? 0)
-            if account.type == .giro || account.type == .tagesgeld,
-               let shortfall = Self.shortfall(start: start, upcoming: upcoming, today: today) {
+            // Known payments are always inside; estimates only fill the time up to them.
+            let lastKnown = forecast.events.last { !$0.isEstimate }?.day ?? today
+            let horizon = min(max(monthEnd, today.adding(days: 14), lastKnown), until)
+            let ownPlanned = forecast.events.reduce(0) { sum, event in
+                if case .manual = event.source { sum + event.cents } else { sum }
+            }
+            let basis = ForecastBasis(bookedCents: balance.bookedCents, startCents: start, forecast: forecast, horizon: horizon,
+                                      ownPlannedCents: ownPlanned)
+            forecasts[account.id] = basis
+            let path = BalanceForecast.path(start: start, events: forecast.events, today: today, until: horizon)
+            if account.type == .giro || account.type == .tagesgeld, let shortfall = Self.shortfall(path) {
                 shortfalls[account.id] = shortfall
             }
-            balanceCurves[account.id] = Self.curve(booked: balance.bookedCents, start: start, nets: dailyBookedNet[account.id] ?? emptyDays,
-                                                   upcoming: upcoming, shortfallDay: shortfalls[account.id]?.day, today: today)
+            balanceCurves[account.id] = Self.curve(booked: balance.bookedCents, nets: dailyBookedNet[account.id] ?? emptyDays,
+                                                   path: path, horizon: horizon, today: today)
         }
-    }
-
-    /// Planned payments that are overdue for longer are treated as stale and left out.
-    static let overdueDays = 7
-    /// A booking within this many days of a planned payment, same amount and counterpart, is that
-    /// payment already executed.
-    static let matchDays = 3
-
-    private static func counterpartKey(_ name: String) -> String {
-        name.lowercased().filter(\.isLetter)
-    }
-
-    /// Planned payments still to come, oldest first, incoming before outgoing on the same day (a
-    /// salary on the rent day counts first). Overdue ones count as due today; ones the bank already
-    /// booked (pending or booked, same amount and counterpart, ± `matchDays`) are left out.
-    private static func upcoming(_ planned: [MFNCore.Transaction], recent: [MFNCore.Transaction], today: BankDay) -> [UpcomingPayment] {
-        planned.compactMap { payment -> UpcomingPayment? in
-            let key = counterpartKey(payment.counterpartName)
-            let executed = recent.contains { actual in
-                actual.amountCents == payment.amountCents
-                    && abs(actual.effectiveDate.days(to: payment.valueDate)) <= matchDays
-                    && (key.isEmpty || counterpartKey(actual.counterpartName) == key)
-            }
-            if executed { return nil }
-            return UpcomingPayment(day: max(payment.valueDate, today), cents: payment.amountCents)
-        }
-        .sorted { ($0.day, -$0.cents) < ($1.day, -$1.cents) }
     }
 
     private static let shortDay = Date.FormatStyle(locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone).day().month(.wide)
 
-    /// Only a warning about planned payments: an account already below zero with nothing outgoing
-    /// planned gets none (its balance says it).
-    private static func shortfall(start: Int, upcoming: [UpcomingPayment], today: BankDay) -> Shortfall? {
-        var running = start
-        var lowest = running
-        var firstDay: BankDay? = running < 0 ? today : nil
-        var outgoing = 0
-        for payment in upcoming {
-            running += payment.cents
-            if payment.cents < 0 { outgoing -= payment.cents }
-            if running < 0, firstDay == nil { firstDay = payment.day }
-            lowest = min(lowest, running)
-        }
-        guard let firstDay, lowest < 0, outgoing > 0 else { return nil }
-        return Shortfall(day: firstDay, missingCents: -lowest, plannedOutCents: outgoing,
-                         dayText: firstDay.startDate.formatted(shortDay), missingText: Money.format(-lowest))
+    /// Only a warning about expected payments: an account already below zero with nothing outgoing
+    /// expected gets none (its balance says it).
+    private static func shortfall(_ path: ForecastPath) -> Shortfall? {
+        let outgoing = path.steps.reduce(0) { $0 + max(0, -$1.event.cents) }
+        guard let firstDay = path.firstNegativeDay, path.lowestCents < 0, outgoing > 0 else { return nil }
+        return Shortfall(day: firstDay, missingCents: -path.lowestCents, plannedOutCents: outgoing,
+                         estimated: path.steps.contains { $0.event.isEstimate && $0.event.cents < 0 },
+                         dayText: firstDay.startDate.formatted(shortDay), missingText: Money.format(-path.lowestCents))
     }
 
-    private static func curve(booked: Int, start: Int, nets: [Int], upcoming: [UpcomingPayment],
-                              shortfallDay: BankDay?, today: BankDay) -> BalanceCurve {
+    /// End-of-day balances of the last `overviewDays` days, walked back from today's balance.
+    private static func past(booked: Int, nets: [Int], today: BankDay) -> [BalanceCurve.Point] {
         let first = today.adding(days: -(overviewDays - 1))
         var running = booked
         var past: [BalanceCurve.Point] = []
@@ -1729,26 +1865,21 @@ struct SnapshotIndex {
             running -= nets.indices.contains(slot) ? nets[slot] : 0
         }
         past.reverse()
+        return past
+    }
 
-        // First of next month minus one day (adding a month to the 31st would clamp first).
-        let next = today.year * 12 + today.month
-        let monthEnd = (BankDay(year: next / 12, month: next % 12 + 1, day: 1) ?? today.adding(days: 30)).adding(days: -1)
-        let horizon = max(monthEnd, today.adding(days: 14), shortfallDay ?? today)
+    private static func curve(booked: Int, nets: [Int], path: ForecastPath, horizon: BankDay, today: BankDay) -> BalanceCurve {
         var index = overviewDays
         func point(_ day: BankDay, _ cents: Int) -> BalanceCurve.Point {
             defer { index += 1 }
             return .init(index: index, day: day, cents: cents, isForecast: true)
         }
-        var projected = start
-        var forecast = [point(today, booked), point(today, projected)]
-        for payment in upcoming where payment.day <= horizon {
-            projected += payment.cents
-            forecast.append(point(payment.day, projected))
-        }
-        forecast.append(point(horizon, projected))
+        var forecast = [point(today, booked), point(today, path.startCents)]
+        for step in path.steps { forecast.append(point(step.day, step.cents)) }
+        forecast.append(point(horizon, path.endCents))
         let low = forecast.min { $0.cents < $1.cents }
-        return BalanceCurve(past: past, forecast: forecast, todayCents: booked, endCents: projected, end: horizon,
-                            lowest: (low?.cents ?? 0) < 0 ? low : nil)
+        return BalanceCurve(past: past(booked: booked, nets: nets, today: today), forecast: forecast, todayCents: booked,
+                            endCents: path.endCents, end: horizon, lowest: (low?.cents ?? 0) < 0 ? low : nil)
     }
 
     /// Newer first: later date, on the same day pending before booked, then snapshot order.

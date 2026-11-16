@@ -26,6 +26,8 @@ struct TransactionListView: View {
         @Bindable var model = model
         let ledger = model.ledgerContent(for: item)
         let page = ledger.page(limit: rowLimit)
+        // Once per body, not per use.
+        let ownPlans = self.ownPlans
 
         VStack(spacing: 0) {
             LedgerHeader(ledger: ledger)
@@ -39,7 +41,7 @@ struct TransactionListView: View {
                 FilterBar(ledger: ledger)
             }
             Divider()
-            if ledger.isEmpty {
+            if ledger.isEmpty, ownPlans.isEmpty {
                 if ledger.query.isFiltering {
                     ContentUnavailableView.search(text: ledger.query.text)
                 } else {
@@ -47,6 +49,27 @@ struct TransactionListView: View {
                 }
             } else {
                 List(selection: $model.selectedTransactionIDs) {
+                    if !ownPlans.isEmpty {
+                        // Items a booking probably fulfilled are listed, but not summed (like
+                        // "nach selbst Geplantem" in the header).
+                        let matched = Set(ownPlans.filter { model.forecastBasis(of: $0.accountID)?.forecast.matches[$0.id] != nil }.map(\.id))
+                        Section {
+                            ForEach(ownPlans) { plan in
+                                if let account = model.account(plan.accountID) {
+                                    PlannedItemRow(item: plan, account: account,
+                                                   accountName: ledger.showsAccountName ? ledger.accountName(plan.accountID) : nil,
+                                                   isMatched: matched.contains(plan.id))
+                                        .selectionDisabled()
+                                }
+                            }
+                        } header: {
+                            SectionHeaderRow(
+                                title: "Selbst geplant",
+                                trailing: "\(ownPlans.count == 1 ? "1 Buchung" : "\(ownPlans.count) Buchungen") · "
+                                    + amount(ownPlans.filter { !matched.contains($0.id) }.reduce(0) { $0 + $1.amountCents }, currency: ledger.sumCurrency)
+                            )
+                        }
+                    }
                     if !ledger.upcoming.isEmpty {
                         Section {
                             ForEach(ledger.upcoming) { TransactionRow(transaction: $0, info: ledger.rowInfo(for: $0)).equatable() }
@@ -162,6 +185,21 @@ struct TransactionListView: View {
                 .help("Kategorien einrichten (⌥⌘K)")
                 .disabled(!model.canShowCategorySetup)
             }
+        }
+    }
+
+    /// The user's planned items: of the shown account, all of them in "Alle Konten" and
+    /// "Vorgemerkt". None while filtering (they have no category, counterpart or purpose).
+    private var ownPlans: [PlannedItem] {
+        switch item {
+        case let .account(id):
+            var query = model.ledgerQuery
+            query.accounts = []
+            return query.isFiltering ? [] : model.plannedItems(for: id)
+        case .allAccounts, .pending:
+            return model.ledgerQuery.isFiltering ? [] : model.snapshot.plannedItems
+        case .overview, .review:
+            return []
         }
     }
 
@@ -484,12 +522,16 @@ enum ShortfallFormat {
     static let symbol = "exclamationmark.circle.fill"
 
     static func text(_ shortfall: SnapshotIndex.Shortfall) -> String {
-        "Guthaben reicht nicht für geplante Zahlungen: ab \(shortfall.dayText) fehlen bis zu \(shortfall.missingText)"
+        "Guthaben reicht nicht für \(payments(shortfall)): ab \(shortfall.dayText) fehlen bis zu \(shortfall.missingText)"
     }
 
     /// Short form for the sidebar tooltip and VoiceOver.
     static func short(_ shortfall: SnapshotIndex.Shortfall) -> String {
-        "Reicht nicht für geplante Zahlungen ab \(shortfall.dayText), bis zu \(shortfall.missingText)"
+        "Reicht nicht für \(payments(shortfall)) ab \(shortfall.dayText), bis zu \(shortfall.missingText)"
+    }
+
+    private static func payments(_ shortfall: SnapshotIndex.Shortfall) -> String {
+        shortfall.estimated ? "geplante und regelmäßige Zahlungen" : "geplante Zahlungen"
     }
 }
 
@@ -643,6 +685,16 @@ private struct LedgerHeader: View {
                 .controlSize(.small)
                 .help(hasBudget ? "Budget ändern oder entfernen" : "Ausgabenbudget für dieses Konto festlegen")
             }
+            if model.forecastBasis(of: account.id) != nil {
+                Button {
+                    model.showForecast(for: account)
+                } label: {
+                    Label("Planen …", systemImage: "calendar.badge.plus")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .help("Prognose ansehen und einmalige Ausgaben einplanen (⌥⌘P)")
+            }
         }
         .labelStyle(CompactableLabelStyle(compact: compact))
         .lineLimit(1)
@@ -725,11 +777,32 @@ private struct LedgerHeader: View {
                 Figure(label: ledger.account?.type == .card ? "Saldo" : "Gebucht", cents: balance.bookedCents, currency: balance.currency)
                 if let available = balance.availableCents {
                     Figure(label: "Verfügbar", cents: available, currency: balance.currency) {
+                        if let planned = ledger.account.map({ model.ownPlannedCents(for: $0.id) }), planned != 0 {
+                            Text("\(model.hideAmounts ? "•••••" : Money.format(available + planned)) nach selbst Geplantem")
+                                .accessibilityLabel(model.hideAmounts ? "Betrag ausgeblendet, nach selbst Geplantem" : "\(Money.format(available + planned)) nach selbst Geplantem")
+                                .help("Verfügbar abzüglich der selbst geplanten Buchungen (\(model.hideAmounts ? "•••••" : Money.format(planned, signed: true)))")
+                        }
                         if ledger.pendingCents != 0 {
                             Text("gebucht \(ledger.pendingCents < 0 ? "−" : "+") \(model.hideAmounts ? "•••••" : Money.format(abs(ledger.pendingCents))) vorgemerkt")
                                 .accessibilityLabel(model.hideAmounts ? "Betrag ausgeblendet, vorgemerkt" : "gebucht \(ledger.pendingCents < 0 ? "minus" : "plus") \(Money.format(abs(ledger.pendingCents))) vorgemerkt")
                         }
                     }
+                }
+                // No "Verfügbar" from the bank (most giro accounts): what is left after pending
+                // and self-planned payments, as a figure of its own. Simulated: the label and the
+                // caption say so (not a dimmed colour, it is a key figure).
+                if balance.availableCents == nil, let planned = ledger.account.map({ model.ownPlannedCents(for: $0.id) }), planned != 0 {
+                    let pending = ledger.account.flatMap { model.forecastBasis(of: $0.id) }.map { $0.startCents - $0.bookedCents } ?? 0
+                    Figure(label: "Nach Geplantem", cents: balance.bookedCents + pending + planned, currency: balance.currency) {
+                        // Two short lines like "Verfügbar": one long line made the figure too wide.
+                        Text("gebucht \(planned < 0 ? "−" : "+") \(model.hideAmounts ? "•••••" : Money.format(abs(planned))) geplant")
+                            .accessibilityLabel(model.hideAmounts ? "Betrag ausgeblendet, selbst geplant" : "simuliert: gebucht \(planned < 0 ? "abzüglich" : "zuzüglich") \(Money.format(abs(planned))) selbst geplant")
+                        if pending != 0 {
+                            Text("\(pending < 0 ? "−" : "+") \(model.hideAmounts ? "•••••" : Money.format(abs(pending))) vorgemerkt")
+                                .accessibilityLabel(model.hideAmounts ? "Betrag ausgeblendet, vorgemerkt" : "\(pending < 0 ? "minus" : "plus") \(Money.format(abs(pending))) vorgemerkt")
+                        }
+                    }
+                    .help("Simuliert: gebuchter Saldo mit vorgemerkten und selbst geplanten Buchungen. Regelmäßige Buchungen zeigt die Prognose (⌥⌘P).")
                 }
                 if let limit = ledger.account?.creditLimitCents {
                     Figure(label: "Limit", cents: limit, currency: balance.currency)

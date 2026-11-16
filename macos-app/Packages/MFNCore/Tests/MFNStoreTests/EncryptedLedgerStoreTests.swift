@@ -531,3 +531,31 @@ private struct ProbeConnector: BankConnector {
         #expect(snapshot.depotHistory["d"]?.map(\.day.iso) == ["2026-05-01", "2026-05-02", "2026-05-03"])
     }
 }
+
+@Suite struct PlannedItemPersistenceTests {
+    @Test func plannedItemsPersistAndGoWithTheBank() async throws {
+        let url = tempURL()
+        let store = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        try await Fixture.fill(store)
+        // Whole seconds: the column is a Unix time.
+        var item = PlannedItem(accountID: Fixture.giro.id, day: BankDay(year: 2027, month: 1, day: 15)!, amountCents: -120_000,
+                               title: "Autoreparatur", createdAt: Date(timeIntervalSince1970: 1_800_000_000), ignoredMatches: ["tx-1"])
+        try await store.upsertPlannedItem(item)
+        item.amountCents = -135_000
+        try await store.upsertPlannedItem(item)
+        let other = PlannedItem(accountID: Fixture.giro.id, day: BankDay(year: 2026, month: 12, day: 1)!, amountCents: 50_000,
+                                title: "Erstattung", createdAt: Date(timeIntervalSince1970: 1_800_000_100))
+        try await store.upsertPlannedItem(other)
+        await store.close()
+        let reopened = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await reopened.snapshot().plannedItems == [other, item], "by day")
+        try await reopened.removePlannedItem(other.id)
+        #expect(await reopened.snapshot().plannedItems == [item])
+        try await reopened.removeConnection(Fixture.connection.id)
+        #expect(await reopened.snapshot().plannedItems.isEmpty)
+        await reopened.close()
+        let third = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await third.snapshot().plannedItems.isEmpty)
+        await third.close()
+    }
+}

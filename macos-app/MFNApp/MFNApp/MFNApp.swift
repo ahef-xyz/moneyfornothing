@@ -48,6 +48,11 @@ struct MFNApp: App {
                 Button("Bank ausklappen") { model.setSelectedBankCollapsed(false) }
                     .keyboardShortcut(.rightArrow, modifiers: [.command, .option])
                     .disabled(model.lock.isLocked || model.selectedBankCollapsed != true)
+                Button("Prognose und Planung …") {
+                    if let account = model.forecastAccount { model.showForecast(for: account) }
+                }
+                .keyboardShortcut("p", modifiers: [.command, .option])
+                .disabled(model.forecastAccount == nil)
                 if DeveloperMode.isAvailable {
                     // Same report as the context menu of a FinTS bank.
                     Button("Zusammenführen prüfen …") { model.mergeCheck = model.mergeCandidate }

@@ -129,6 +129,19 @@ enum Schema {
             PRIMARY KEY (accountID, day)
         );
         """,
+        // 8 – one-off payments the user plans (forecast only; `ignoredMatches` = JSON array of
+        // transaction IDs)
+        """
+        CREATE TABLE plannedItem (
+            id TEXT PRIMARY KEY NOT NULL,
+            accountID TEXT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+            day TEXT NOT NULL,
+            amountCents INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            createdAt REAL NOT NULL,
+            ignoredMatches TEXT NOT NULL
+        );
+        """,
     ]
 
     static func migrate(_ db: SQLiteConnection) throws {
@@ -338,6 +351,28 @@ enum DepotValueTable {
         DepotValuePoint(accountID: AccountID(try row.string("accountID")), day: try day(row, "day"),
                         valueCents: try row.int("valueCents"), purchaseCents: try row.optionalInt("purchaseCents"),
                         currency: try row.string("currency"))
+    }
+}
+
+enum PlannedItemTable {
+    static let columns = ["id", "accountID", "day", "amountCents", "title", "createdAt", "ignoredMatches"]
+    static let upsert = upsertSQL(table: "plannedItem", columns: columns, conflict: ["id"])
+
+    static func values(_ item: PlannedItem) throws -> [SQLValue] {
+        let ignored = String(decoding: try JSONEncoder().encode(item.ignoredMatches.map(\.rawValue).sorted()), as: UTF8.self)
+        return [.text(item.id.uuidString), .text(item.accountID.rawValue), .text(item.day.iso), SQLValue(item.amountCents),
+                .text(item.title), .real(item.createdAt.timeIntervalSince1970), .text(ignored)]
+    }
+
+    static func model(_ row: SQLRow) throws -> PlannedItem {
+        guard let id = UUID(uuidString: try row.string("id")),
+              let ignored = try? JSONDecoder().decode([String].self, from: Data(try row.string("ignoredMatches").utf8)) else {
+            throw StoreError.corruptRow("plannedItem")
+        }
+        return PlannedItem(id: id, accountID: AccountID(try row.string("accountID")), day: try day(row, "day"),
+                           amountCents: try row.int("amountCents"), title: try row.string("title"),
+                           createdAt: Date(timeIntervalSince1970: try row.double("createdAt")),
+                           ignoredMatches: Set(ignored.map(TransactionID.init(rawValue:))))
     }
 }
 

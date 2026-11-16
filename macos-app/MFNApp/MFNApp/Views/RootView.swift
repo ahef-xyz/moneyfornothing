@@ -197,6 +197,9 @@ struct MainView: View {
         .sheet(item: $model.budgetEditor) { account in
             BudgetSheet(account: account)
         }
+        .sheet(item: $model.forecastPanel) { request in
+            ForecastSheet(request: request)
+        }
         .sheet(item: $model.bankSetup) { setup in
             BankSetupView(setup: setup)
         }

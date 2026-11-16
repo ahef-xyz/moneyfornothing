@@ -283,6 +283,8 @@ extension ConnectionMerge {
         public var accounts: [AccountID: AccountID] = [:]
         /// Recorded depot history of the source, now for the target (only days the target lacks).
         public var depotValues: [DepotValuePoint] = []
+        /// The source's planned items, now for the target account.
+        public var plannedItems: [PlannedItem] = []
 
         public init(source: ConnectionID) {
             self.source = source
@@ -309,6 +311,14 @@ extension ConnectionMerge {
             changes.depotValues += (snapshot.depotHistory[account.pair.source.id] ?? [])
                 .filter { !targetDays.contains($0.day) }
                 .map { DepotValuePoint(accountID: target, day: $0.day, valueCents: $0.valueCents, purchaseCents: $0.purchaseCents, currency: $0.currency) }
+            // Moved bookings keep their IDs; a matched source twin goes away, its "this is not the
+            // item" answer passes to the target twin.
+            let twins = Dictionary(account.matched.map { ($0.source.id, $0.target.id) }, uniquingKeysWith: { first, _ in first })
+            for var item in snapshot.plannedItems where item.accountID == account.pair.source.id {
+                item.accountID = target
+                item.ignoredMatches = Set(item.ignoredMatches.map { twins[$0] ?? $0 })
+                changes.plannedItems.append(item)
+            }
         }
         return changes
     }
@@ -328,6 +338,7 @@ extension LedgerSnapshot {
         for (account, name) in changes.names { setCustomName(name, for: account) }
         for budget in changes.budgets { budgets[budget.accountID] = budget }
         record(changes.depotValues)
+        for item in changes.plannedItems { upsertPlannedItem(item) }
         removeConnection(changes.source)
     }
 }

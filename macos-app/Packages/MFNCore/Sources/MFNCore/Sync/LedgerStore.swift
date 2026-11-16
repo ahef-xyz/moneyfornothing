@@ -21,6 +21,8 @@ public struct LedgerSnapshot: Sendable, Equatable {
     public var budgets: [AccountID: AccountBudget] = [:]
     /// Depot value per day, oldest first (`DepotValuePoint`, recorded by `apply(_ update:)`).
     public var depotHistory: [AccountID: [DepotValuePoint]] = [:]
+    /// One-off payments the user expects (`PlannedItem`), by day.
+    public var plannedItems: [PlannedItem] = []
 
     public init() {}
 
@@ -71,6 +73,17 @@ public struct LedgerSnapshot: Sendable, Equatable {
         for account in accountIDs { customAccountNames[account] = nil }
         for account in accountIDs { budgets[account] = nil }
         for account in accountIDs { depotHistory[account] = nil }
+        plannedItems.removeAll { accountIDs.contains($0.accountID) }
+    }
+
+    public mutating func upsertPlannedItem(_ item: PlannedItem) {
+        plannedItems.removeAll { $0.id == item.id }
+        plannedItems.append(item)
+        plannedItems.sort { ($0.day, $0.createdAt) < ($1.day, $1.createdAt) }
+    }
+
+    public mutating func removePlannedItem(_ id: UUID) {
+        plannedItems.removeAll { $0.id == id }
     }
 
     public mutating func upsertRule(_ rule: CategoryRule) {
@@ -228,6 +241,11 @@ public struct SyncState: Sendable, Equatable, Codable {
     }
 }
 
+public enum PlannedItemError: Error, Equatable, Sendable {
+    /// The account the item belongs to is not in the ledger.
+    case unknownAccount(AccountID)
+}
+
 /// Persistence boundary of MFN. The UI and `SyncEngine` only talk to this protocol.
 ///
 /// `InMemoryLedgerStore` backs previews, tests and the mock app; `EncryptedLedgerStore`
@@ -259,6 +277,9 @@ public protocol LedgerStore: Actor {
     func removeRule(_ id: UUID) async throws
     func setBudget(_ budget: AccountBudget) async throws
     func removeBudget(for account: AccountID) async throws
+    /// Adds or changes a planned item (by ID).
+    func upsertPlannedItem(_ item: PlannedItem) async throws
+    func removePlannedItem(_ id: UUID) async throws
     /// Removes machine categories in one write; manual categories stay untouched.
     func clearCategories(_ ids: Set<TransactionID>) async throws
     /// One category for many transactions in one write (manual correction of a selection).
@@ -425,6 +446,16 @@ public actor InMemoryLedgerStore: LedgerStore {
 
     public func removeBudget(for account: AccountID) {
         change { $0.budgets[account] = nil }
+    }
+
+    /// Like the encrypted store (foreign key): an item of an unknown account is an error.
+    public func upsertPlannedItem(_ item: PlannedItem) throws {
+        guard state.accounts.contains(where: { $0.id == item.accountID }) else { throw PlannedItemError.unknownAccount(item.accountID) }
+        change { $0.upsertPlannedItem(item) }
+    }
+
+    public func removePlannedItem(_ id: UUID) {
+        change { $0.removePlannedItem(id) }
     }
 
     public func clearCategories(_ ids: Set<TransactionID>) {

@@ -148,7 +148,10 @@ struct OverviewView: View {
     /// accounts, "Alle Umsätze" and the newest transactions.
     private func targets(_ connections: [Connection], data: OverviewData) -> [OverviewFocus] {
         var list: [OverviewFocus] = []
-        if shows(.figures) { list += [.pending, .review] }
+        if shows(.figures) {
+            list += [.pending, .review]
+            if let next = model.plannedOverview.next, model.account(next.accountID) != nil { list.append(.planned) }
+        }
         if shows(.accounts) {
             for connection in connections {
                 // A disabled button cannot take the focus: the arrows would lose their place.
@@ -644,6 +647,18 @@ private struct KeyFigures: View {
             }
             .overviewTarget(.review, focus: focus, cornerRadius: 12, highlight: false) { model.selection = .review }
             .help("Zu prüfen anzeigen (⌘1)")
+            // Only with self-planned payments: opens the forecast of the next one's account.
+            let planned = model.plannedOverview
+            if let next = planned.next, let account = model.account(next.accountID) {
+                // Short enough for one line: a wrapped title made this tile taller than the others.
+                tile(planned.count == 1 ? "1 geplante Buchung" : "\(planned.count) geplante Buchungen", symbol: "calendar.badge.plus", opens: true) {
+                    // One line like the other tiles (same height); the next one is in the tooltip.
+                    AmountText(cents: planned.cents, colorsInflow: false)
+                }
+                .overviewTarget(.planned, focus: focus, cornerRadius: 12, highlight: false) { model.showForecast(for: account) }
+                .accessibilityHint("Nächste: \(next.title) am \(ForecastFormat.text(max(next.day, model.index.day), today: model.index.day)). Öffnet die Prognose von \(account.name).")
+                .help("Selbst geplant. Nächste: \(next.title) am \(ForecastFormat.text(max(next.day, model.index.day), today: model.index.day)). Öffnet die Prognose von \(account.name).")
+            }
         }
         .contextMenu {
             Button("„\(OverviewSection.figures.title)“ ausblenden") { hide(.figures) }
@@ -1157,7 +1172,7 @@ private struct OverviewTransactionLine: View {
 
 /// What can have the keyboard focus in the overview.
 enum OverviewFocus: Hashable {
-    case pending, review
+    case pending, review, planned
     case sync(ConnectionID)
     case account(AccountID)
     case allTransactions
@@ -1241,12 +1256,16 @@ extension View {
 /// forecast from pending and planned bookings (dotted), both from `SnapshotIndex.BalanceCurve`
 /// (built once per snapshot, the same payments as the shortfall warning). A zero line and an
 /// orange mark at the lowest point show when the money would not last. Lower than the header's
-/// text block. Hidden with the amounts (⇧⌘H). Click, Return or Space show the exact values.
+/// text block. Hidden with the amounts (⇧⌘H). Click, Return or Space open the forecast panel
+/// (`ForecastSheet`); the tooltip has the exact values.
 struct AccountBalanceChart: View {
     let account: AccountID
     @Environment(AppModel.self) private var model
-    @State private var showsDetails = false
     @FocusState private var focused: Bool
+
+    private func open() {
+        if let account = model.account(account) { model.showForecast(for: account) }
+    }
 
     var body: some View {
         if !model.hideAmounts, let curve = model.balanceCurve(of: account) {
@@ -1298,30 +1317,24 @@ struct AccountBalanceChart: View {
                 FocusHighlight(cornerRadius: 6, fill: false)
             }
             .contentShape(Rectangle())
-            .help(summary)
+            .help(summary + "\nKlicken öffnet die Prognose (⌥⌘P).")
             .onTapGesture {
                 focused = false   // the ring is for the keyboard
-                showsDetails.toggle()
+                open()
             }
             .focusable()
             .focused($focused)
             .focusEffectDisabled()
             .onKeyPress(keys: [.return, .space]) { _ in
-                showsDetails.toggle()
+                open()
                 return .handled
-            }
-            .popover(isPresented: $showsDetails, arrowEdge: .bottom) {
-                Text(summary)
-                    .font(.callout)
-                    .monospacedDigit()
-                    .textSelection(.enabled)
-                    .padding(12)
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Saldoverlauf der letzten 31 Tage mit Prognose")
             .accessibilityValue(summary)
+            .accessibilityHint("Öffnet die Prognose")
             .accessibilityAddTraits(.isButton)
-            .accessibilityAction { showsDetails.toggle() }
+            .accessibilityAction { open() }
             .accessibilityChartDescriptor(BalanceChartDescriptor(curve: curve))
         }
     }
@@ -1349,7 +1362,7 @@ struct AccountBalanceChart: View {
         var lines: [String] = []
         if let first = curve.past.first { lines.append("Vor 30 Tagen: \(Money.format(first.cents))") }
         lines.append("Heute gebucht: \(Money.format(curve.todayCents))")
-        lines.append("Prognose \(curve.end.startDate.formatted(dayFormat)): \(Money.format(curve.endCents)) (mit vorgemerkten und geplanten Buchungen)")
+        lines.append("Prognose \(curve.end.startDate.formatted(dayFormat)): \(Money.format(curve.endCents)) (mit vorgemerkten, geplanten und regelmäßigen Buchungen)")
         if let low = curve.lowest {
             lines.append("Tiefster Stand: \(Money.format(low.cents)) am \(low.day.startDate.formatted(dayFormat))")
         }

@@ -144,6 +144,9 @@ public actor EncryptedLedgerStore: LedgerStore {
             for point in changes.depotValues {
                 try db.run(DepotValueTable.upsert, DepotValueTable.values(point))
             }
+            for item in changes.plannedItems {
+                try db.run(PlannedItemTable.upsert, try PlannedItemTable.values(item))
+            }
             try Self.deleteConnection(changes.source, accounts: sourceAccounts, in: db)
         }
         change { $0 = next }
@@ -151,7 +154,7 @@ public actor EncryptedLedgerStore: LedgerStore {
 
     private static func deleteConnection(_ id: ConnectionID, accounts: [AccountID], in db: SQLiteConnection) throws {
         for account in accounts {
-            for table in ["ledgerTransaction", "cardStatement", "securityPosition", "balance", "accountName", "budget", "depotValue"] {
+            for table in ["ledgerTransaction", "cardStatement", "securityPosition", "balance", "accountName", "budget", "depotValue", "plannedItem"] {
                 try db.run("DELETE FROM \(table) WHERE accountID = ?", [.text(account.rawValue)])
             }
         }
@@ -345,6 +348,16 @@ public actor EncryptedLedgerStore: LedgerStore {
         change { $0.budgets[account] = nil }
     }
 
+    public func upsertPlannedItem(_ item: PlannedItem) throws {
+        try write { try $0.run(PlannedItemTable.upsert, try PlannedItemTable.values(item)) }
+        change { $0.upsertPlannedItem(item) }
+    }
+
+    public func removePlannedItem(_ id: UUID) throws {
+        try write { try $0.run("DELETE FROM plannedItem WHERE id = ?", [.text(id.uuidString)]) }
+        change { $0.removePlannedItem(id) }
+    }
+
     public func removeRule(_ id: UUID) throws {
         try write { try $0.run("DELETE FROM categoryRule WHERE id = ?", [.text(id.uuidString)]) }
         change { $0.removeRule(id) }
@@ -398,6 +411,7 @@ public actor EncryptedLedgerStore: LedgerStore {
             let anchor = try tolerance.map { AccountBudget.IncomeAnchor(toleranceDays: $0, counterpart: try row.optionalString("anchorCounterpart")) }
             snapshot.budgets[account] = AccountBudget(accountID: account, amountCents: try row.int("amountCents"), period: period, startDay: try row.int("startDay"), anchor: anchor)
         }
+        snapshot.plannedItems = try db.query("SELECT * FROM plannedItem ORDER BY day, createdAt").map(PlannedItemTable.model)
         for row in try db.query("SELECT accountID, name FROM accountName") {
             snapshot.customAccountNames[AccountID(try row.string("accountID"))] = try row.string("name")
         }
