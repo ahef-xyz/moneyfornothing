@@ -436,3 +436,27 @@ private struct ExpiredSessionConnector: BankConnector {
         #expect(seen == false)
     }
 }
+
+// MARK: - Accounts without a bank connection (protocol v10)
+
+@Suite struct ManualConnectionSyncTests {
+    @Test func engineNeverSyncsAManualConnection() async throws {
+        let store = InMemoryLedgerStore()
+        let counter = CallCounter()
+        let engine = SyncEngine(store: store)
+        let manual = Connection(id: "manual:A", connectorID: .manual, displayName: "Sparbuch")
+        // Even if a connector is handed in by mistake, it is never called.
+        try await engine.register(manual, connector: StubConnector(calls: counter))
+        try await engine.register(Connection(id: "c1", connectorID: .mock, displayName: "Test"), connector: StubConnector(calls: counter))
+
+        #expect(await engine.registeredConnections == ["c1"])
+        await engine.syncAll(trigger: .manual)
+        await engine.sync("manual:A", trigger: .manual)
+        await engine.sync("manual:A", trigger: .automatic)
+
+        #expect(await counter.count == 1)
+        // The connection is stored (it lists its accounts), but it never gets a sync state.
+        #expect(await store.snapshot().connections.contains(manual))
+        #expect(await store.snapshot().syncStates["manual:A"] == nil)
+    }
+}

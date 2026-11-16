@@ -181,7 +181,7 @@ private final class LoginPage {
 
     @Test func formShownAgainIsNeverSubmittedTwice() throws {
         let outcome = try LoginPage().run(state: ["phase": "submitted"])
-        #expect(outcome.error == "authFailed: N26 login form shown again")
+        #expect(outcome.error == "N26 login form shown again")
         #expect(outcome.clicks.isEmpty && outcome.values["password"] == "")
     }
 
@@ -198,7 +198,8 @@ private final class LoginPage {
         let page = LoginPage()
         page.storage = [N26LoginScript.submittedMarker: "1"]
         let outcome = try page.run(state: nil)
-        #expect(outcome.error?.hasPrefix("authFailed") == true)
+        // No error panel: not a credential error, but the login stops.
+        #expect(outcome.error == "N26 login form shown again")
         #expect(outcome.clicks.isEmpty && outcome.values == ["username": "", "password": ""])
     }
 

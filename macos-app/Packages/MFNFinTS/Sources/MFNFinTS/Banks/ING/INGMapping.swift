@@ -90,8 +90,9 @@ enum INGMapping {
     }
 
     /// Start day for `HKKAZ`: `since` (bank day), capped to the storage period. `nil` → whole period.
+    /// Today counts as day 1 of the period, so the earliest day is `storageDays - 1` days back.
     static func statementStart(since: Date?, today: BankDay, storageDays: Int) -> BankDay {
-        let earliest = today.adding(days: -storageDays)
+        let earliest = today.adding(days: -(max(storageDays, 1) - 1))
         guard let since else { return earliest }
         return max(BankDay(since), earliest)
     }

@@ -79,7 +79,13 @@ struct C24Amount: Decodable, Hashable, Sendable {
         return NSDecimalNumber(decimal: rounded).intValue
     }
 
-    /// `"-1222.01"`, `"1.234,56 €"`, `"7,09 €"`, `"−0,99"`.
+    /// No comma, and every dot is followed by a group of exactly three digits.
+    static func dotsAreThousandsSeparators(_ body: String) -> Bool {
+        let groups = body.split(separator: ".", omittingEmptySubsequences: false)
+        return groups.count > 1 && groups.dropFirst().allSatisfy { $0.count == 3 && $0.allSatisfy(\.isNumber) }
+    }
+
+    /// `"-1222.01"`, `"1.234,56 €"`, `"7,09 €"`, `"−0,99"`, `"1.234 €"` (dot = thousands).
     static func cents(fromText text: String) -> Int? {
         var body = text.replacingOccurrences(of: "−", with: "-")
             .filter { $0.isNumber || $0 == "," || $0 == "." || $0 == "-" }
@@ -91,6 +97,10 @@ struct C24Amount: Decodable, Hashable, Sendable {
                 : body.replacingOccurrences(of: ",", with: "")
         case (_?, nil):
             body = body.replacingOccurrences(of: ",", with: ".")
+        case (nil, _?) where Self.dotsAreThousandsSeparators(body):
+            // German grouping without decimals: "1.234 €", "1.234.567" (a decimal point would
+            // have one or two digits after it, as in "-1222.01").
+            body = body.replacingOccurrences(of: ".", with: "")
         default:
             break
         }

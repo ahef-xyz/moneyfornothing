@@ -28,7 +28,9 @@ struct BankSetupView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
-            if let connector = setup.connector, setup.step != .chooseBank {
+            if setup.isManualStep {
+                ConnectorBadge(connector: .manual, size: 36)
+            } else if let connector = setup.connector, setup.step != .chooseBank {
                 ConnectorBadge(connector: connector, size: 36)
             } else {
                 Image(systemName: "building.columns")
@@ -51,6 +53,8 @@ struct BankSetupView: View {
         case .chooseBank: "Bank hinzufügen"
         case .credentials, .connecting, .failed: "Bei \(setup.connector?.displayName ?? "") anmelden"
         case .accounts: "Konten gefunden"
+        case .manualAccount: setup.manualEditing == nil ? "Konto ohne Anbindung anlegen" : "Konto bearbeiten"
+        case .manualCreated: "Konto angelegt"
         }
     }
 
@@ -61,6 +65,8 @@ struct BankSetupView: View {
         case .connecting: "MFN meldet sich an. Freigaben erscheinen hier."
         case .accounts: "Mit „Fertig“ startet der erste Abgleich mit der verfügbaren Historie."
         case .failed: "Die Anmeldung hat nicht geklappt."
+        case .manualAccount: "Für Banken, die MFN nicht abgleichen kann, und Bargeld. Umsätze kommen aus CSV-Dateien des Online-Bankings."
+        case .manualCreated: "MFN gleicht dieses Konto nie mit einer Bank ab. Der Kontostand ergibt sich aus Startsaldo und importierten Umsätzen."
         }
     }
 
@@ -74,6 +80,8 @@ struct BankSetupView: View {
         case .connecting: connecting
         case .accounts: accountList
         case let .failed(message): failure(message)
+        case .manualAccount: ManualAccountForm(setup: setup)
+        case .manualCreated: manualCreated
         }
     }
 
@@ -201,6 +209,22 @@ struct BankSetupView: View {
         .padding(.bottom, 16)
     }
 
+    private var manualCreated: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("„\(setup.manual.name.trimmingCharacters(in: .whitespacesAndNewlines))“ steht jetzt in der Seitenleiste.", systemImage: "checkmark.circle")
+            Text("Lade die Umsätze als CSV-Datei aus dem Online-Banking der Bank herunter und importiere sie hier. Das geht auch später im Menü „Ablage“ (⇧⌘I) oder im Kontextmenü des Kontos.")
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            if let warning = setup.finishError {
+                Label(warning, systemImage: "exclamationmark.triangle")
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+    }
+
     private func failure(_ message: String) -> some View {
         Label(message, systemImage: "exclamationmark.triangle")
             .foregroundStyle(.red)
@@ -213,8 +237,18 @@ struct BankSetupView: View {
 
     private var footer: some View {
         HStack {
-            if setup.step == .credentials {
+            if setup.step == .credentials || (setup.step == .manualAccount && !setup.manualOnly) {
                 Button("Zurück") { setup.backToBanks() }
+            }
+            if setup.step == .chooseBank {
+                Button("Konto ohne Anbindung anlegen …") { setup.chooseManualAccount() }
+                    .help("Konto ohne Abgleich, Umsätze per CSV-Import")
+            }
+            if setup.step == .manualAccount, let problem = setup.manual.problem, setup.manual != ManualAccountDraft() {
+                Text(problem)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
             }
             if setup.step == .credentials, let problem = setup.credentialProblem, setup.values.values.contains(where: { !$0.isEmpty }) {
                 Text(problem)
@@ -224,8 +258,13 @@ struct BankSetupView: View {
             Spacer()
             // During a login the inline approval has its own "Abbrechen" (ends the login, Esc);
             // this one closes the whole assistant.
-            Button(setup.step == .connecting ? "Assistent schließen" : "Abbrechen", role: .cancel) { setup.cancel() }
-                .keyboardShortcut(setup.step == .connecting ? nil : .cancelAction)
+            if case .manualCreated = setup.step {
+                Button("Später") { setup.cancel() }
+                    .keyboardShortcut(.cancelAction)
+            } else {
+                Button(setup.step == .connecting ? "Assistent schließen" : "Abbrechen", role: .cancel) { setup.cancel() }
+                    .keyboardShortcut(setup.step == .connecting ? nil : .cancelAction)
+            }
             switch setup.step {
             case .chooseBank:
                 Button("Weiter") { setup.chooseBank() }
@@ -244,6 +283,14 @@ struct BankSetupView: View {
                     .disabled(setup.isFinishing)
             case .failed:
                 Button("Erneut versuchen") { setup.retry() }
+                    .keyboardShortcut(.defaultAction)
+            case .manualAccount:
+                if setup.isFinishing { ProgressView().controlSize(.small) }
+                Button(setup.manualEditing == nil ? "Anlegen" : "Sichern") { Task { await setup.saveManualAccount() } }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(setup.manual.fields == nil || setup.isFinishing)
+            case .manualCreated:
+                Button("Umsätze aus CSV importieren …") { setup.importCSVIntoManualAccount() }
                     .keyboardShortcut(.defaultAction)
             }
         }

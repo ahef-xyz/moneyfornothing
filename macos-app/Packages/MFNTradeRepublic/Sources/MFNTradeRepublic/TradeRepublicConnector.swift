@@ -45,6 +45,20 @@ public struct TradeRepublicConnector: BankConnector {
         public static let production = Configuration()
     }
 
+    /// Public-key pins for `api.traderepublic.com` (format: see `TRURLSessionTransport.init`):
+    /// the issuing CA and its root, plus two DigiCert roots as backup, so a renewal of the server
+    /// certificate keeps working; a CA change outside DigiCert fails closed. Read from the live
+    /// chain on 2026-11-16 (`openssl s_client -showcerts`, roots from the macOS root store):
+    /// DigiCert Global G2 TLS RSA SHA256 2020 CA1 (until 2031-03), DigiCert Global Root G2
+    /// (until 2038-01); backups DigiCert Global Root G3 (ECDSA, until 2038-01) and DigiCert TLS
+    /// RSA4096 Root G5 (until 2046-01).
+    public static let pinnedKeyHashes: Set<String> = [
+        "6/lnA5oSgvzWrr6BXgbjn3t88Fs/w3aKfCS8b8sSoMs=",
+        "kzNpObIj7PazozWYvpGtefirgmaT+KxQzYJwCOyniWg=",
+        "yh3BBoIIMtyhstjq3B01dct35nh4FQs/d6mV8ZigMfc=",
+        "nFu/rHS4W76y4MvMHwbX9pixgciwBUo0VbNT7Pbjcso=",
+    ]
+
     public let id: ConnectorID = .tradeRepublic
     public let connectionID: ConnectionID
     private let service: TRService
@@ -53,11 +67,12 @@ public struct TradeRepublicConnector: BankConnector {
     /// - Parameters:
     ///   - presenter: shows the web login. Without it a needed login throws `authRequired(.webLogin)`.
     ///   - pinnedKeyHashes: public-key pins for `api.traderepublic.com` (see `TRURLSessionTransport`).
+    ///     Empty = `pinnedKeyHashes` (always pinned).
     public init(
         connectionID: ConnectionID,
         presenter: (any AuthChallengePresenter)?,
         sessionStore: (any TRSessionStore)? = nil,
-        pinnedKeyHashes: Set<String> = []
+        pinnedKeyHashes: Set<String> = TradeRepublicConnector.pinnedKeyHashes
     ) {
         let transport = TRURLSessionTransport(pinnedKeyHashes: pinnedKeyHashes)
         self.init(
@@ -179,6 +194,12 @@ actor TRService {
     private var cachedDepotValue: Decimal?
     /// Set after the first failed detail: the rest of the run goes without details.
     private var detailsDisabled = false
+    /// `timelineDetailV2` answers by item ID. The connector cannot see what the store already
+    /// has, so details are cached for the lifetime of this instance (e.g. balance + transactions
+    /// in one sync, or a second `transactions` call) instead of being fetched again.
+    private var detailCache: [String: JSONValue] = [:]
+    /// Detail subscriptions in flight at once (the socket multiplexes them by subscription ID).
+    static let detailConcurrency = 6
 
     init(session: TRSession, socket: TRWebSocketClient, maxPages: Int, now: @escaping @Sendable () -> Date) {
         self.session = session
@@ -235,6 +256,8 @@ actor TRService {
             let page = try TRMapping.timelinePage(json)
             pages += 1
             items += page.items
+            // An empty page ends the history even if the server still sends a cursor.
+            if page.items.isEmpty { break }
             cursor = page.after
             if let next = cursor, !seenCursors.insert(next).inserted || pages >= maxPages {
                 throw .formatChanged(detail: "Trade-Republic-Timeline endet nicht (Cursor wiederholt sich)")
@@ -242,15 +265,20 @@ actor TRService {
             if let since, let oldest = page.items.compactMap(TRMapping.itemDay).min(), oldest < since { break }
         } while cursor != nil
 
+        let relevant = items.filter { item in
+            guard let since, TRMapping.status(of: item) != .pending, let day = TRMapping.itemDay(item) else { return true }
+            return day >= since
+        }
+        let detailIDs = relevant.compactMap { item -> String? in
+            guard TRMapping.eventType(item).needsDetail, item["amount"].map({ !$0.isNull }) == true else { return nil }
+            return TRMapping.itemID(item)
+        }
+        let details = try await self.details(ids: detailIDs)
+
         var transactions: [Transaction] = []
         var skipped = 0
-        for item in items {
-            let status = TRMapping.status(of: item)
-            if let since, status != .pending, let day = TRMapping.itemDay(item), day < since { continue }
-            var detail: JSONValue?
-            if TRMapping.eventType(item).needsDetail, item["amount"].map({ !$0.isNull }) == true, let id = TRMapping.itemID(item) {
-                detail = try await self.detail(id: id)
-            }
+        for item in relevant {
+            let detail: JSONValue? = if TRMapping.eventType(item).needsDetail, let id = TRMapping.itemID(item) { details[id] } else { nil }
             if let transaction = try TRMapping.transaction(item: item, detail: detail, account: account) {
                 transactions.append(transaction)
             } else {
@@ -270,18 +298,61 @@ actor TRService {
         return cash
     }
 
-    /// Detail of a transfer (IBAN, reference). Best effort: unverified WebSocket format, so a
-    /// failure costs only the details of this run, never the sync. Only cancellation propagates.
-    private func detail(id: String) async throws(ConnectorError) -> JSONValue? {
-        guard !detailsDisabled else { return nil }
-        do {
-            return try await socket.request(.object(["type": .string("timelineDetailV2"), "id": .string(id)]))
-        } catch .cancelled {
-            throw .cancelled
-        } catch {
+    /// Details of transfers (IBAN, reference) by item ID, at most `detailConcurrency` at once.
+    /// Best effort: unverified WebSocket format, so a failure costs only the details still
+    /// missing in this run, never the sync. Only cancellation propagates.
+    private func details(ids: [String]) async throws(ConnectorError) -> [String: JSONValue] {
+        var result: [String: JSONValue] = [:]
+        var missing: [String] = []
+        var queued: Set<String> = []
+        for id in ids {
+            if let cached = detailCache[id] {
+                result[id] = cached
+            } else if queued.insert(id).inserted {
+                missing.append(id)
+            }
+        }
+        guard !detailsDisabled, !missing.isEmpty else { return result }
+
+        let socket = socket
+        var failure: ConnectorError?
+        await withTaskGroup(of: (String, Result<JSONValue, ConnectorError>).self) { group in
+            var next = 0
+            func enqueue() {
+                let id = missing[next]
+                next += 1
+                group.addTask { (id, await Self.fetchDetail(id, socket: socket)) }
+            }
+            while next < min(Self.detailConcurrency, missing.count) { enqueue() }
+            while let (id, outcome) = await group.next() {
+                switch outcome {
+                case let .success(detail):
+                    result[id] = detail
+                    detailCache[id] = detail
+                case let .failure(error):
+                    // The first failure counts; the rest are the cancellations it caused.
+                    if failure == nil {
+                        failure = error
+                        group.cancelAll()
+                    }
+                }
+                if failure == nil, next < missing.count { enqueue() }
+            }
+        }
+        if Task.isCancelled { throw .cancelled }
+        if let failure {
+            if failure == .cancelled { throw .cancelled }
             detailsDisabled = true
-            TRLog.log.error("Trade Republic: Umsatzdetails nicht abrufbar (\(error.description, privacy: .public)), Sync ohne Details")
-            return nil
+            TRLog.log.error("Trade Republic: Umsatzdetails nicht abrufbar (\(failure.description, privacy: .public)), Sync ohne Details")
+        }
+        return result
+    }
+
+    private static func fetchDetail(_ id: String, socket: TRWebSocketClient) async -> Result<JSONValue, ConnectorError> {
+        do throws(ConnectorError) {
+            return .success(try await socket.request(.object(["type": .string("timelineDetailV2"), "id": .string(id)])))
+        } catch {
+            return .failure(error)
         }
     }
 

@@ -131,7 +131,7 @@ public actor EasybankConnector: BankConnector {
         clientIsFresh = fresh
         appValues = cookies.filter { EasybankEndpoints.appValueNames.contains($0.name) }
         let plain = cookies.filter { !EasybankEndpoints.appValueNames.contains($0.name) }
-        let client = ScrapeClient(cookies: plain, transport: transport, policy: policy, sleeper: sleeper)
+        let client = ScrapeClient(cookies: plain, transport: transport, policy: policy, sleeper: sleeper, allowedHosts: [EasybankEndpoints.host])
         self.client = client
         return client
     }
@@ -174,6 +174,7 @@ public actor EasybankConnector: BankConnector {
 
     private func send(_ body: JSONValue, to url: URL, with client: ScrapeClient) async throws(ConnectorError) -> EBEnvelope {
         let headers = EasybankEndpoints.headers(cookies: await client.currentCookies, appValues: appValues)
-        return try await client.post(url, json: body, as: EBEnvelope.self, headers: headers).value
+        // The envelope API is read-only (queries sent as POST), so retries are safe.
+        return try await client.post(url, json: body, as: EBEnvelope.self, headers: headers, retryable: true).value
     }
 }

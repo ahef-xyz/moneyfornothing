@@ -47,6 +47,9 @@ public struct Transaction: Identifiable, Hashable, Codable, Sendable {
     public let originalCurrency: String?
     /// Raw bank payload for this transaction, unchanged. Interpretation happens only in `MFNCore`.
     public let rawJSON: Data
+    /// The CSV import that added this row (v10); `nil` = delivered by a bank sync. Set only by
+    /// `MFNCore`'s importer, never by connectors. Missing in older JSON = `nil`.
+    public let importID: ImportBatchID?
 
     public var categoryID: CategoryID?
     public var categorySource: CategorySource?
@@ -72,7 +75,8 @@ public struct Transaction: Identifiable, Hashable, Codable, Sendable {
         rawJSON: Data = Data("{}".utf8),
         categoryID: CategoryID? = nil,
         categorySource: CategorySource? = nil,
-        confidence: Double? = nil
+        confidence: Double? = nil,
+        importID: ImportBatchID? = nil
     ) {
         let fingerprint = Fingerprint.make(
             accountID: accountID,
@@ -102,12 +106,16 @@ public struct Transaction: Identifiable, Hashable, Codable, Sendable {
         self.categoryID = categoryID
         self.categorySource = categorySource
         self.confidence = confidence
+        self.importID = importID
     }
 
     /// The day the transaction belongs to for sorting, filtering and `since` checks.
     public var effectiveDate: BankDay { bookingDate ?? valueDate }
 
     public var isInflow: Bool { amountCents > 0 }
+
+    /// Added by a CSV import (removable, marked in the UI); bank data otherwise.
+    public var isImported: Bool { importID != nil }
 }
 
 extension Transaction {
@@ -134,7 +142,7 @@ extension Transaction {
             creditorID: creditorID, status: status, externalID: externalID,
             originalAmountCents: originalAmountCents, originalCurrency: originalCurrency,
             rawJSON: rawJSON, categoryID: categoryID, categorySource: categorySource,
-            confidence: confidence
+            confidence: confidence, importID: importID
         )
     }
 }

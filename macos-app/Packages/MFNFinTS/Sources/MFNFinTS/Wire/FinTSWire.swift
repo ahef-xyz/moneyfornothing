@@ -54,7 +54,8 @@ public enum FinTSWire {
                       let length = Int(latin1(Array(bytes[lengthStart..<lengthEnd]))), length >= 0
                 else { throw .invalidBinaryLength(offset: index) }
                 let dataStart = lengthEnd + 1
-                guard dataStart + length <= bytes.count else { throw .binaryOutOfBounds(offset: index) }
+                // Compare against the remaining bytes: `dataStart + length` could overflow.
+                guard length <= bytes.count - dataStart else { throw .binaryOutOfBounds(offset: index) }
                 binary = Data(bytes[dataStart..<(dataStart + length)])
                 index = dataStart + length - 1
                 hasContent = true

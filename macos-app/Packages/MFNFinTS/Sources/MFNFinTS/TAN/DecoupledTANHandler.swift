@@ -27,8 +27,10 @@ public struct SystemDecoupledClock: DecoupledClock {
 /// 2. Wait `waitBeforeFirstStatus`, then poll `HKTAN` process `S` every `waitBetweenStatus`.
 ///    The presenter returning `.confirmed` ("Ich habe freigegeben") triggers an immediate poll.
 /// 3. `3956` = still pending → keep polling. `0020`/`3076`, or the business answer → done; the
-///    poll response carries the result of the original request.
-/// 4. More than `maxStatusRequests` polls, a rejection (`9xxx`) → `ConnectorError.authFailed`.
+///    poll response carries the result of the original request, including its segment errors
+///    (e.g. `9010`), which the connector checks itself.
+/// 4. More than `maxStatusRequests` polls, a TAN rejection (`9941`, `993x`, PIN family) →
+///    `ConnectorError.authFailed`. Other errors on a dialog-init approval → `formatChanged`.
 ///    User cancels → `ConnectorError.cancelled`. No presenter → `ConnectorError.authRequired`.
 ///
 /// Never retries anything on its own beyond the polls the bank allows.
@@ -69,12 +71,12 @@ public struct DecoupledTANHandler: FinTSTANHandler {
         }
         defer { presentation.cancel() }
 
-        let final = try await poll(orderReference: orderReference, dialog: dialog, signal: signal)
+        let final = try await poll(orderReference: orderReference, dialog: dialog, signal: signal, challengeIsInit: challenge.requestTypes.contains("HKIDN"))
         Self.log.info("Decoupled-Freigabe erteilt")
         return Self.carryingDialogData(from: challenge, into: final)
     }
 
-    private func poll(orderReference: String, dialog: FinTSDialog, signal: ConfirmationSignal) async throws(ConnectorError) -> FinTSResponse {
+    private func poll(orderReference: String, dialog: FinTSDialog, signal: ConfirmationSignal, challengeIsInit: Bool) async throws(ConnectorError) -> FinTSResponse {
         var wait = parameters.waitBeforeFirstStatus
         for attempt in 1...parameters.statusRequestLimit {
             if await signal.state == .cancelled { throw .cancelled }
@@ -87,6 +89,12 @@ public struct DecoupledTANHandler: FinTSTANHandler {
             let response = try await dialog.send([FinTSSegments.tanStatusPoll(version: parameters.hktanVersion, orderReference: orderReference)])
             switch Self.evaluate(response) {
             case .approved:
+                // Dialog init has no caller that inspects segment errors: an error here means
+                // the bank did not open the dialog, which is not a TAN rejection.
+                if challengeIsInit, let error = response.errors.first {
+                    Self.log.error("Dialog-Initialisierung nach Freigabe abgelehnt: \(error.code, privacy: .public)")
+                    throw .formatChanged(detail: "FinTS \(error.code)")
+                }
                 return response
             case .pending:
                 Self.log.debug("Freigabe ausstehend (Abfrage \(attempt, privacy: .public))")
@@ -103,11 +111,19 @@ public struct DecoupledTANHandler: FinTSTANHandler {
         case approved, pending, rejected(String)
     }
 
-    /// `3956` = still pending; errors = rejected/expired; otherwise approved (`0020`, `3076`, data).
+    /// TAN rejection codes: rejected/expired/invalid TAN (`994x`, `995x`), access blocked (`993x`),
+    /// PIN wrong (`934x`). Other errors belong to the original order and go back to the caller.
+    static func isTANRejection(_ code: String) -> Bool {
+        ["993", "994", "995", "934"].contains { code.hasPrefix($0) }
+    }
+
+    /// TAN rejection = rejected; `3956` = still pending; otherwise approved (`0020`, `3076`, data,
+    /// or business errors of the original order, which the caller checks).
     static func evaluate(_ response: FinTSResponse) -> PollOutcome {
-        if let error = response.errors.first { return .rejected(error.code) }
+        if let error = response.errors.first(where: { isTANRejection($0.code) }) { return .rejected(error.code) }
         if response.has(FinTSCode.decoupledPending) { return .pending }
-        let approvedCodes: Set<String> = [FinTSCode.executed, "3076"]
+        if !response.errors.isEmpty { return .approved }
+        let approvedCodes: Set<String> = [FinTSCode.executed, FinTSCode.scaNotRequired]
         if response.allCodes.contains(where: { approvedCodes.contains($0.code) }) { return .approved }
         return response.segments.contains(where: { !envelopeTypes.contains($0.type) }) ? .approved : .pending
     }

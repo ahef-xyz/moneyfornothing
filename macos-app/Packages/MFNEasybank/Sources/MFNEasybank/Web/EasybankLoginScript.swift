@@ -29,8 +29,9 @@ import MFNCore
 /// The run returns its state only at the end, and `HeadlessLogin` drops the result of a run whose
 /// page navigated. So the submit is also remembered in the page's `sessionStorage`
 /// (`mfn.easybank.submitted`, written before the click, never credentials). A login form seen
-/// after a submit of an earlier run (state or marker) ends the login with `authFailed`, with or
-/// without an error panel: the form is never filled twice (lockout risk). The script only fills
+/// after a submit of an earlier run (state or marker) ends the login: with an error panel as
+/// `authFailed`, without one (approval declined/expired) as a non-auth error. The form is never
+/// filled twice (lockout risk). A captcha is not a credential error either. The script only fills
 /// pages on `banking.easybank.de`; another host before the submit is a format error.
 enum EasybankLoginScript {
     static let approvalMessage = "Anmeldedaten gesendet, easybank schickt gleich einen SMS-Code …"
@@ -170,7 +171,7 @@ enum EasybankLoginScript {
         "#Captcha input", "vc-captcha-generator input",
         "#Captcha img", "vc-captcha-generator img", "#Captcha canvas", "vc-captcha-generator canvas",
       ])) {
-        throw new Error("authFailed: easybank asks for a captcha");
+        throw new Error("easybank login: easybank asks for a captcha");
       }
 
       const otp = input("OTPPassword");
@@ -210,7 +211,7 @@ enum EasybankLoginScript {
           // The login form came back after an earlier run's submit: never submit twice (lockout risk).
           const text = errorText();
           if (text) { throw new Error("authFailed: easybank rejected username or password: " + wording(text)); }
-          throw new Error("authFailed: easybank login form shown again");
+          throw new Error("easybank login: login form shown again");
         } else if (st.submitted) {
           loginPolls += 1;
           const text = rejected(loginBaseline === null ? "" : loginBaseline, loginPolls);

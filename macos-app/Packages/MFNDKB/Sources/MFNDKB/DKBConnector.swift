@@ -202,7 +202,13 @@ public actor DKBConnector: BankConnector {
         let task = Task { try await self.startSession() }
         login = task
         defer { login = nil }
-        let (client, list) = try await task.value
+        // The unstructured task does not see the caller's cancellation: forward it, so a
+        // cancelled sync also ends the login (sheet) instead of waiting for the user.
+        let (client, list) = try await withTaskCancellationHandler {
+            try await task.value
+        } onCancel: {
+            task.cancel()
+        }
         self.client = client
         checkedList = list
         return client
@@ -240,7 +246,7 @@ public actor DKBConnector: BankConnector {
 
     private func check(_ cookies: [SessionCookie]) async throws -> (ScrapeClient, DKBAccountList) {
         // The login script's marker only completes the login; it never goes to the bank or the keychain.
-        let client = ScrapeClient(cookies: cookies.filter { $0.name != DKBEndpoints.loginDoneCookie }, transport: transport, policy: policy, sleeper: sleeper)
+        let client = ScrapeClient(cookies: cookies.filter { $0.name != DKBEndpoints.loginDoneCookie }, transport: transport, policy: policy, sleeper: sleeper, allowedHosts: [endpoints.host])
         let data = try await request(try endpoints.accountsURL(), with: client)
         let list = try decode(DKBAccountList.self, from: data, context: "Konten")
         try await session.update(await client.currentCookies)

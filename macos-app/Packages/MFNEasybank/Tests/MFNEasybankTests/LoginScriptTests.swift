@@ -324,7 +324,7 @@ struct LoginScriptTests {
 
     @Test func reentryAfterSubmitDoesNotSubmitAgain() throws {
         let outcome = try LoginHarness.run(setup: "page = loginPage();", state: #"{"loads":1,"submitted":1}"#)
-        #expect(outcome.error == "authFailed: easybank login form shown again")
+        #expect(outcome.error == "easybank login: login form shown again")
         #expect(outcome.clicks.isEmpty)
         #expect(outcome.values["password"] == "")
     }
@@ -347,7 +347,7 @@ struct LoginScriptTests {
         storage["\(EasybankLoginScript.submittedMarker)"] = "1";
         page = loginPage();
         """)
-        #expect(outcome.error == "authFailed: easybank login form shown again")
+        #expect(outcome.error == "easybank login: login form shown again")
         #expect(outcome.clicks.isEmpty)
         #expect(outcome.values["username"] == "" && outcome.values["password"] == "")
         #expect(outcome.events.isEmpty)
@@ -395,13 +395,14 @@ struct LoginScriptTests {
         #expect(outcome.error?.hasPrefix("authFailed") == false)
     }
 
-    @Test func captchaStopsAsAuthFailed() throws {
+    @Test func captchaStopsWithoutAuthFailed() throws {
         let outcome = try LoginHarness.run(setup: """
         page = loginPage();
         add("#Captcha", new FakeElement("captcha"));
         add("#Captcha input", new HTMLInputElement("captcha-input"));
         """)
-        #expect(outcome.error?.hasPrefix("authFailed") == true)
+        #expect(outcome.error != nil)
+        #expect(outcome.error?.hasPrefix("authFailed") == false)
         #expect(outcome.clicks.isEmpty)
     }
 

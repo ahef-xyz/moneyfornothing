@@ -36,18 +36,23 @@ struct NeighbourIndex: Sendable {
         return NeighbourIndex(entries: entries, queryVectors: queryVectors)
     }
 
+    /// The `k` nearest, nearest first; ties keep history order. Partial selection (a sorted
+    /// buffer of `k`) instead of sorting every entry: `k` is small, the history is not.
     func neighbours(of query: Transaction, k: Int) -> [Neighbour] {
-        guard let v = queryVectors[query.id] else { return [] }
+        guard k > 0, let v = queryVectors[query.id] else { return [] }
         let queryIncome = query.amountCents > 0
-        var all: [Neighbour] = []
-        all.reserveCapacity(entries.count)
+        var nearest: [Neighbour] = []
+        nearest.reserveCapacity(k + 1)
         for entry in entries where entry.transaction.id != query.id {
             var d = VectorMath.distance(v, entry.vector)
             if (entry.transaction.amountCents > 0) != queryIncome { d += Self.signPenalty }
-            all.append(Neighbour(entry: entry, distance: d))
+            if nearest.count == k, let last = nearest.last, d >= last.distance { continue }
+            // After all equal distances, so earlier entries win ties.
+            let position = nearest.firstIndex { $0.distance > d } ?? nearest.endIndex
+            nearest.insert(Neighbour(entry: entry, distance: d), at: position)
+            if nearest.count > k { nearest.removeLast() }
         }
-        all.sort { $0.distance < $1.distance }
-        return Array(all.prefix(k))
+        return nearest
     }
 }
 

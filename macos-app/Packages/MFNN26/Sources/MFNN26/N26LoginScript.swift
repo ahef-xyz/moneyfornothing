@@ -13,7 +13,8 @@
 /// 2. `submitted`: watch the page. `#login-errors` (wrong credentials, rate limit) or
 ///    `#abort-login-attempt-errors` (`shouldAbortLoginAttempt`) → `authFailed`, never retried.
 ///    Otherwise show „Bitte in der N26-App bestätigen.“.
-/// 3. Login page shown again after `submitted` without an error → `authFailed` (no second attempt).
+/// 3. Login page shown again after `submitted` without an error (push declined or expired) →
+///    a non-auth error, never a second attempt: only the explicit error panels mean wrong credentials.
 ///
 /// The submit is also remembered in the page's `sessionStorage` (`mfn.n26.submitted`, written before the
 /// click): `HeadlessLogin` drops the return value of a run whose page navigated, so without the marker a full
@@ -108,8 +109,9 @@ enum N26LoginScript {
           const reason = failure();
           if (reason) throw new Error(reason);
           if (find(USER) && find(PASS) && !document.querySelector(PUSH_POLL)) {
-            // The form is back without an error: never submit the credentials a second time.
-            throw new Error("authFailed: N26 login form shown again");
+            // The form is back without an error (push declined or expired): not a credential
+            // error, but never submit the credentials a second time.
+            throw new Error("N26 login form shown again");
           }
         } else {
           if (!credentials || !credentials.username || !credentials.password) {

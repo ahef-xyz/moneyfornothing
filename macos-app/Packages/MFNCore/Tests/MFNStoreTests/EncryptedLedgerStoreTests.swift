@@ -173,6 +173,22 @@ private enum Fixture {
         await #expect(throws: StoreError.self) { try await EncryptedLedgerStore.open(at: url, key: keyA) }
     }
 
+    @Test func newerSchemaIsReportedAndLeftUntouched() async throws {
+        let url = tempURL()
+        let first = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        await first.close()
+
+        let supported = Schema.migrations.count
+        try tamper(url, "PRAGMA user_version = \(supported + 1)")
+        await #expect(throws: StoreError.newerSchema(found: supported + 1, supported: supported)) {
+            _ = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        }
+        // Still the newer version: an older app never downgrades or rewrites it.
+        await #expect(throws: StoreError.newerSchema(found: supported + 1, supported: supported)) {
+            _ = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        }
+    }
+
     private func tamper(_ url: URL, _ sql: String) throws {
         var passphrase = keyA.sqlCipherRawKey
         defer { passphrase.wipe() }
@@ -556,6 +572,32 @@ private struct ProbeConnector: BankConnector {
         await reopened.close()
         let third = try await EncryptedLedgerStore.open(at: url, key: keyA)
         #expect(await third.snapshot().plannedItems.isEmpty)
+        await third.close()
+    }
+}
+
+@Suite struct EncryptedOpeningBalanceTests {
+    @Test func openingBalancePersistsAndGoesWithTheAccount() async throws {
+        let url = tempURL()
+        let store = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        let connection = Connection(id: "manual:A", connectorID: .manual, displayName: "Sparbuch")
+        let account = Account(id: "manual:A", connectionID: "manual:A", type: .tagesgeld, name: "Sparbuch")
+        try await store.upsert(connection: connection)
+        try await store.replaceAccounts([account], of: connection.id)
+        let opening = OpeningBalance(cents: -12_345, day: day("2026-02-01"))
+        try await store.setOpeningBalance(opening, for: account.id)
+        // Foreign key: an opening balance of an unknown account is not stored.
+        await #expect(throws: (any Error).self) { try await store.setOpeningBalance(OpeningBalance(cents: 1), for: "manual:unknown") }
+        await store.close()
+        let reopened = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await reopened.snapshot().connections == [connection])
+        #expect(await reopened.snapshot().openingBalances == [account.id: opening])
+        try await reopened.setOpeningBalance(OpeningBalance(cents: 5), for: account.id)
+        try await reopened.removeConnection(connection.id)
+        #expect(await reopened.snapshot().openingBalances.isEmpty)
+        await reopened.close()
+        let third = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await third.snapshot().openingBalances.isEmpty)
         await third.close()
     }
 }

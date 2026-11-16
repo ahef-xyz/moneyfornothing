@@ -85,8 +85,8 @@ import Testing
         let kaz = await transport.requests.compactMap { $0.first { $0.type == "HKKAZ" } }
         #expect(kaz.map { $0[5].first } == [nil, "ING-TD-2"])
         #expect(kaz.allSatisfy { $0.version == 7 })
-        // since nil → whole storage period (90 days).
-        #expect(kaz.allSatisfy { $0[2].first == "20260811" && $0[3].first == nil })
+        // since nil → whole storage period (90 days, today is day 1).
+        #expect(kaz.allSatisfy { $0[2].first == "20260812" && $0[3].first == nil })
     }
 
     @Test func sinceOlderThan90DaysIsCappedAndFiltered() async throws {
@@ -101,7 +101,7 @@ import Testing
         #expect(recent.map(\.amountCents) == [-320, 1250])
 
         let kaz = await transport.requests.compactMap { $0.first { $0.type == "HKKAZ" } }
-        #expect(kaz.map { $0[2].first } == ["20260811", "20261023"])
+        #expect(kaz.map { $0[2].first } == ["20260812", "20261023"])
     }
 
     @Test func fingerprintsStableAcrossRuns() async throws {

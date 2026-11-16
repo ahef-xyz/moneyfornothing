@@ -56,6 +56,9 @@ private let credentials = BankCredentials(["username": "max@example.invalid", "p
 
     @Test func errorMappingFollowsProtocol() {
         #expect(HeadlessLogin.error(forScriptMessage: "authFailed") == .authFailed)
+        #expect(HeadlessLogin.error(forScriptMessage: HeadlessLogin.cancelledMessage) == .cancelled)
+        #expect(HeadlessLogin.error(forScriptMessage: "Error: cancelled") == .cancelled)
+        #expect(HeadlessLogin.error(forScriptMessage: "cancelled by bank") == .formatChanged(detail: "login script"))
         #expect(HeadlessLogin.error(forScriptMessage: "authFailed: falsches Passwort") == .authFailed)
         #expect(HeadlessLogin.error(forScriptMessage: "Error: authFailed wrong pin") == .authFailed)
         #expect(HeadlessLogin.error(forScriptMessage: "TypeError: authFailed") == .authFailed)

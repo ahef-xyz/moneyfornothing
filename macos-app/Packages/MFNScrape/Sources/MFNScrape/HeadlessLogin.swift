@@ -167,7 +167,7 @@ public struct HeadlessLogin: Sendable, CustomStringConvertible, CustomDebugStrin
     }
 
     /// `PROTOCOL.md`: a message starting with `authFailed` → `.authFailed` (never retried);
-    /// anything else → `.formatChanged(detail: "login script")` without the message text.
+    /// exactly `cancelledMessage` (a cancelled `mfn.requestCode`) → `.cancelled`; anything else → `.formatChanged(detail: "login script")` without the message text.
     /// WebKit prefixes exceptions with their type (`Error: authFailed …`), which is tolerated.
     public static func error(forScriptMessage message: String?) -> ConnectorError {
         guard var text = message?.trimmingCharacters(in: .whitespacesAndNewlines) else { return .formatChanged(detail: "login script") }
@@ -177,6 +177,8 @@ public struct HeadlessLogin: Sendable, CustomStringConvertible, CustomDebugStrin
         if let colon = text.range(of: ": "), text[..<colon.lowerBound].allSatisfy({ $0.isLetter }), text[..<colon.lowerBound].hasSuffix("Error") {
             text = String(text[colon.upperBound...])
         }
+        // The user cancelled the code prompt and the script let the rejection propagate.
+        if text == cancelledMessage { return .cancelled }
         return text.hasPrefix("authFailed") ? .authFailed : .formatChanged(detail: "login script")
     }
 

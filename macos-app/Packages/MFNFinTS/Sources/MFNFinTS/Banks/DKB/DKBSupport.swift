@@ -10,7 +10,9 @@ import MFNCore
 /// mean an approval in the DKB-App on every sync. Persist it.
 public protocol DKBStateStore: Sendable {
     func loadSystemID() async -> String?
-    func saveSystemID(_ systemID: String) async
+    /// Throws when the ID cannot be persisted: silently losing it means a DKB-App approval on
+    /// every later sync, so the failure must be visible.
+    func saveSystemID(_ systemID: String) async throws(ConnectorError)
 }
 
 /// In-process only (tests, previews). The app uses `KeychainDKBStateStore`.
@@ -48,11 +50,12 @@ public struct KeychainDKBStateStore: DKBStateStore {
         }
     }
 
-    public func saveSystemID(_ systemID: String) async {
+    public func saveSystemID(_ systemID: String) async throws(ConnectorError) {
         do {
             try keychain.set(Data(systemID.utf8), for: key)
         } catch {
-            Self.log.error("DKB: System-ID nicht gespeichert (\(String(describing: error), privacy: .public))")
+            Self.log.error("DKB: System-ID nicht gespeichert (\(String(describing: type(of: error)), privacy: .public))")
+            throw .formatChanged(detail: "DKB: System-ID nicht im Schlüsselbund speicherbar")
         }
     }
 }

@@ -43,7 +43,7 @@ The app lives in `macos-app/`.
 macos-app/
   MFNApp/           SwiftUI app: views, view models, menus. No networking, no SQL.
   Packages/
-    MFNCore/          models, BankConnector protocol, store (SQLCipher), SyncEngine, keychain, CSV import
+    MFNCore/          models, BankConnector protocol, store (SQLCipher), SyncEngine, keychain, CSV import/export
     MFNIntelligence/  categorisation: rules -> kNN -> Foundation Models
     MFNMock/          MockConnector and data generator; previews and UI tests use only this
     MFNFinTS/         FinTS 3.0 client (wire, segments, dialog, TAN) with MT940/MT535/camt parsers, ING/DKB connectors

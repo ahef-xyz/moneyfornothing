@@ -202,16 +202,23 @@ private struct ConnectionSettingsRow: View {
                     .foregroundStyle(isError(state) ? AnyShapeStyle(.red) : AnyShapeStyle(.secondary))
             }
             Spacer()
-            Button("Abgleichen") { model.syncConnection(connection.id) }
-                .disabled(state.phase == .syncing)
+            if connection.connectorID.hasConnector {
+                Button("Abgleichen") { model.syncConnection(connection.id) }
+                    .disabled(state.phase == .syncing)
+            }
             if !model.isDemo {
                 Menu {
                     AccountVisibilityMenu(connection: connection.id)
                     Divider()
                     Button("Umbenennen …") { renaming = .bank(connection) }
-                    Button("Zugangsdaten ändern …") { editingCredentials = connection }
-                    Divider()
-                    Button("Bank entfernen …", role: .destructive) { removing = connection }
+                    if connection.isManual {
+                        Divider()
+                        Button("Konto entfernen …", role: .destructive) { removing = connection }
+                    } else {
+                        Button("Zugangsdaten ändern …") { editingCredentials = connection }
+                        Divider()
+                        Button("Bank entfernen …", role: .destructive) { removing = connection }
+                    }
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
@@ -227,13 +234,14 @@ private struct ConnectionSettingsRow: View {
         let all = model.ledger.accounts(of: connection.id)
         let accounts = all.count
         let hidden = all.count(where: { model.isHidden($0.id) })
-        let status: String = switch state.phase {
+        let synced: String = switch state.phase {
         case .syncing: "Abgleich läuft …"
         case .waitingForApproval: "wartet auf Freigabe"
         case let .failed(error): error.description
         case let .storeFailed(message): "Speichern fehlgeschlagen: \(message)"
         case .idle: state.lastSuccess.map { "abgeglichen \(DayFormat.syncTime($0))" } ?? "noch nicht abgeglichen"
         }
+        let status = connection.isManual ? "ohne Anbindung, Umsätze per CSV-Import" : synced
         let hiddenText = hidden > 0 ? " (\(hidden) ausgeblendet)" : ""
         return "\(accounts) \(accounts == 1 ? "Konto" : "Konten")\(hiddenText) · \(status)"
     }

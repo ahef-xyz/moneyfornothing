@@ -1,4 +1,5 @@
 import MFNCore
+import MFNStore
 import SwiftUI
 
 @main
@@ -15,6 +16,12 @@ struct MFNApp: App {
         let model = AppModel.make()
         _model = State(initialValue: model)
         AppDelegate.lockForMenuBar = { model.lock.lock() }
+        #if DEBUG
+        // Shows the lock screen's "newer database" state without touching a database.
+        if ProcessInfo.processInfo.environment["MFN_SHOW_NEWER_SCHEMA"] != nil {
+            model.lock.lock(problem: AppModel.problem(for: StoreError.newerSchema(found: 11, supported: 10)))
+        }
+        #endif
     }
 
     var body: some Scene {
@@ -23,6 +30,7 @@ struct MFNApp: App {
         Window(model.profile.badge.map { "MoneyForNothing – \($0)" } ?? "MoneyForNothing", id: MainWindow.id) {
             RootView()
                 .environment(model)
+                .environment(updater)
                 .frame(minWidth: 1000, minHeight: 560)
         }
         .commands {
@@ -30,17 +38,31 @@ struct MFNApp: App {
                 AboutCommand()
                 CheckForUpdatesCommand(updater: updater)
             }
+            CommandGroup(replacing: .importExport) {
+                // ⇧⌘I: ⌘I is unused, ⌥⌘I belongs to "Details einblenden".
+                Button("Umsätze aus CSV importieren …") { model.beginCSVImport() }
+                    .keyboardShortcut("i", modifiers: [.command, .shift])
+                    .disabled(!model.canImportCSV)
+                Button("Umsätze als CSV exportieren …") { model.exportCSV() }
+                    .keyboardShortcut("e", modifiers: [.command, .shift])
+                    .disabled(!model.canExportCSV)
+            }
             CommandMenu("Konten") {
                 Button("Bank hinzufügen …") { model.showBankSetup() }
                     .keyboardShortcut("n", modifiers: [.command, .shift])
                     .disabled(!model.canAddBank)
+                // v10: account without a bank connection, transactions from CSV only.
+                Button("Konto ohne Anbindung anlegen …") { model.showManualAccountSetup() }
+                    .keyboardShortcut("n", modifiers: [.command, .option])
+                    .disabled(!model.canAddBank || model.bankSetup != nil)
                 Divider()
                 Button("Alle Konten abgleichen") { model.syncAll() }
                     .keyboardShortcut("r", modifiers: .command)
                     .disabled(model.lock.isLocked)
                 Button("Dieses Konto abgleichen") { model.syncSelectedConnection() }
                     .keyboardShortcut("r", modifiers: [.command, .shift])
-                    .disabled(model.lock.isLocked || model.selectedAccountID == nil)
+                    // Accounts without a bank connection have nothing to sync.
+                    .disabled(!model.canSyncSelectedConnection)
                 // Bank of the selected account (CLAUDE.md §6: every command has a menu item).
                 Button("Bank einklappen") { model.setSelectedBankCollapsed(true) }
                     .keyboardShortcut(.leftArrow, modifiers: [.command, .option])
@@ -80,6 +102,12 @@ struct MFNApp: App {
                 }
                     .keyboardShortcut("f", modifiers: .command)
                     .disabled(model.lock.isLocked)
+                // ⌃⌘I: ⇧⌘I is the import itself, ⌥⌘I the details.
+                Toggle("Nur importierte Umsätze", isOn: Binding(
+                    get: { model.ledgerQuery.onlyImported }, set: { _ in model.toggleImportedFilter() }
+                ))
+                .keyboardShortcut("i", modifiers: [.command, .control])
+                .disabled(model.lock.isLocked)
                 Button("Filter zurücksetzen") {
                     model.ledgerQuery.resetFilters()
                     model.ledgerQuery.text = ""
@@ -96,6 +124,16 @@ struct MFNApp: App {
                 Button("Vorschlag übernehmen") { model.acceptSuggestions() }
                     .keyboardShortcut(.return, modifiers: .command)
                     .disabled(!model.canAcceptSuggestion)
+                Divider()
+                // Only CSV-imported rows; bank data cannot be removed.
+                Button("Importierte Umsätze entfernen …") { model.requestRemoveSelectedImports() }
+                    .keyboardShortcut(.delete, modifiers: .command)
+                    .disabled(!model.canRemoveSelectedImports)
+                Button("Alle importierten Umsätze des Kontos entfernen …") {
+                    if let account = model.importRemovalAccount { model.requestRemoveImports(of: account) }
+                }
+                .keyboardShortcut(.delete, modifiers: [.command, .option])
+                .disabled(model.importRemovalAccount == nil)
                 Divider()
                 Button("Kategorien einrichten …") { model.showCategorySetup() }
                     .keyboardShortcut("k", modifiers: [.command, .option])
@@ -117,10 +155,7 @@ struct MFNApp: App {
                     .keyboardShortcut("h", modifiers: [.command, .shift])
             }
             CommandGroup(after: .appSettings) {
-                // ⌘N is "Neues Fenster", so ⇧⌘N (CLAUDE.md §6: every command has a shortcut).
-                Button("Bank hinzufügen …") { model.showBankSetup() }
-                    .keyboardShortcut("n", modifiers: [.command, .shift])
-                    .disabled(!model.canAddBank)
+                // "Bank hinzufügen …" (⇧⌘N) lives in the "Konten" menu only: one shortcut, one item.
                 Button("Sperren") { model.lock.lock() }
                     .keyboardShortcut("l", modifiers: [.command, .control])
                     .disabled(model.lock.isLocked)

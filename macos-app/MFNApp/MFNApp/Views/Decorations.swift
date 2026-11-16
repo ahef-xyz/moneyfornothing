@@ -75,7 +75,15 @@ struct BankBadge: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        if let icon = model.bankIcons[connection.connectorID] {
+        if connection.isManual {
+            // v10: no bank behind it, so no favicon and no bank colour: a neutral symbol.
+            Image(systemName: "tray.and.arrow.down.fill")
+                .font(.system(size: size * 0.5, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: size, height: size)
+                .background(Monogram.bankColor(connection), in: RoundedRectangle(cornerRadius: size * 0.23, style: .continuous))
+                .accessibilityHidden(true)
+        } else if let icon = model.bankIcons[connection.connectorID] {
             Image(nsImage: icon)
                 .resizable()
                 .interpolation(.high)
@@ -179,7 +187,7 @@ enum Monogram {
         case .c24: "C"
         case .easybank: "E"
         case .n26: "N"
-        case .mock: String(connection.displayName.prefix(1)).uppercased()
+        case .mock, .manual: String(connection.displayName.prefix(1)).uppercased()
         }
     }
 
@@ -193,6 +201,7 @@ enum Monogram {
         case .easybank: Color(red: 0.45, green: 0.75, blue: 0.27)
         case .n26: Color(red: 0.21, green: 0.63, blue: 0.62)
         case .mock: color(for: connection.displayName)
+        case .manual: .gray
         }
     }
 }

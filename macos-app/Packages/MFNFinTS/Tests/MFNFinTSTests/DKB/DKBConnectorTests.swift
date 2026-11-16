@@ -119,7 +119,7 @@ import Testing
         let caz = await transport.requests.compactMap { $0.first { $0.type == "HKCAZ" } }
         #expect(caz.map { $0[6].first } == [nil, "P2"])
         #expect(caz.first?[1].first == "urn:iso:std:iso:20022:tech:xsd:camt.052.001.08", "newest camt.052 from HICAZS")
-        #expect(caz.first?[3].first == "20250816", "since == nil → HICAZS storage period (450 days)")
+        #expect(caz.first?[3].first == "20250817", "since == nil → HICAZS storage period (450 days, today is day 1)")
     }
 
     @Test func sinceIsSentAndRespected() async throws {

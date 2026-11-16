@@ -55,16 +55,26 @@ struct KeyEnvelope: Codable, Equatable {
     private static func derive(password: String, salt: Data, iterations: Int) throws(VaultError) -> SymmetricKey {
         guard iterations > 0, let rounds = UInt32(exactly: iterations) else { throw .unsupportedEnvelope }
         var derived = Data(count: 32)
-        let passwordBytes = Array(password.precomposedStringWithCanonicalMapping.utf8)
+        // NUL-terminated so the buffer is never empty (non-nil base address); the terminator is not passed.
+        var passwordBytes = Array(password.precomposedStringWithCanonicalMapping.utf8) + [0]
+        // The copy of the password must not outlive the derivation (the `String` itself cannot be wiped).
+        defer {
+            passwordBytes.withUnsafeMutableBytes { buffer in
+                guard let base = buffer.baseAddress else { return }
+                _ = memset_s(base, buffer.count, 0, buffer.count)
+            }
+        }
         let status = derived.withUnsafeMutableBytes { out in
             salt.withUnsafeBytes { saltBytes in
-                CCKeyDerivationPBKDF(
-                    CCPBKDFAlgorithm(kCCPBKDF2),
-                    passwordBytes.map { CChar(bitPattern: $0) }, passwordBytes.count,
-                    saltBytes.bindMemory(to: UInt8.self).baseAddress, salt.count,
-                    CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256), rounds,
-                    out.bindMemory(to: UInt8.self).baseAddress, 32
-                )
+                passwordBytes.withUnsafeBytes { password in
+                    CCKeyDerivationPBKDF(
+                        CCPBKDFAlgorithm(kCCPBKDF2),
+                        password.bindMemory(to: CChar.self).baseAddress, password.count - 1,
+                        saltBytes.bindMemory(to: UInt8.self).baseAddress, salt.count,
+                        CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256), rounds,
+                        out.bindMemory(to: UInt8.self).baseAddress, 32
+                    )
+                }
             }
         }
         guard status == kCCSuccess else { throw .crypto("pbkdf2") }

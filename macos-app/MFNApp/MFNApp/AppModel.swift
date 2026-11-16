@@ -372,7 +372,7 @@ final class AppModel {
                 vaultPrompt = .password
             }
         } catch {
-            lock.lock(reason: Self.message(for: error))
+            lock.lock(problem: Self.problem(for: error))
         }
     }
 
@@ -396,7 +396,7 @@ final class AppModel {
                 vaultError = Self.message(for: error)
             default:
                 vaultPrompt = nil
-                lock.lock(reason: Self.message(for: error))
+                lock.lock(problem: Self.problem(for: error))
             }
         }
     }
@@ -405,8 +405,11 @@ final class AppModel {
         lock.lock()
     }
 
+    /// The current unlock; read before an `await`, checked with `isStale` after it.
+    var lockSession: Int { session }
+
     /// Locked (and maybe unlocked again) since `session` was read: this store is not ours anymore.
-    private func isStale(_ session: Int) -> Bool {
+    func isStale(_ session: Int) -> Bool {
         lock.isLocked || session != self.session
     }
 
@@ -425,7 +428,7 @@ final class AppModel {
             try await registerConnectors(engine, store, presenter)
         } catch {
             await store.close()
-            if !isStale(session) { lock.lock(reason: Self.message(for: error)) }
+            if !isStale(session) { lock.lock(problem: Self.problem(for: error)) }
             return
         }
         // Locked while the connectors registered: nothing may be assigned or started behind the
@@ -508,6 +511,18 @@ final class AppModel {
         showsInspector = false
         budgetEditor = nil
         forecastPanel = nil
+        csvImport?.cancel()
+        csvImport = nil
+        csvImportFailure = nil
+        isOpeningCSV = false
+        // Ends the save sheet; its completion sees the lock and writes nothing.
+        csvExportPanel?.cancel(nil)
+        csvExportPanel = nil
+        // Alerts and reports over decrypted rows (counts, account names, transactions).
+        importRemoval = nil
+        importRemovalFailure = nil
+        importIndexCache = nil
+        mergeCheck = nil
         // The search text names counterparts; caches hold decrypted transactions.
         ledgerQuery.text = ""
         ledgerCache = nil
@@ -544,9 +559,59 @@ final class AppModel {
             "Für diese Datenbank gibt es weder einen Schlüssel auf diesem Mac noch eine Passwort-Datei (ledger.key). Die Daten können nicht entschlüsselt werden."
         case VaultError.store(.cannotDecrypt):
             "Die Datenbank lässt sich mit diesem Schlüssel nicht entschlüsseln."
+        case VaultError.store(.newerSchema), StoreError.newerSchema:
+            "Diese Datenbank stammt aus einer neueren Version von MFN."
         default:
-            "Datenbank konnte nicht geöffnet werden: \(error)"
+            "Die Datenbank konnte nicht geöffnet werden."
         }
+    }
+
+    /// What the lock screen shows when the data could not be opened: a plain sentence, what to do,
+    /// and the technical detail only where the sentence cannot say more.
+    static func problem(for error: any Error) -> AppLock.Problem {
+        switch error {
+        case let VaultError.store(.newerSchema(found, supported)), let StoreError.newerSchema(found, supported):
+            let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+            return AppLock.Problem(
+                message: message(for: error),
+                hint: "Deine Daten sind unverändert. Mit der aktuellen Version von MFN lässt sich die Datenbank wieder öffnen.",
+                detail: "MFN \(version) kennt Schema bis \(supported), die Datenbank hat Schema \(found).",
+                action: .update
+            )
+        case VaultError.wrongPassword, VaultError.weakPassword, VaultError.key(.authenticationCancelled),
+             VaultError.key(.missingEntitlement), VaultError.keyUnrecoverable, VaultError.store(.cannotDecrypt):
+            return AppLock.Problem(message: message(for: error))
+        default:
+            return AppLock.Problem(
+                message: message(for: error),
+                hint: "Deine Daten bleiben unverändert. Versuche es erneut oder starte MFN neu.",
+                detail: errorKind(error)
+            )
+        }
+    }
+
+    /// "StoreError.corruptRow", "VaultError.store(StoreError.cannotOpen)": type and case only. The
+    /// lock screen shows this before authentication, so never associated values (row contents,
+    /// paths, messages).
+    static func errorKind(_ error: any Error) -> String {
+        let type = String(describing: Swift.type(of: error))
+        let mirror = Mirror(reflecting: error)
+        guard mirror.displayStyle == .enum else { return type }
+        guard let payload = mirror.children.first else {
+            // A case without payload prints as its name, unless the type describes itself.
+            return error is any CustomStringConvertible ? type : "\(type).\(String(describing: error))"
+        }
+        guard let label = payload.label else { return type }
+        // One level down when the payload is the underlying error (`VaultError.store(_)`).
+        let inner: any Error
+        if let error = payload.value as? any Error {
+            inner = error
+        } else if let tuple = Mirror(reflecting: payload.value).children.first?.value as? any Error {
+            inner = tuple
+        } else {
+            return "\(type).\(label)"
+        }
+        return "\(type).\(label)(\(errorKind(inner)))"
     }
 
     // MARK: - Commands
@@ -562,8 +627,19 @@ final class AppModel {
     }
 
     func syncSelectedConnection() {
-        guard let account = selectedAccount else { return }
+        guard let account = selectedAccount, canSync(account.connectionID) else { return }
         syncConnection(account.connectionID)
+    }
+
+    /// `false` for accounts without a bank connection (v10, `ConnectorID.manual`): they have
+    /// nothing to sync, so their sync buttons and menu items are hidden or disabled.
+    func canSync(_ id: ConnectionID) -> Bool {
+        ledger.connections.first { $0.id == id }?.connectorID.hasConnector ?? false
+    }
+
+    /// The selected account's bank can be synced (⇧⌘R).
+    var canSyncSelectedConnection: Bool {
+        !lock.isLocked && selectedAccount.map { canSync($0.connectionID) } == true
     }
 
     // MARK: - Banks
@@ -574,6 +650,104 @@ final class AppModel {
     func showBankSetup() {
         guard canAddBank, bankSetup == nil else { return }
         bankSetup = BankSetup(model: self)
+    }
+
+    /// "Konto ohne Anbindung anlegen …" from the "Konten" menu: the assistant opens directly
+    /// on that form (from the bank list it switches there instead).
+    func showManualAccountSetup() {
+        guard canAddBank, bankSetup == nil else { return }
+        let setup = BankSetup(model: self)
+        setup.startManualAccount()
+        bankSetup = setup
+    }
+
+    /// "Konto bearbeiten …" of an account without a bank connection: type, currency, IBAN, opening balance.
+    func showManualAccountEditor(for account: Account) {
+        guard canAddBank, bankSetup == nil, isManual(account.id) else { return }
+        let setup = BankSetup(model: self)
+        setup.startManualAccount(editing: account, opening: ledger.openingBalances[account.id])
+        bankSetup = setup
+    }
+
+    /// The account belongs to an account without a bank connection (v10).
+    func isManual(_ account: AccountID) -> Bool {
+        guard let connection = self.account(account)?.connectionID else { return false }
+        return ledger.connections.first { $0.id == connection }?.isManual == true
+    }
+
+    enum ManualAccountOutcome {
+        /// `balanceStale`: saved, but the computed balance could not be written (twice); the
+        /// sidebar may show the old one until the next import or edit.
+        case saved(AccountID, balanceStale: Bool)
+        case failed(String)
+    }
+
+    /// Creates (or, with `editing`, changes) an account without a bank connection: connection and
+    /// account through the regular store calls, the opening balance, then the computed balance.
+    /// Never registered with the sync engine. A new one is removed again if a later write fails.
+    func saveManualAccount(_ fields: ManualAccountFields, editing: Account? = nil) async -> ManualAccountOutcome {
+        guard let store, !lock.isLocked else { return .failed("MFN ist gesperrt.") }
+        // Stored amounts are in the account's currency; the form locks the picker, this is the backstop.
+        if let editing, editing.currency != fields.currency, ledger.transactions.contains(where: { $0.accountID == editing.id }) {
+            return .failed("Die Währung lässt sich nicht ändern, solange das Konto Umsätze hat.")
+        }
+        let session = lockSession
+        let ids = editing.map { ($0.connectionID, $0.id) } ?? ManualAccount.newIDs()
+        let connection = Connection(id: ids.0, connectorID: .manual, displayName: fields.name)
+        let account = Account(id: ids.1, connectionID: ids.0, iban: fields.iban, type: fields.type, currency: fields.currency,
+                              name: editing?.name ?? fields.name)
+        do {
+            if editing == nil { try await store.upsert(connection: connection) }
+            try await store.replaceAccounts([account], of: connection.id)
+            try await store.setOpeningBalance(fields.opening, for: account.id)
+        } catch {
+            Log.logger("app").error("Konto ohne Anbindung nicht gespeichert: \(String(describing: type(of: error)), privacy: .public)")
+            if editing == nil {
+                do {
+                    try await store.removeConnection(connection.id)
+                } catch {
+                    Log.logger("app").error("Halb angelegtes Konto nicht entfernt: \(String(describing: type(of: error)), privacy: .public)")
+                }
+            }
+            return .failed(isStale(session) ? "MFN ist gesperrt." : "Das Konto konnte nicht gespeichert werden.")
+        }
+        // Locked while saving: the store is closed, nothing more to write or select.
+        guard !isStale(session) else { return .failed("MFN ist gesperrt.") }
+        // The account and opening balance are stored; only the derived balance is left. One retry,
+        // then report it as possibly stale instead of "not saved".
+        var balanceStale = false
+        for attempt in 1...2 {
+            do {
+                try await recomputeManualBalance(of: account.id, in: store)
+                break
+            } catch {
+                Log.logger("app").error("Kontostand nicht neu berechnet (Versuch \(attempt, privacy: .public)): \(String(describing: type(of: error)), privacy: .public)")
+                balanceStale = attempt == 2
+            }
+        }
+        guard !isStale(session) else { return .failed("MFN ist gesperrt.") }
+        if editing == nil { selection = .account(account.id) }
+        return .saved(account.id, balanceStale: balanceStale)
+    }
+
+    /// Opening balance plus booked transactions → `setBalance` (accounts without a bank
+    /// connection only; others keep what their bank reported).
+    private func recomputeManualBalance(of account: AccountID, in store: some LedgerStore) async throws {
+        guard let balance = await store.snapshot().computedManualBalance(of: account, asOf: Date()) else { return }
+        try await store.setBalance(balance, for: account)
+    }
+
+    /// After rows were removed: recomputes the balance of accounts without a bank connection
+    /// (no-op for real banks, whose balance comes from the bank).
+    func recomputeManualBalances(_ accounts: Set<AccountID>) async {
+        guard let store else { return }
+        for account in accounts {
+            do {
+                try await recomputeManualBalance(of: account, in: store)
+            } catch {
+                Log.logger("app").error("Kontostand nicht neu berechnet: \(String(describing: type(of: error)), privacy: .public)")
+            }
+        }
     }
 
     /// Registers a connection found in the assistant and starts its first sync (full history:
@@ -600,11 +774,12 @@ final class AppModel {
         do {
             try await store.removeConnection(connection.id)
         } catch {
-            return "Die Bank konnte nicht entfernt werden: \(error)"
+            return connection.isManual ? "Das Konto konnte nicht entfernt werden: \(error)" : "Die Bank konnte nicht entfernt werden: \(error)"
         }
         displayOrder.connections.removeAll { $0 == connection.id.rawValue }
         displayOrder.accounts[connection.id.rawValue] = nil
-        await Self.deleteSecrets(of: connection)
+        // An account without a bank connection has no credentials, session or web data store.
+        if !connection.isManual { await Self.deleteSecrets(of: connection) }
         return nil
     }
 
@@ -788,6 +963,7 @@ final class AppModel {
             return
         }
         let connectors = Set(snapshot.connections.map(\.connectorID)).union(ConnectorID.allCases.filter { $0 != .mock })
+            .filter(\.hasConnector)
         for connector in connectors where bankIcons[connector] == nil {
             Task { [weak self] in
                 guard let data = await iconStore.icon(for: connector), let image = NSImage(data: data) else { return }
@@ -1209,6 +1385,85 @@ final class AppModel {
         }
     }
 
+    // MARK: - CSV import
+
+    /// The open import preview (`CSVImportSession`, sheet over the main window).
+    var csvImport: CSVImportSession?
+    /// Why a chosen file could not be opened (alert); `nil` when there is nothing to say.
+    var csvImportFailure: String?
+    /// The file is being read and split before the preview opens (`beginCSVImport`).
+    var isOpeningCSV = false
+    /// The open "Umsätze als CSV exportieren" panel; cancelled when locking.
+    @ObservationIgnored var csvExportPanel: NSSavePanel?
+    /// "Importierte Umsätze entfernen" waiting for confirmation (alert with the count).
+    var importRemoval: ImportRemovalRequest?
+    /// Why a removal failed (alert); `nil` when there is nothing to say.
+    var importRemovalFailure: String?
+    /// Imported rows per account and batch (`ImportIndex`), rebuilt per snapshot revision.
+    @ObservationIgnored var importIndexCache: (revision: Int, index: ImportIndex)?
+
+    var canImportCSV: Bool { !lock.isLocked && store != nil && csvImport == nil && !isOpeningCSV && !csvImportAccounts.isEmpty }
+
+    enum CSVImportOutcome {
+        case success(count: Int, account: AccountID)
+        case failure(String)
+    }
+
+    /// Imports the session's rows through the shared merge path (`CSVImportPlan.merge` →
+    /// `LedgerStore.apply`), planned again against what is stored now (a sync may have run since
+    /// the preview), then categorizes them like synced transactions.
+    func importCSV(_ session: CSVImportSession) async -> CSVImportOutcome {
+        guard let store, !lock.isLocked, let account = session.account else { return .failure("MFN ist gesperrt.") }
+        let lockSession = self.lockSession
+        // Every row of this import carries the batch's ID (v10): marked, filterable, removable.
+        let batchID = ImportBatchID.make()
+        let document = session.document
+        let stored = await store.storedTransactions(of: account.id)
+        guard !isStale(lockSession) else { return .failure("MFN ist gesperrt.") }
+        // Parse and plan off the main actor, like the preview.
+        let (incoming, plan) = await Task.detached(priority: .userInitiated) {
+            let incoming = document.transactions(for: account, importID: batchID).transactions
+            return (incoming, CSVImportPlan.make(incoming: incoming, stored: stored))
+        }.value
+        guard !isStale(lockSession) else { return .failure("MFN ist gesperrt.") }
+        let rows = plan.transactionsToImport(includingLikelyDuplicates: session.includeLikelyDuplicates)
+        guard !rows.isEmpty else { return .success(count: 0, account: account.id) }
+        let batch = ImportBatch(
+            id: batchID, accountID: account.id, format: session.document.preset?.id, fileName: session.fileName,
+            encoding: session.document.table.encoding.rawValue, rowCount: rows.count
+        )
+        do {
+            try await store.recordImport(batch, merge: CSVImportPlan.merge(rows, into: stored))
+        } catch {
+            Log.logger("import").error("CSV-Import nicht gespeichert: \(String(describing: type(of: error)), privacy: .public)")
+            return .failure(isStale(lockSession) ? "MFN ist gesperrt." : "Die Umsätze konnten nicht gespeichert werden.")
+        }
+        // Locked while writing: the store is closed; no balance, no categorization, no selection.
+        guard !isStale(lockSession) else { return .failure("MFN ist gesperrt.") }
+        // Counts only, never contents.
+        Log.logger("import").info("CSV importiert: \(rows.count, privacy: .public) Umsätze, \(plan.duplicates.count, privacy: .public) vorhanden")
+        // Without a bank there is no reported balance: opening balance + booked transactions.
+        do {
+            try await recomputeManualBalance(of: account.id, in: store)
+        } catch {
+            Log.logger("import").error("Kontostand nicht gespeichert: \(String(describing: type(of: error)), privacy: .public)")
+        }
+        guard !isStale(lockSession) else { return .failure("MFN ist gesperrt.") }
+        categorizeInBackground()
+        return .success(count: rows.count, account: account.id)
+    }
+
+    /// Store side of "Importierte Umsätze entfernen" (`ImportedTransactions.swift`): one write;
+    /// the store refuses bank rows.
+    var canWriteStore: Bool { store != nil }
+
+    func removeImportedTransactions(_ ids: Set<TransactionID>) async throws -> LedgerSnapshot.ImportRemoval {
+        guard let store else { throw StoreUnavailable() }
+        return try await store.removeImportedTransactions(ids)
+    }
+
+    struct StoreUnavailable: Error {}
+
     // MARK: - Forecast and planned items
 
     /// The open forecast panel.
@@ -1501,6 +1756,13 @@ final class AppModel {
         hideAmounts ? nil : index.shortfalls[account]
     }
 
+    /// "ursprünglich"-style original amount of a foreign-currency booking; `nil` without one and
+    /// while amounts are hidden (⇧⌘H).
+    func foreignAmountText(of transaction: MFNCore.Transaction) -> String? {
+        guard !hideAmounts, let original = transaction.originalAmountCents, let currency = transaction.originalCurrency else { return nil }
+        return Money.format(original, currency: currency)
+    }
+
     /// Overview: newest transactions of all visible accounts (the index is built without hidden ones).
     var latestOverall: [MFNCore.Transaction] { index.latestOverall }
 
@@ -1524,7 +1786,8 @@ final class AppModel {
 
     /// Oldest successful sync across all connections, `nil` until every connection synced once.
     var lastCompleteSync: Date? {
-        let dates = snapshot.connections.map { snapshot.syncStates[$0.id]?.lastSuccess }
+        // Accounts without a bank connection never sync (v10).
+        let dates = snapshot.connections.filter(\.connectorID.hasConnector).map { snapshot.syncStates[$0.id]?.lastSuccess }
         guard !dates.isEmpty, !dates.contains(nil) else { return nil }
         return dates.compactMap(\.self).min()
     }
@@ -1558,6 +1821,7 @@ extension LedgerSnapshot {
         result.cardStatements.removeAll { hidden.contains($0.accountID) }
         result.securities.removeAll { hidden.contains($0.accountID) }
         result.plannedItems.removeAll { hidden.contains($0.accountID) }
+        result.importBatches.removeAll { hidden.contains($0.accountID) }
         return result
     }
 }
@@ -1916,3 +2180,13 @@ struct LedgerCacheKey: Equatable {
     let revision: Int
     let today: BankDay
 }
+
+#if DEBUG
+extension AppModel {
+    /// Unit tests feed a ledger without a store (and so without Keychain or Touch ID).
+    func applyLedgerForTesting(_ snapshot: LedgerSnapshot) { ledger = snapshot }
+
+    /// Unit tests inject figures that are otherwise derived from a forecast.
+    func applyIndexForTesting(_ index: SnapshotIndex) { self.index = index }
+}
+#endif

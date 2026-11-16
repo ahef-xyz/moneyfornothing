@@ -142,12 +142,56 @@ enum Schema {
             ignoredMatches TEXT NOT NULL
         );
         """,
+        // 9 – opening balance of accounts without a bank connection (protocol v10,
+        // `ConnectorID.manual`); `day` NULL = every booking counts.
+        """
+        CREATE TABLE openingBalance (
+            accountID TEXT PRIMARY KEY NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+            cents INTEGER NOT NULL,
+            day TEXT
+        );
+        """,
+        // 10 – CSV imports (`importBatchMigration`)
+        importBatchMigration,
     ]
+
+    /// 10 – CSV imports (protocol v10): `importBatch` plus `ledgerTransaction.importID` (NULL = bank
+    /// sync). Backfill: rows a CSV import wrote before (`rawJSON` `{"format":…,"row":{…},"source":"csv"}`)
+    /// get one synthetic batch per account (`ImportBatch.backfillID`, format if all rows agree,
+    /// importedAt = migration time, no file name or encoding).
+    /// Kept as one self-contained step, so it can be renumbered when branches merge.
+    static let importBatchMigration = """
+        CREATE TABLE importBatch (
+            id TEXT PRIMARY KEY NOT NULL,
+            accountID TEXT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+            importedAt REAL NOT NULL,
+            format TEXT,
+            fileName TEXT,
+            encoding TEXT,
+            rowCount INTEGER NOT NULL
+        );
+        CREATE INDEX importBatch_account ON importBatch(accountID);
+        ALTER TABLE ledgerTransaction ADD COLUMN importID TEXT;
+        CREATE INDEX ledgerTransaction_import ON ledgerTransaction(importID);
+        CREATE TEMP TABLE csvBackfill AS
+            SELECT id, accountID, json_extract(raw, '$.format') AS format
+            FROM (SELECT id, accountID, CAST(rawJSON AS TEXT) AS raw FROM ledgerTransaction)
+            WHERE CASE WHEN json_valid(raw)
+                THEN json_type(raw) = 'object' AND json_extract(raw, '$.source') = 'csv' AND json_type(raw, '$.row') = 'object'
+                ELSE 0 END;
+        INSERT INTO importBatch (id, accountID, importedAt, format, fileName, encoding, rowCount)
+            SELECT 'backfill:' || accountID, accountID, CAST(strftime('%s', 'now') AS REAL),
+                   CASE WHEN COUNT(DISTINCT format) = 1 AND COUNT(format) = COUNT(*) THEN MAX(format) END,
+                   NULL, NULL, COUNT(*)
+            FROM csvBackfill GROUP BY accountID;
+        UPDATE ledgerTransaction SET importID = 'backfill:' || accountID WHERE id IN (SELECT id FROM csvBackfill);
+        DROP TABLE csvBackfill;
+        """
 
     static func migrate(_ db: SQLiteConnection) throws {
         let current = try db.query("PRAGMA user_version").first?.int("user_version") ?? 0
         guard current <= migrations.count else {
-            throw StoreError.database("Datenbank stammt aus einer neueren MFN-Version (Schema \(current))")
+            throw StoreError.newerSchema(found: current, supported: migrations.count)
         }
         for (index, sql) in migrations.enumerated() where index >= current {
             try db.transaction {
@@ -164,7 +208,7 @@ private let positionLocale = Locale(identifier: "en_US_POSIX")
 
 private func day(_ row: SQLRow, _ column: String) throws -> BankDay {
     let text = try row.string(column)
-    guard let day = BankDay(iso: text) else { throw StoreError.corruptRow("\(column)=\(text)") }
+    guard let day = BankDay(iso: text) else { throw StoreError.corruptRow(column) }
     return day
 }
 
@@ -175,7 +219,7 @@ private func optionalDay(_ row: SQLRow, _ column: String) throws -> BankDay? {
 
 private func enumValue<T: RawRepresentable>(_ row: SQLRow, _ column: String) throws -> T where T.RawValue == String {
     let text = try row.string(column)
-    guard let value = T(rawValue: text) else { throw StoreError.corruptRow("\(column)=\(text)") }
+    guard let value = T(rawValue: text) else { throw StoreError.corruptRow(column) }
     return value
 }
 
@@ -246,7 +290,7 @@ enum BalanceTable {
 enum TransactionTable {
     static let columns = ["id", "accountID", "bookingDate", "valueDate", "amountCents", "currency", "counterpartName",
                           "counterpartIBAN", "purpose", "eref", "mref", "creditorID", "status", "externalID", "fingerprint",
-                          "originalAmountCents", "originalCurrency", "rawJSON", "categoryID", "categorySource", "confidence"]
+                          "originalAmountCents", "originalCurrency", "rawJSON", "categoryID", "categorySource", "confidence", "importID"]
     static let upsert = upsertSQL(table: "ledgerTransaction", columns: columns, conflict: ["id"])
 
     static func values(_ t: Transaction) -> [SQLValue] {
@@ -254,7 +298,8 @@ enum TransactionTable {
          SQLValue(t.amountCents), .text(t.currency), .text(t.counterpartName), SQLValue(t.counterpartIBAN), .text(t.purpose),
          SQLValue(t.eref), SQLValue(t.mref), SQLValue(t.creditorID), .text(t.status.rawValue), SQLValue(t.externalID),
          .text(t.fingerprint), SQLValue(t.originalAmountCents), SQLValue(t.originalCurrency), .blob(t.rawJSON),
-         SQLValue(t.categoryID?.rawValue), SQLValue(t.categorySource?.rawValue), SQLValue(t.confidence)]
+         SQLValue(t.categoryID?.rawValue), SQLValue(t.categorySource?.rawValue), SQLValue(t.confidence),
+         SQLValue(t.importID?.rawValue)]
     }
 
     static func model(_ row: SQLRow) throws -> Transaction {
@@ -279,7 +324,8 @@ enum TransactionTable {
             rawJSON: try row.data("rawJSON"),
             categoryID: try row.optionalString("categoryID").map(CategoryID.init(rawValue:)),
             categorySource: try optionalEnumValue(row, "categorySource"),
-            confidence: try row.optionalDouble("confidence")
+            confidence: try row.optionalDouble("confidence"),
+            importID: try row.optionalString("importID").map(ImportBatchID.init(rawValue:))
         )
         // The fingerprint is recomputed from the fields; a mismatch means the row was altered
         // or the fingerprint rule changed without a migration. Not worth locking the whole
@@ -288,6 +334,23 @@ enum TransactionTable {
             Log.store.error("Fingerprint einer Buchung weicht ab, wird neu berechnet: \(id, privacy: .private)")
         }
         return transaction
+    }
+}
+
+enum ImportBatchTable {
+    static let columns = ["id", "accountID", "importedAt", "format", "fileName", "encoding", "rowCount"]
+    static let upsert = upsertSQL(table: "importBatch", columns: columns, conflict: ["id"])
+
+    static func values(_ b: ImportBatch) -> [SQLValue] {
+        [.text(b.id.rawValue), .text(b.accountID.rawValue), SQLValue(b.importedAt), SQLValue(b.format),
+         SQLValue(b.fileName), SQLValue(b.encoding), SQLValue(b.rowCount)]
+    }
+
+    static func model(_ row: SQLRow) throws -> ImportBatch {
+        ImportBatch(id: ImportBatchID(try row.string("id")), accountID: AccountID(try row.string("accountID")),
+                    importedAt: try row.date("importedAt"), format: try row.optionalString("format"),
+                    fileName: try row.optionalString("fileName"), encoding: try row.optionalString("encoding"),
+                    rowCount: try row.int("rowCount"))
     }
 }
 
@@ -325,7 +388,7 @@ enum SecurityPositionTable {
 
     static func model(_ row: SQLRow) throws -> SecurityPosition {
         let quantityText = try row.string("quantity")
-        guard let quantity = Decimal(string: quantityText, locale: positionLocale) else { throw StoreError.corruptRow("quantity=\(quantityText)") }
+        guard let quantity = Decimal(string: quantityText, locale: positionLocale) else { throw StoreError.corruptRow("quantity") }
         return SecurityPosition(
             accountID: AccountID(try row.string("accountID")),
             isin: try row.string("isin"),
@@ -373,6 +436,19 @@ enum PlannedItemTable {
                            amountCents: try row.int("amountCents"), title: try row.string("title"),
                            createdAt: Date(timeIntervalSince1970: try row.double("createdAt")),
                            ignoredMatches: Set(ignored.map(TransactionID.init(rawValue:))))
+    }
+}
+
+enum OpeningBalanceTable {
+    static let columns = ["accountID", "cents", "day"]
+    static let upsert = upsertSQL(table: "openingBalance", columns: columns, conflict: ["accountID"])
+
+    static func values(_ opening: OpeningBalance, account: AccountID) -> [SQLValue] {
+        [.text(account.rawValue), SQLValue(opening.cents), opening.day.map { .text($0.iso) } ?? .null]
+    }
+
+    static func model(_ row: SQLRow) throws -> (AccountID, OpeningBalance) {
+        (AccountID(try row.string("accountID")), OpeningBalance(cents: try row.int("cents"), day: try optionalDay(row, "day")))
     }
 }
 

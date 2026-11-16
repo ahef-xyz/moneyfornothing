@@ -143,14 +143,25 @@ extension Data {
 
     /// SQLCipher raw-key syntax `x'<64 hex>'`: skips SQLCipher's PBKDF2, which only adds cost
     /// for a random key.
+    ///
+    /// Allocated once at its final size and filled in place: growing by `append` would
+    /// reallocate and leave unwiped copies of the hex key in freed memory.
     var sqlCipherRawKey: Data {
-        var passphrase = Data("x'".utf8)
-        let digits = Array("0123456789ABCDEF".utf8)
-        for byte in self {
-            passphrase.append(digits[Int(byte >> 4)])
-            passphrase.append(digits[Int(byte & 0x0F)])
+        let digits: StaticString = "0123456789ABCDEF"
+        var passphrase = Data(count: 2 + count * 2 + 1)
+        passphrase.withUnsafeMutableBytes { out in
+            digits.withUTF8Buffer { hex in
+                out[0] = UInt8(ascii: "x")
+                out[1] = UInt8(ascii: "'")
+                var position = 2
+                for byte in self {
+                    out[position] = hex[Int(byte >> 4)]
+                    out[position + 1] = hex[Int(byte & 0x0F)]
+                    position += 2
+                }
+                out[position] = UInt8(ascii: "'")
+            }
         }
-        passphrase.append(contentsOf: "'".utf8)
         return passphrase
     }
 

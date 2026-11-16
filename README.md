@@ -60,10 +60,10 @@ Swift 6, SwiftUI/AppKit. Requires **macOS 26** on **Apple Silicon**.
 | DKB | FinTS 3.0 PIN/TAN with decoupled TAN (DKB app); the DKB web banking is used until FinTS is available for your setup |
 | Trade Republic | Unofficial REST/WebSocket API (phone, PIN, 2FA code) |
 | C24 | The bank's own web login (QR/push approval), then its web JSON endpoints |
-| easybank | The bank's own web login, then its web endpoints; CSV import as fallback |
+| easybank | The bank's own web login, then its web endpoints |
 | N26 | Headless web login with push approval |
 
-CSV import is available for every account. Unofficial and web-banking interfaces can change at any
+CSV import works for every account, including accounts without a bank connection; CSV export works for every list. Unofficial and web-banking interfaces can change at any
 time and may break MFN without notice.
 
 ## Install

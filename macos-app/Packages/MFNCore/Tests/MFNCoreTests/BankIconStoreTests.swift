@@ -36,6 +36,26 @@ import Testing
         ])
     }
 
+    @Test func dropsIconLinksOffTheBanksDomain() {
+        let html = """
+        <link rel="icon" href="https://tracker.example-other.com/fav.png" sizes="512x512">
+        <link rel="icon" href="https://example-bank.de.evil.example/fav.png" sizes="256x256">
+        <link rel="icon" href="https://static.example-bank.de/fav.png" sizes="32x32">
+        """
+        let urls = BankIconStore.iconCandidates(inHTML: html, base: base).map(\.absoluteString)
+        #expect(urls == ["https://static.example-bank.de/fav.png"])
+    }
+
+    @Test func sameSiteRuleUsesRegistrableDomain() throws {
+        let site = try #require(BankIconStore.registrableDomain(of: base))
+        #expect(site == "example-bank.de")
+        #expect(BankIconStore.isAllowed(URL(string: "https://example-bank.de/a")!, site: site))
+        #expect(BankIconStore.isAllowed(URL(string: "https://cdn.www.example-bank.de/a")!, site: site))
+        #expect(!BankIconStore.isAllowed(URL(string: "http://www.example-bank.de/a")!, site: site))
+        #expect(!BankIconStore.isAllowed(URL(string: "https://notexample-bank.de/a")!, site: site))
+        #expect(!BankIconStore.isAllowed(URL(string: "https://example-bank.de.evil.example/a")!, site: site))
+    }
+
     @Test func recognisesImagesButNotErrorPages() {
         #expect(BankIconStore.looksLikeImage(Data([0x89, 0x50, 0x4E, 0x47, 0x0D]), mimeType: "image/png"))
         #expect(BankIconStore.looksLikeImage(Data([0x00, 0x00, 0x01, 0x00, 0x01]), mimeType: "image/x-icon"))
@@ -44,9 +64,11 @@ import Testing
     }
 
     @Test func everyBankHasAnHTTPSHomepage() {
-        for connector in ConnectorID.allCases where connector != .mock {
+        for connector in ConnectorID.allCases where connector != .mock && connector != .manual {
             #expect(BankIconStore.homepage(for: connector)?.scheme == "https")
         }
         #expect(BankIconStore.homepage(for: .mock) == nil)
+        // v10: an account without a bank connection has no favicon.
+        #expect(BankIconStore.homepage(for: .manual) == nil)
     }
 }

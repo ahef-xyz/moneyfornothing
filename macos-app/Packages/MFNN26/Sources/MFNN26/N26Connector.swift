@@ -282,7 +282,8 @@ public actor N26Connector: BankConnector {
             "Origin": endpoints.origin.absoluteString,
             "Referer": (try? endpoints.url("/feed").absoluteString) ?? endpoints.origin.absoluteString,
         ]
-        let data = try await session.client.data(try endpoints.graphqlURL(operation: operation), method: "POST", body: body, headers: headers)
+        // GraphQL queries only (read-only), so retries on 429/5xx are safe.
+        let data = try await session.client.data(try endpoints.graphqlURL(operation: operation), method: "POST", body: body, headers: headers, retryable: true)
         try await persist(session)
         return try N26JSON.data(data, operation: operation)
     }
@@ -295,7 +296,13 @@ public actor N26Connector: BankConnector {
         let task = Task { try await self.startSession() }
         login = task
         defer { login = nil }
-        let session = try await task.value
+        // The unstructured task does not see the caller's cancellation: forward it, so a
+        // cancelled sync also ends the login (sheet) instead of waiting for the user.
+        let session = try await withTaskCancellationHandler {
+            try await task.value
+        } onCancel: {
+            task.cancel()
+        }
         active = session
         return session
     }
@@ -334,7 +341,7 @@ public actor N26Connector: BankConnector {
     private func makeSession(_ cookies: [SessionCookie]) async throws -> ActiveSession {
         let storageNames: Set<String> = [endpoints.csrfStorageKey, endpoints.pekStorageKey]
         let plain = cookies.filter { !storageNames.contains($0.name) }
-        let client = ScrapeClient(cookies: plain, transport: transport, policy: policy, sleeper: sleeper)
+        let client = ScrapeClient(cookies: plain, transport: transport, policy: policy, sleeper: sleeper, allowedHosts: [endpoints.host])
         if let csrf = cookies.first(where: { $0.name == endpoints.csrfStorageKey }).flatMap({ Self.nonEmpty($0.value) }),
            let pek = cookies.first(where: { $0.name == endpoints.pekStorageKey }).flatMap({ Self.nonEmpty($0.value) }),
            let cipher = try? N26PayloadCipher(pek: pek) {

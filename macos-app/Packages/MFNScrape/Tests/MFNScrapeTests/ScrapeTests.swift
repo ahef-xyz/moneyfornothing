@@ -77,6 +77,45 @@ private let session = [
         }
     }
 
+    @Test func postIsNotRetriedUnlessMarkedAsRead() async throws {
+        let transport = ScriptedHTTPTransport { request, _ in ScriptedHTTPTransport.response(request.url, status: 503) }
+        let client = ScrapeClient(cookies: session, transport: transport, sleeper: NoSleep())
+        await #expect(throws: ConnectorError.bankUnavailable) { _ = try await client.data(api, method: "POST", body: Data("{}".utf8)) }
+        #expect(await transport.requests.count == 1)
+        await #expect(throws: ConnectorError.bankUnavailable) { _ = try await client.data(api, method: "POST", body: Data("{}".utf8), retryable: true) }
+        #expect(await transport.requests.count == 1 + BackoffPolicy().maxAttempts)
+    }
+
+    @Test func requestsOutsideAllowedHostsAreRefusedBeforeSending() async throws {
+        let transport = ScriptedHTTPTransport { request, _ in ScriptedHTTPTransport.response(request.url, body: Data("{}".utf8)) }
+        let client = ScrapeClient(cookies: session, transport: transport, sleeper: NoSleep(), allowedHosts: ["banking.example.invalid"])
+        _ = try await client.data(api)
+        for foreign in ["https://evil.invalid/api", "https://banking.example.invalid.evil.invalid/api", "http://banking.example.invalid/api"] {
+            await #expect(throws: ConnectorError.formatChanged(detail: "Anfrage an nicht erlaubten Host")) {
+                _ = try await client.data(try #require(URL(string: foreign)))
+            }
+        }
+        #expect(await transport.requests.count == 1)
+        #expect(ScrapeClient.isAllowed(try #require(URL(string: "https://api.banking.example.invalid/x")), hosts: ["banking.example.invalid"]))
+    }
+
+    @Test func errorDetailsUsePathTemplatesWithoutIDs() async throws {
+        let url = try #require(URL(string: "https://banking.example.invalid/api/v2/accounts/DE00123456781234567890/transactions/3f2a9c1e-77aa-4b0e-9a51-0c2f6e1d2b3a"))
+        #expect(ScrapeClient.pathTemplate(url) == "/api/v2/accounts/{id}/transactions/{id}")
+        let transport = ScriptedHTTPTransport { request, _ in ScriptedHTTPTransport.response(request.url, status: 404) }
+        let client = ScrapeClient(cookies: session, transport: transport, sleeper: NoSleep())
+        await #expect(throws: ConnectorError.formatChanged(detail: "HTTP 404 für /api/v2/accounts/{id}/transactions/{id}")) {
+            _ = try await client.data(url)
+        }
+    }
+
+    @Test func redirectsOnlyOnTheSameHost() throws {
+        let from = URL(string: "https://banking.example.invalid/api/a")
+        #expect(SameHostRedirectDelegate.allows(from: from, to: URL(string: "https://banking.example.invalid/api/b")))
+        #expect(!SameHostRedirectDelegate.allows(from: from, to: URL(string: "https://evil.invalid/api/b")))
+        #expect(!SameHostRedirectDelegate.allows(from: from, to: URL(string: "http://banking.example.invalid/api/b")))
+    }
+
     @Test func keepsSetCookieUpdates() async throws {
         let transport = ScriptedHTTPTransport { request, _ in
             ScriptedHTTPTransport.response(request.url, headers: ["Set-Cookie": "SESSION=rotated; Domain=example.invalid; Path=/; Secure"], body: Data("{}".utf8))

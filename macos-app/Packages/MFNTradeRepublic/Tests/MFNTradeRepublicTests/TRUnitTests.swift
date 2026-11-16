@@ -201,13 +201,26 @@ import Testing
     }
 
     @Test func amountsAreExactCents() {
-        let cases: [(String, Int)] = [("0.07", 7), ("19.99", 1999), ("-1234.565", -123_456), ("1234.575", 123_458), ("\"-0.1\"", -10), ("1e2", 10_000)]
+        let cases: [(String, Int)] = [("0.07", 7), ("19.99", 1999), ("-1234.5", -123_450), ("\"-0.1\"", -10), ("1e2", 10_000)]
         for (value, cents) in cases {
             let json = JSONValue.parse(#"{"value":\#(value),"currency":"EUR"}"#)
             #expect(json.flatMap(TRMapping.money)?.cents == cents, "\(value)")
         }
-        #expect(TRMapping.money(JSONValue.parse(#"{"value":1000,"currency":"JPY","fractionDigits":0}"#) ?? .null)?.cents == 1000)
+        // Always cents, whatever `fractionDigits` says.
+        #expect(TRMapping.money(JSONValue.parse(#"{"value":1000,"currency":"JPY","fractionDigits":0}"#) ?? .null)?.cents == 100_000)
+        #expect(TRMapping.money(JSONValue.parse(#"{"value":12.34,"currency":"EUR","fractionDigits":4}"#) ?? .null)?.cents == 1234)
         #expect(TRMapping.money(JSONValue.parse(#"{"value":1,"currency":"euro"}"#) ?? .null) == nil)
+    }
+
+    /// More than two decimals is never rounded into a booking: `formatChanged`.
+    @Test func subCentAmountsAreFormatChanged() throws {
+        for value in ["-1234.565", "0.001", "1234.575"] {
+            #expect(TRMapping.money(JSONValue.parse(#"{"value":\#(value),"currency":"EUR"}"#) ?? .null) == nil, "\(value)")
+        }
+        let item = try #require(JSONValue.parse(#"{"id":"t-1","timestamp":"2026-03-14T09:12:33.123+0000","amount":{"value":-1.005,"currency":"EUR"},"title":"Test","eventType":"CARD_TRANSACTION","status":"EXECUTED"}"#))
+        #expect(throws: ConnectorError.formatChanged(detail: "Timeline-Betrag nicht lesbar")) {
+            _ = try TRMapping.transaction(item: item, detail: nil, account: AccountID("acc"))
+        }
     }
 
     @Test func eventTypes() {

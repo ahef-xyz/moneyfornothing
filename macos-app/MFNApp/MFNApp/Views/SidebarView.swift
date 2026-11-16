@@ -90,7 +90,22 @@ struct SidebarView: View {
                                     .disabled(accounts.last?.id == account.id)
                                 Divider()
                                 Button("Umbenennen …") { renaming = .account(account) }
+                                if connection.isManual {
+                                    Button("Konto bearbeiten …") { model.showManualAccountEditor(for: account) }
+                                        .disabled(!model.canAddBank || model.bankSetup != nil)
+                                }
                                 Button(model.budget(for: account.id) == nil ? "Budget festlegen …" : "Budget ändern …") { model.showBudgetEditor(for: account) }
+                                if account.type != .depot {
+                                    Button("Umsätze aus CSV importieren …") { model.beginCSVImport(for: account.id) }
+                                        .disabled(!model.canImportCSV)
+                                    Button("Umsätze als CSV exportieren …") { model.exportCSV(account: account.id) }
+                                        .disabled(model.lock.isLocked)
+                                    let imported = model.importedCount(of: account.id)
+                                    Button(imported > 0 ? "Importierte Umsätze entfernen (\(imported)) …" : "Importierte Umsätze entfernen …") {
+                                        model.requestRemoveImports(of: account.id)
+                                    }
+                                    .disabled(imported == 0 || model.lock.isLocked)
+                                }
                                 Toggle("In Summe einrechnen", isOn: Binding(
                                     get: { model.isCountedInTotals(account.id) },
                                     set: { model.setCountedInTotals($0, account: account.id) }
@@ -122,8 +137,10 @@ struct SidebarView: View {
                             Button("Bank nach unten") { moveConnection(connection.id, by: 1) }
                                 .disabled(connections.last?.id == connection.id)
                             Divider()
-                            Button("\(connection.displayName) abgleichen") { model.syncConnection(connection.id) }
-                                .disabled(model.lock.isLocked)
+                            if connection.connectorID.hasConnector {
+                                Button("\(connection.displayName) abgleichen") { model.syncConnection(connection.id) }
+                                    .disabled(model.lock.isLocked)
+                            }
                             AccountVisibilityMenu(connection: connection.id)
                             AccountTotalsMenu(connection: connection.id)
                             Button("Umbenennen …") { renaming = .bank(connection) }
@@ -142,8 +159,12 @@ struct SidebarView: View {
                             }
                             if !model.isDemo {
                                 Divider()
-                                Button("Zugangsdaten ändern …") { editingCredentials = connection }
-                                Button("Bank entfernen …", role: .destructive) { removing = connection }
+                                if connection.isManual {
+                                    Button("Konto entfernen …", role: .destructive) { removing = connection }
+                                } else {
+                                    Button("Zugangsdaten ändern …") { editingCredentials = connection }
+                                    Button("Bank entfernen …", role: .destructive) { removing = connection }
+                                }
                             }
                         }
                 }
@@ -574,18 +595,28 @@ private struct ConnectionHeader: View {
             .accessibilityAction(named: "Bank nach oben") { move(-1) }
             .accessibilityAction(named: "Bank nach unten") { move(1) }
             .accessibilityHint(model.isCollapsed(connection.id) ? "Konten einblenden" : "Konten ausblenden")
-            Button {
-                model.syncConnection(connection.id)
-            } label: {
+            if connection.connectorID.hasConnector {
+                Button {
+                    model.syncConnection(connection.id)
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.caption.weight(.semibold))
+                }
+                .buttonStyle(.borderless)
+                .disabled(isBusy || model.lock.isLocked)
+                .help("\(connection.displayName) abgleichen")
+                .accessibilityLabel("\(connection.displayName) abgleichen")
+                .padding(.leading, 4)
+                .padding(.trailing, SidebarMetrics.scrollerClearance)
+            } else {
+                // Same width as the sync button, so the totals of all banks line up.
                 Image(systemName: "arrow.clockwise")
                     .font(.caption.weight(.semibold))
+                    .hidden()
+                    .accessibilityHidden(true)
+                    .padding(.leading, 4)
+                    .padding(.trailing, SidebarMetrics.scrollerClearance)
             }
-            .buttonStyle(.borderless)
-            .disabled(isBusy || model.lock.isLocked)
-            .help("\(connection.displayName) abgleichen")
-            .accessibilityLabel("\(connection.displayName) abgleichen")
-            .padding(.leading, 4)
-            .padding(.trailing, SidebarMetrics.scrollerClearance)
         }
         .help(syncHelp)
         // The state is only an icon here: VoiceOver hears when a bank fails or needs a login.
@@ -605,6 +636,7 @@ private struct ConnectionHeader: View {
     }
 
     private var syncHelp: String {
+        if connection.isManual { return "Ohne Anbindung: Umsätze per CSV-Import" }
         guard let last = state.lastSuccess else { return "Noch nicht abgeglichen" }
         return "Zuletzt abgeglichen: \(DayFormat.syncTime(last))"
     }
@@ -681,13 +713,16 @@ private struct AccountRow: View {
                 // inheriting the row's bold.
                 .fontWeight(isSelected ? .semibold : .regular)
                 .help(account.cardLast4.map { "\(account.name) ·· \($0)" } ?? account.name)
+                // The shortfall warning belongs to the account, not to a separate symbol element.
+                .accessibilityLabel(model.shortfall(for: account.id).map { "\(account.name), Warnung: \(ShortfallFormat.short($0))" } ?? account.name)
             Spacer(minLength: 8)
             if let shortfall = model.shortfall(for: account.id) {
                 Image(systemName: ShortfallFormat.symbol)
                     .font(.caption)
                     .foregroundStyle(.orange)
                     .help(ShortfallFormat.short(shortfall))
-                    .accessibilityLabel(ShortfallFormat.short(shortfall))
+                    // Read with the account name (see above), not as a separate element.
+                    .accessibilityHidden(true)
             }
             if let status = model.budgetStatus(for: account.id) {
                 BudgetRing(status: status)

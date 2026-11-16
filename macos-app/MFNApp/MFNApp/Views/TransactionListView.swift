@@ -44,6 +44,16 @@ struct TransactionListView: View {
             if ledger.isEmpty, ownPlans.isEmpty {
                 if ledger.query.isFiltering {
                     ContentUnavailableView.search(text: ledger.query.text)
+                } else if let account = ledger.account, account.type != .depot {
+                    // An empty account: history from the bank's CSV export (CLAUDE.md §1).
+                    ContentUnavailableView {
+                        Label(ledger.emptyTitle, systemImage: "tray")
+                    } description: {
+                        Text("Ältere Umsätze lassen sich aus einer CSV-Datei des Online-Bankings übernehmen.")
+                    } actions: {
+                        Button("Umsätze aus CSV importieren …") { model.beginCSVImport(for: account.id) }
+                            .disabled(!model.canImportCSV)
+                    }
                 } else {
                     ContentUnavailableView(ledger.emptyTitle, systemImage: "tray")
                 }
@@ -110,6 +120,10 @@ struct TransactionListView: View {
                 .frame(minHeight: 0, maxHeight: .infinity)
                 .contextMenu(forSelectionType: TransactionID.self) { ids in
                     TransactionContextMenu(ids: ids)
+                }
+                // ⌫: removes the selection only if every row is CSV-imported (asks first).
+                .onDeleteCommand {
+                    if model.canRemoveSelectedImports { model.requestRemoveSelectedImports() }
                 }
                 .focused($listFocused)
                 // Back to the sidebar (the list has no left/right movement of its own).
@@ -184,6 +198,13 @@ struct TransactionListView: View {
                 }
                 .help("Kategorien einrichten (⌥⌘K)")
                 .disabled(!model.canShowCategorySetup)
+                Button {
+                    model.exportCSV()
+                } label: {
+                    Label("Umsätze als CSV exportieren", systemImage: "square.and.arrow.up")
+                }
+                .help("Umsätze als CSV exportieren (⇧⌘E)")
+                .disabled(!model.canExportCSV)
             }
         }
     }
@@ -249,6 +270,8 @@ struct LedgerBase {
     /// Currency the list's sums are in: the account's, EUR in overviews. Other currencies are
     /// left out of sums rather than mixed in (like `AppModel.totalBalanceCents`).
     let sumCurrency: String
+    /// Imported rows in this list (filter menu count).
+    let importedCount: Int
 
     init(item: SidebarItem, model: AppModel, today: BankDay) {
         self.item = item
@@ -288,6 +311,12 @@ struct LedgerBase {
         let monthBooked = source.filter { $0.status == .booked && $0.currency == "EUR" && (month?.contains($0.effectiveDate) ?? false) }
         monthInCents = monthBooked.filter { $0.amountCents > 0 }.sumCents
         monthOutCents = monthBooked.filter { $0.amountCents < 0 }.sumCents
+        // From the cached per-snapshot index where the list is a whole account or all accounts.
+        switch item {
+        case .overview, .allAccounts: importedCount = model.importIndex.count
+        case let .account(id): importedCount = model.importedCount(of: id)
+        case .review, .pending: importedCount = source.count { $0.importID != nil }
+        }
         categories = Array(Set(source.compactMap(\.categoryID))).sorted { ($0.catalogIndex, $0.rawValue) < ($1.catalogIndex, $1.rawValue) }
         let present = Set(source.map(\.accountID))
         filterAccounts = account == nil ? snapshot.accounts.filter { present.contains($0.id) } : []
@@ -419,6 +448,12 @@ struct LedgerContent {
     var monthOutCents: Int { base.monthOutCents }
     var showsAccountName: Bool { base.showsAccountName }
     var sumCurrency: String { base.sumCurrency }
+    var importedCount: Int { base.importedCount }
+
+    /// Listed imported rows ("Alle entfernen …" in the filter bar).
+    var listedImportedIDs: Set<TransactionID> {
+        Set(ordered.lazy.filter { $0.importID != nil }.map(\.id))
+    }
 
     var isEmpty: Bool { upcoming.isEmpty && days.isEmpty && flat.isEmpty }
 
@@ -671,7 +706,20 @@ private struct LedgerHeader: View {
     /// `measuring`: an invisible copy for `actions`; it must not announce sync progress.
     private func actionButtons(for account: Account, compact: Bool, giroCode: Binding<Bool>, measuring: Bool = false) -> some View {
         HStack(spacing: 8) {
-            AccountSyncButton(connectionID: account.connectionID, announces: !measuring)
+            if connection?.isManual == true {
+                // v10: nothing to sync; new transactions come from CSV files.
+                Button {
+                    model.beginCSVImport(for: account.id)
+                } label: {
+                    Label("CSV importieren …", systemImage: "square.and.arrow.down")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .disabled(!model.canImportCSV)
+                .help("Umsätze aus CSV importieren (⇧⌘I)")
+            } else {
+                AccountSyncButton(connectionID: account.connectionID, announces: !measuring)
+            }
             AccountCopyMenu(account: account, balance: ledger.balance, bankName: connection?.displayName,
                             showsGiroCode: giroCode)
             if account.type != .depot {
@@ -757,7 +805,9 @@ private struct LedgerHeader: View {
                 }
             }
             if let account = ledger.account {
-                if let lastSync = model.snapshot.syncStates[account.connectionID]?.lastSuccess {
+                if connection?.isManual == true {
+                    Label("ohne Anbindung", systemImage: "tray.and.arrow.down")
+                } else if let lastSync = model.snapshot.syncStates[account.connectionID]?.lastSuccess {
                     Label("abgeglichen \(DayFormat.syncTime(lastSync))", systemImage: "clock")
                 }
             }
@@ -973,7 +1023,9 @@ struct TransactionRow: View, Equatable {
 
             AmountText(cents: transaction.amountCents, currency: transaction.currency, colorsInflow: status != .cancelled, signed: true)
                 .fontWeight(status == .booked ? .medium : .regular)
-                .frame(width: 110, alignment: .trailing)
+                // A minimum, not a fixed width: columns line up, larger text grows instead of clipping.
+                .frame(minWidth: 110, alignment: .trailing)
+                .layoutPriority(1)
 
             if !info.showsAccountName {
                 Group {
@@ -984,7 +1036,8 @@ struct TransactionRow: View, Equatable {
                         Text("–").foregroundStyle(.tertiary)
                     }
                 }
-                .frame(width: 100, alignment: .trailing)
+                .frame(minWidth: 100, alignment: .trailing)
+                .layoutPriority(1)
             }
         }
         .italic(status.isUpcoming)
@@ -1012,6 +1065,7 @@ struct TransactionRow: View, Equatable {
             parts.append(model.needsReview(transaction) ? "Kategorievorschlag \(category.title)" : "Kategorie \(category.title)")
         }
         if info.isRecurring, status != .cancelled { parts.append("wiederkehrend") }
+        if transaction.isImported { parts.append("importiert") }
         return parts.joined(separator: ", ")
     }
 
@@ -1025,9 +1079,8 @@ struct TransactionRow: View, Equatable {
         if let person = info.initiatorName { parts.append("von \(person)") }
         if let account = info.accountName { parts.append(account) }
         if !transaction.purpose.isEmpty { parts.append(transaction.purpose) }
-        if let original = transaction.originalAmountCents, let currency = transaction.originalCurrency {
-            parts.append(Money.format(original, currency: currency))
-        }
+        // ⇧⌘H: the original amount in a foreign currency is an amount too.
+        if let foreign = model.foreignAmountText(of: transaction) { parts.append(foreign) }
         if status == .planned {
             parts.append("fällig \(shortDate(transaction.valueDate))")
         }
@@ -1056,6 +1109,9 @@ struct TransactionRow: View, Equatable {
             }
             if status != .cancelled, info.isRecurring {
                 HintChip(text: "Wiederkehrend")
+            }
+            if transaction.isImported {
+                ImportedMarker()
             }
         }
         .italic(false)
@@ -1200,6 +1256,8 @@ private struct FilterMenu: View {
             }
             .pickerStyle(.inline)
             Toggle("Nur ohne Kategorie", isOn: $query.onlyUncategorized)
+            Toggle(ledger.importedCount > 0 ? "Nur importierte (\(ledger.importedCount))" : "Nur importierte", isOn: $query.onlyImported)
+                .help("Nur Umsätze aus CSV-Importen (⌃⌘I)")
             if !ledger.categories.isEmpty || query.category != nil {
                 Picker("Kategorie", selection: $query.category) {
                     Text("Alle Kategorien").tag(CategoryID?.none)
@@ -1252,6 +1310,14 @@ private struct FilterBar: View {
                 .accessibilityLabel(model.hideAmounts ? "\(ledger.listedCount) Treffer, Betrag ausgeblendet" : "\(ledger.listedCount) Treffer, Summe \(Money.format(ledger.listedCents, currency: ledger.sumCurrency))")
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
+            if ledger.query.onlyImported {
+                // The filter lists imported rows only: the IDs (and the check that all are
+                // imported, in `requestRemoveImports`) are needed on press, not per body pass.
+                Button("Alle entfernen …") { model.requestRemoveImports(ledger.listedImportedIDs) }
+                    .buttonStyle(.link)
+                    .disabled(ledger.listedCount == 0 || model.lock.isLocked)
+                    .help("Die angezeigten importierten Umsätze entfernen (fragt nach)")
+            }
             Button("Zurücksetzen") {
                 model.ledgerQuery.resetFilters()
                 model.ledgerQuery.text = ""
@@ -1275,6 +1341,7 @@ private struct FilterBar: View {
         } else if let category = query.category {
             parts.append(category.title)
         }
+        if query.onlyImported { parts.append("importiert") }
         if let key = query.initiator { parts.append("von \(ledger.person(key)?.name ?? "…")") }
         if let account = query.accounts.first { parts.append(ledger.accountName(account)) }
         return parts.joined(separator: " · ")
@@ -1290,6 +1357,7 @@ extension TransactionQuery {
         accounts = []
         initiator = nil
         onlyUncategorized = false
+        onlyImported = false
     }
 }
 
@@ -1328,8 +1396,11 @@ struct SuggestionChip: View {
                 Text(category.title + "?")
                     .lineLimit(1)
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 8, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
+                    .imageScale(.small)
                     .opacity(0.8)
+                    // Decoration: the menu button already says it opens a menu.
+                    .accessibilityHidden(true)
             }
             .font(.callout)
         } primaryAction: {

@@ -6,6 +6,11 @@ import Foundation
 /// Requests use an ephemeral session without cookies or cache, so the bank's public website
 /// learns nothing beyond an anonymous icon fetch. Failure is not an error for the UI: it falls
 /// back to the monogram badge, so `icon(for:)` returns `nil` and logs the reason.
+///
+/// Every request (page, icon, each redirect) must stay on the homepage's registrable domain,
+/// and bodies are read with a hard byte cap. The cache holds only these public favicons, as
+/// plain files in the app's caches directory: nothing bank- or user-specific, so it stays
+/// outside the encrypted database on purpose.
 public actor BankIconStore {
     /// Icons are refreshed after this age; a stale icon is still used if the refresh fails.
     public static let maximumAge: TimeInterval = 30 * 24 * 60 * 60
@@ -41,7 +46,7 @@ public actor BankIconStore {
         case .c24: URL(string: "https://www.c24.de/")
         case .easybank: URL(string: "https://www.easybank.de/")
         case .n26: URL(string: "https://n26.com/")
-        case .mock: nil
+        case .mock, .manual: nil
         }
     }
 
@@ -70,17 +75,18 @@ public actor BankIconStore {
 
     private func download(_ connector: ConnectorID) async -> Data? {
         guard let homepage = Self.homepage(for: connector) else { return nil }
+        guard let site = Self.registrableDomain(of: homepage) else { return nil }
         var candidates: [URL] = []
-        if let (page, response) = await fetch(homepage, limit: Self.maximumPageBytes),
+        if let (page, response) = await fetch(homepage, site: site, limit: Self.maximumPageBytes),
            let html = String(data: page, encoding: .utf8) ?? String(data: page, encoding: .isoLatin1) {
             // Redirects (easybank.de → /easybank-de) change the base for relative links.
-            candidates = Self.iconCandidates(inHTML: html, base: response.url ?? homepage)
+            candidates = Self.iconCandidates(inHTML: html, base: response.url ?? homepage, site: site)
         }
         if let fallback = URL(string: "/favicon.ico", relativeTo: homepage)?.absoluteURL, !candidates.contains(fallback) {
             candidates.append(fallback)
         }
         for candidate in candidates {
-            if let (data, response) = await fetch(candidate, limit: Self.maximumIconBytes),
+            if let (data, response) = await fetch(candidate, site: site, limit: Self.maximumIconBytes),
                Self.looksLikeImage(data, mimeType: response.mimeType) {
                 return data
             }
@@ -89,11 +95,26 @@ public actor BankIconStore {
         return nil
     }
 
-    private func fetch(_ url: URL, limit: Int) async -> (Data, URLResponse)? {
-        guard url.scheme == "https" else { return nil }
+    /// GET restricted to `site` (also across redirects), body streamed and capped at `limit` bytes.
+    private func fetch(_ url: URL, site: String, limit: Int) async -> (Data, URLResponse)? {
+        guard Self.isAllowed(url, site: site) else { return nil }
         do {
-            let (data, response) = try await session.data(from: url)
-            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), data.count <= limit else { return nil }
+            let (bytes, response) = try await session.bytes(from: url, delegate: SameSiteRedirectGuard(site: site))
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode),
+                  http.url.map({ Self.isAllowed($0, site: site) }) ?? true,
+                  http.expectedContentLength <= Int64(limit) else {
+                bytes.task.cancel()
+                return nil
+            }
+            var data = Data()
+            if http.expectedContentLength > 0 { data.reserveCapacity(Int(http.expectedContentLength)) }
+            for try await byte in bytes {
+                guard data.count < limit else {
+                    bytes.task.cancel()
+                    return nil
+                }
+                data.append(byte)
+            }
             return (data, response)
         } catch {
             Log.core.debug("Bank-Symbol: \(url.host() ?? "", privacy: .public) nicht erreichbar")
@@ -101,18 +122,37 @@ public actor BankIconStore {
         }
     }
 
+    // MARK: - Same-site rule (internal for tests)
+
+    /// The last two host labels (`www.ing.de` → `ing.de`). Enough for the fixed homepages, which
+    /// all sit directly under a one-label public suffix (`.de`, `.com`).
+    static func registrableDomain(of url: URL) -> String? {
+        guard let host = url.host()?.lowercased() else { return nil }
+        let labels = host.split(separator: ".")
+        guard labels.count >= 2 else { return nil }
+        return labels.suffix(2).joined(separator: ".")
+    }
+
+    /// HTTPS on `site` itself or one of its subdomains.
+    static func isAllowed(_ url: URL, site: String) -> Bool {
+        guard url.scheme == "https", let host = url.host()?.lowercased() else { return false }
+        return host == site || host.hasSuffix("." + site)
+    }
+
     // MARK: - Parsing (internal for tests)
 
     /// `<link rel="… icon …" href="…">` targets, best first: apple-touch-icon, then by declared
     /// size (largest first), SVG last (NSImage cannot draw every SVG favicon).
-    static func iconCandidates(inHTML html: String, base: URL) -> [URL] {
+    /// Links off `site` (the homepage's registrable domain) are dropped; `nil` = derive from `base`.
+    static func iconCandidates(inHTML html: String, base: URL, site: String? = nil) -> [URL] {
+        guard let site = site ?? registrableDomain(of: base) else { return [] }
         struct Candidate { let url: URL; let rank: Int }
         var result: [Candidate] = []
         for tag in html.matches(of: /<link\b[^>]*>/.ignoresCase()) {
             let attributes = Self.attributes(String(tag.output))
             guard let rel = attributes["rel"]?.lowercased(), rel.contains("icon"),
                   let href = attributes["href"], !href.hasPrefix("data:"),
-                  let url = URL(string: href, relativeTo: base)?.absoluteURL, url.scheme == "https" else { continue }
+                  let url = URL(string: href, relativeTo: base)?.absoluteURL, isAllowed(url, site: site) else { continue }
             let size = attributes["sizes"].flatMap { Int($0.lowercased().split(separator: "x").first ?? "") } ?? 16
             var rank = min(size, 512)
             if rel.contains("apple-touch-icon") { rank += 1_000 }
@@ -137,5 +177,22 @@ public actor BankIconStore {
         let ico: [UInt8] = [0x00, 0x00, 0x01, 0x00]
         let head = Array(data.prefix(4))
         return head == png || head == ico || data.starts(with: [0xFF, 0xD8]) || data.starts(with: Array("GIF8".utf8))
+    }
+}
+
+/// Refuses redirects that leave the bank's registrable domain (or HTTPS).
+private final class SameSiteRedirectGuard: NSObject, URLSessionTaskDelegate, Sendable {
+    let site: String
+
+    init(site: String) {
+        self.site = site
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest) async -> URLRequest? {
+        guard let url = request.url, BankIconStore.isAllowed(url, site: site) else {
+            Log.core.notice("Bank-Symbol: Weiterleitung auf fremde Domain abgelehnt")
+            return nil
+        }
+        return request
     }
 }

@@ -118,6 +118,12 @@ final class TRLoginHarness {
       get cookie() { return __cookie; },
       createElement: () => ({ getContext: () => null }),
     };
+    // JavaScriptCore has no `URL`; WebKit pages do. Enough of it for `origin`.
+    var URL = function (u) {
+      var m = /^([a-z][a-z0-9+.-]*):[/][/]([^/?#@]+)/i.exec(String(u));
+      if (!m) throw new TypeError("Invalid URL");
+      this.origin = m[1].toLowerCase() + "://" + m[2].toLowerCase();
+    };
     var sessionStorage = {
       getItem: (k) => (k in __session ? __session[k] : null),
       setItem: (k, v) => { __session[k] = String(v); },
@@ -261,7 +267,8 @@ final class TRLoginHarness {
         let poll = TRLoginHarness.Route(method: "GET", path: Self.processPath, responses: [(200, Self.fixture("login-process-pending.json")), (409, Self.error("ALREADY_PROCESSED"))])
         let harness = try TRLoginHarness(routes: [Self.login, poll])
         #expect(harness.run().error?.hasPrefix("authFailed") == true)
-        #expect(harness.sessionStorage.isEmpty)
+        // The process marker is gone; the submit marker stays so a reload never resends the PIN.
+        #expect(harness.sessionStorage == ["mfn.tr.submitted": "1"])
     }
 
     /// A process that ended without confirmation stops polling at once.
@@ -274,7 +281,7 @@ final class TRLoginHarness {
         let harness = try TRLoginHarness(routes: [Self.login, poll])
         #expect(harness.run().error?.hasPrefix("authFailed") == true)
         #expect(harness.apiRequests.count == 3)
-        #expect(harness.sessionStorage.isEmpty)
+        #expect(harness.sessionStorage == ["mfn.tr.submitted": "1"])
     }
 
     @Test func expiredProcessIsNotAuthFailed() throws {
@@ -309,20 +316,55 @@ final class TRLoginHarness {
         #expect(posts.map(\.body) == [#"{"code":"111111"}"#, #"{"code":"123456"}"#])
     }
 
+    @Test func cancelledCodeEntryEndsLogin() throws {
+        let poll = TRLoginHarness.Route(method: "GET", path: Self.processPath, responses: [
+            (200, #"{"status":"PENDING","requiredAction":"AUTHENTICATOR_VERIFICATION","expiresAt":null,"claims":null}"#),
+        ])
+        let harness = try TRLoginHarness(routes: [Self.login, poll], codes: [])
+        #expect(harness.run().error == "cancelled")
+    }
+
+    /// The v1 login would send the PIN a second time: stop instead of falling back.
     @Test(arguments: ["DEVICE_NOT_FOUND", "MOBILE_APP_VERSION_NOT_SUPPORTED"])
-    func explicitCodeFallsBackToSMSCode(code: String) throws {
+    func explicitV1CodeStopsWithoutSecondPIN(code: String) throws {
         let start = TRLoginHarness.Route(method: "POST", path: "/api/v2/auth/web/login", responses: [(400, Self.error(code))])
         let v1 = TRLoginHarness.Route(method: "POST", path: "/api/v1/auth/web/login", responses: [(200, #"{"processId":"p-1","countdownInSeconds":30,"2fa":"SMS"}"#)])
-        let confirm = TRLoginHarness.Route(method: "POST", path: "/api/v1/auth/web/login/p-1/", responses: [(200, "{}")])
-        let harness = try TRLoginHarness(routes: [start, v1, confirm], codes: ["4711"])
+        let harness = try TRLoginHarness(routes: [start, v1], codes: ["4711"])
         let outcome = harness.run()
-        #expect(outcome.error == nil)
-        #expect(harness.codePrompts.first?.last as? Int == 4)
-        #expect(harness.apiRequests.map(\.url) == [
-            "https://api.traderepublic.com/api/v2/auth/web/login",
-            "https://api.traderepublic.com/api/v1/auth/web/login",
-            "https://api.traderepublic.com/api/v1/auth/web/login/p-1/4711",
-        ])
+        #expect(outcome.error?.hasPrefix("login needs the older SMS flow") == true)
+        #expect(outcome.error?.hasPrefix("authFailed") == false)
+        #expect(harness.apiRequests.map(\.url) == ["https://api.traderepublic.com/api/v2/auth/web/login"])
+        #expect(harness.codePrompts.isEmpty)
+    }
+
+    @Test func submitMarkerIsWrittenBeforeThePIN() throws {
+        let harness = try TRLoginHarness(routes: [Self.login, Self.pollUntilConfirmed])
+        harness.context.evaluateScript("""
+        var __markerAtPost = null;
+        const __fetch = fetch;
+        fetch = (u, init) => {
+          if (init && init.method === "POST") __markerAtPost = sessionStorage.getItem("mfn.tr.submitted");
+          return __fetch(u, init);
+        };
+        """)
+        #expect(harness.run().error == nil)
+        #expect(harness.context.evaluateScript("__markerAtPost")?.toString() == "1")
+        #expect(harness.sessionStorage.isEmpty) // both markers removed after success
+    }
+
+    @Test func reentryAfterSubmitWithoutProcessNeverResendsThePIN() throws {
+        let harness = try TRLoginHarness(routes: [Self.login, Self.pollUntilConfirmed])
+        harness.context.evaluateScript("__session['mfn.tr.submitted'] = '1';")
+        let outcome = harness.run(state: nil)
+        #expect(outcome.error == "login already submitted, not sending the PIN again")
+        #expect(harness.apiRequests.isEmpty)
+    }
+
+    @Test func lookalikeOriginIsIgnored() throws {
+        let harness = try TRLoginHarness(routes: [Self.login])
+        _ = harness.run(url: "https://app.traderepublic.com.example.org/login")
+        _ = harness.run(url: "https://app.traderepublic.community/login")
+        #expect(harness.requests.isEmpty)
     }
 
     /// A failed v2 start without an explicit fallback code must not send the PIN a second time.
@@ -335,13 +377,6 @@ final class TRLoginHarness {
         #expect(outcome.error?.hasPrefix("login start HTTP \(status)") == true)
         #expect(harness.apiRequests.count == 1)
         #expect(harness.codePrompts.isEmpty)
-    }
-
-    @Test func cancelledCodeEntryEndsLogin() throws {
-        let start = TRLoginHarness.Route(method: "POST", path: "/api/v2/auth/web/login", responses: [(400, Self.error("DEVICE_NOT_FOUND"))])
-        let v1 = TRLoginHarness.Route(method: "POST", path: "/api/v1/auth/web/login", responses: [(200, #"{"processId":"p-1","2fa":"SMS"}"#)])
-        let harness = try TRLoginHarness(routes: [start, v1], codes: [])
-        #expect(harness.run().error == "cancelled")
     }
 
     @Test func waitsForWAFTokenAndGivesUp() throws {

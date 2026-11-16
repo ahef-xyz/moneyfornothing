@@ -49,9 +49,10 @@ public final class TRURLSessionTransport: TRHTTPTransport, TRWebSocketTransport 
     ///   returns for the public key of any certificate in the chain (`SecCertificateCopyKey`). That is
     ///   **not** the SPKI hash (`openssl … pubkey -outform der | sha256`): for RSA it is the PKCS#1
     ///   `RSAPublicKey` DER, for EC the raw ANSI X9.63 point `04‖X‖Y`, both without the
-    ///   `SubjectPublicKeyInfo` algorithm header. Empty = system trust only (pins are set by the
-    ///   human, see STATUS.md).
-    public init(pinnedKeyHashes: Set<String> = [], timeout: TimeInterval = 30) {
+    ///   `SubjectPublicKeyInfo` algorithm header. Empty = the default pins
+    ///   (`TradeRepublicConnector.pinnedKeyHashes`): there is no unpinned mode (fail closed).
+    public init(pinnedKeyHashes: Set<String> = TradeRepublicConnector.pinnedKeyHashes, timeout: TimeInterval = 30) {
+        let pinnedKeyHashes = pinnedKeyHashes.isEmpty ? TradeRepublicConnector.pinnedKeyHashes : pinnedKeyHashes
         let configuration = URLSessionConfiguration.ephemeral
         configuration.httpCookieStorage = nil
         configuration.httpShouldSetCookies = false

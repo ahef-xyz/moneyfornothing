@@ -33,6 +33,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A00000000000000000000602"
+               BuildableName = "MFNAppTests.xctest"
+               BlueprintName = "MFNAppTests"
+               ReferencedContainer = "container:MFNApp/MFNApp.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "MFNCoreTests"
                BuildableName = "MFNCoreTests"
                BlueprintName = "MFNCoreTests"

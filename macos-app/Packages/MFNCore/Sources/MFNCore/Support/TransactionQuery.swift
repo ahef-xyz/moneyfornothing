@@ -56,6 +56,8 @@ public struct TransactionQuery: Hashable, Sendable {
     public var initiator: String?
     /// Only transactions without any category (takes precedence over `category`).
     public var onlyUncategorized = false
+    /// Only rows a CSV import added (`Transaction.importID`).
+    public var onlyImported = false
 
     public init(
         text: String = "",
@@ -75,7 +77,7 @@ public struct TransactionQuery: Hashable, Sendable {
 
     /// Something narrows the list (sorting alone does not).
     public var isFiltering: Bool {
-        !tokens.isEmpty || direction != .all || period != .all || category != nil || !accounts.isEmpty || initiator != nil || onlyUncategorized
+        !tokens.isEmpty || direction != .all || period != .all || category != nil || !accounts.isEmpty || initiator != nil || onlyUncategorized || onlyImported
     }
 
     /// Filters only, keeps the order of `transactions`.
@@ -88,7 +90,7 @@ public struct TransactionQuery: Hashable, Sendable {
         initiator: (Transaction) -> TransactionInitiator? = { _ in nil }
     ) -> [Transaction] {
         let range = period.range(today: today)
-        let tokens = self.tokens
+        let tokens = self.tokens.map(SearchToken.init)
         return transactions.filter { transaction in
             switch direction {
             case .all: break
@@ -96,13 +98,17 @@ public struct TransactionQuery: Hashable, Sendable {
             case .outflow: guard transaction.amountCents < 0 else { return false }
             }
             if let range, !range.contains(transaction.effectiveDate) { return false }
+            if onlyImported, transaction.importID == nil { return false }
             if onlyUncategorized {
                 if transaction.categoryID != nil { return false }
             } else if let category, transaction.categoryID != category { return false }
             if !accounts.isEmpty, !accounts.contains(transaction.accountID) { return false }
             let person = (self.initiator != nil || !tokens.isEmpty) ? initiator(transaction) : nil
             if let wanted = self.initiator, person?.key != wanted { return false }
-            return tokens.allSatisfy { Self.matches($0, transaction, accountName: accountName(transaction.accountID), extra: person?.name) }
+            guard !tokens.isEmpty else { return true }
+            // Each field folded once per transaction, not once per token.
+            let fields = SearchFields(transaction, accountName: accountName(transaction.accountID), extra: person?.name)
+            return tokens.allSatisfy { fields.matches($0, amountCents: transaction.amountCents) }
         }
     }
 
@@ -151,27 +157,52 @@ public struct TransactionQuery: Hashable, Sendable {
         text.split(whereSeparator: \.isWhitespace).map { Self.fold(String($0)) }.filter { !$0.isEmpty }
     }
 
+    private static let foldingLocale = Locale(identifier: "de_DE")
+
     static func fold(_ text: String) -> String {
-        text.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: Locale(identifier: "de_DE"))
+        text.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: foldingLocale)
     }
 
-    /// A word matches a text field, or – if it is a number like `12,50`, `12.5` or `-12` – the
-    /// amount (sign ignored unless given).
+    /// A search word, parsed once per query.
+    struct SearchToken {
+        let text: String
+        let cents: Int?
+        let signed: Bool
+
+        init(_ text: String) {
+            self.text = text
+            cents = TransactionQuery.amountCents(text)
+            signed = text.hasPrefix("-") || text.hasPrefix("+")
+        }
+    }
+
+    /// The searchable fields of one transaction, folded once.
+    struct SearchFields {
+        /// Folded and without spaces: IBANs are typed with or without them. Search words never
+        /// contain spaces, so this one check also covers the field as written.
+        let compact: [String]
+
+        init(_ transaction: Transaction, accountName: String?, extra: String?) {
+            let fields: [String?] = [
+                transaction.counterpartName, transaction.purpose, transaction.counterpartIBAN, transaction.eref,
+                transaction.mref, transaction.creditorID, transaction.categoryID?.rawValue, accountName, extra,
+            ]
+            compact = fields.compactMap { field in
+                field.map { TransactionQuery.fold($0).replacingOccurrences(of: " ", with: "") }
+            }
+        }
+
+        /// The word matches a field, or – if it is a number like `12,50`, `12.5` or `-12` – the
+        /// amount (sign ignored unless given).
+        func matches(_ token: SearchToken, amountCents: Int) -> Bool {
+            if let cents = token.cents, token.signed ? amountCents == cents : abs(amountCents) == abs(cents) { return true }
+            return compact.contains { $0.contains(token.text) }
+        }
+    }
+
+    /// A word matches a text field or the amount (see `SearchFields.matches`).
     static func matches(_ token: String, _ transaction: Transaction, accountName: String?, extra: String? = nil) -> Bool {
-        if let cents = amountCents(token) {
-            let signed = token.hasPrefix("-") || token.hasPrefix("+")
-            if signed ? transaction.amountCents == cents : abs(transaction.amountCents) == abs(cents) { return true }
-        }
-        let fields: [String?] = [
-            transaction.counterpartName, transaction.purpose, transaction.counterpartIBAN, transaction.eref,
-            transaction.mref, transaction.creditorID, transaction.categoryID?.rawValue, accountName, extra,
-        ]
-        return fields.contains { field in
-            guard let field else { return false }
-            if fold(field).contains(token) { return true }
-            // IBANs are typed with or without spaces.
-            return fold(field).replacingOccurrences(of: " ", with: "").contains(token)
-        }
+        SearchFields(transaction, accountName: accountName, extra: extra).matches(SearchToken(token), amountCents: transaction.amountCents)
     }
 
     /// `12`, `12,5`, `12,50`, `12.50`, `1.234,56`, `-3,99` → cents; `nil` if not an amount.

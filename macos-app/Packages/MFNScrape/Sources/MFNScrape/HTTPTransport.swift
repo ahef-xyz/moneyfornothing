@@ -7,6 +7,8 @@ public protocol HTTPTransport: Sendable {
 }
 
 /// Ephemeral `URLSession`: no shared cookie storage, no cache. Cookies are managed by `ScrapeClient`.
+/// Redirects to another host are not followed: the 3xx answer is returned as is (and
+/// `ScrapeClient` reports it), so session cookies and tokens never leave the bank's host.
 public struct URLSessionTransport: HTTPTransport {
     private let session: URLSession
 
@@ -16,13 +18,30 @@ public struct URLSessionTransport: HTTPTransport {
         configuration.httpShouldSetCookies = false
         configuration.urlCache = nil
         configuration.timeoutIntervalForRequest = timeout
-        session = URLSession(configuration: configuration)
+        session = URLSession(configuration: configuration, delegate: SameHostRedirectDelegate(), delegateQueue: nil)
     }
 
     public func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         return (data, http)
+    }
+}
+
+/// Follows a redirect only when it stays on the same host and on HTTPS.
+final class SameHostRedirectDelegate: NSObject, URLSessionTaskDelegate, Sendable {
+    static func allows(from original: URL?, to target: URL?) -> Bool {
+        guard let from = original?.host()?.lowercased(), let to = target?.host()?.lowercased() else { return false }
+        return from == to && target?.scheme == "https"
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest) async -> URLRequest? {
+        let original = task.originalRequest?.url
+        guard Self.allows(from: original, to: request.url) else {
+            Log.logger("scrape").error("Weiterleitung auf anderen Host abgelehnt: \(request.url?.host() ?? "?", privacy: .public)")
+            return nil
+        }
+        return request
     }
 }
 

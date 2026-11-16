@@ -21,17 +21,33 @@
 		A00000000000000000000D0D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0D /* Sparkle */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		A00000000000000000001701 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000000000000000000101 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A00000000000000000000601;
+			remoteInfo = MFN;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		A00000000000000000000501 /* MFN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MFN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A00000000000000000000502 /* MFN.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MFN.entitlements; sourceTree = "<group>"; };
 		A00000000000000000000503 /* MFN.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = MFN.xcconfig; sourceTree = "<group>"; };
 		A00000000000000000000504 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A00000000000000000000505 /* MFNAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MFNAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A00000000000000000000301 /* MFNApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MFNApp;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000302 /* MFNAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MFNAppTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -56,6 +72,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A00000000000000000000902 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -65,6 +88,7 @@
 				A00000000000000000000502 /* MFN.entitlements */,
 				A00000000000000000000402 /* Config */,
 				A00000000000000000000301 /* MFNApp */,
+				A00000000000000000000302 /* MFNAppTests */,
 				A00000000000000000000401 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -73,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000501 /* MFN.app */,
+				A00000000000000000000505 /* MFNAppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -123,6 +148,29 @@
 			productReference = A00000000000000000000501 /* MFN.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A00000000000000000000602 /* MFNAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000000702 /* Build configuration list for PBXNativeTarget "MFNAppTests" */;
+			buildPhases = (
+				A00000000000000000000802 /* Sources */,
+				A00000000000000000000902 /* Frameworks */,
+				A00000000000000000000A02 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A00000000000000000001801 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A00000000000000000000302 /* MFNAppTests */,
+			);
+			name = MFNAppTests;
+			packageProductDependencies = (
+			);
+			productName = MFNAppTests;
+			productReference = A00000000000000000000505 /* MFNAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -135,6 +183,10 @@
 				TargetAttributes = {
 					A00000000000000000000601 = {
 						CreatedOnToolsVersion = 27.2;
+					};
+					A00000000000000000000602 = {
+						CreatedOnToolsVersion = 27.2;
+						TestTargetID = A00000000000000000000601;
 					};
 				};
 			};
@@ -166,12 +218,20 @@
 			projectRoot = "";
 			targets = (
 				A00000000000000000000601 /* MFN */,
+				A00000000000000000000602 /* MFNAppTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A00000000000000000000A01 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00000000000000000000A02 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -188,7 +248,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A00000000000000000000802 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A00000000000000000001801 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A00000000000000000000601 /* MFN */;
+			targetProxy = A00000000000000000001701 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A00000000000000000001201 /* Debug */ = {
@@ -243,7 +318,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -256,7 +331,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -275,7 +350,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -288,12 +363,50 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		A00000000000000000001601 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000503 /* MFN.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MFN.app/Contents/MacOS/MFN";
+			};
+			name = Debug;
+		};
+		A00000000000000000001602 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000503 /* MFN.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MFN.app/Contents/MacOS/MFN";
 			};
 			name = Release;
 		};
@@ -314,6 +427,15 @@
 			buildConfigurations = (
 				A00000000000000000001201 /* Debug */,
 				A00000000000000000001301 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A00000000000000000000702 /* Build configuration list for PBXNativeTarget "MFNAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000001601 /* Debug */,
+				A00000000000000000001602 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

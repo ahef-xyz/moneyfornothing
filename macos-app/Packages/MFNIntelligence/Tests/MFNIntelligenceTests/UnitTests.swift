@@ -157,3 +157,33 @@ enum SystemLanguageModelProbe {
         try await SystemLanguageModel(useCase: .contentTagging).tokenCount(for: Instructions(text))
     }
 }
+
+@Suite struct NeighbourSelectionTests {
+    private static func row(_ i: Int, amount: Int = -100) -> MFNCore.Transaction {
+        let day = BankDay(year: 2026, month: 1, day: 1 + i % 28) ?? .today
+        return Transaction(accountID: "a", bookingDate: day, valueDate: day,
+                    amountCents: amount, counterpartName: "Händler \(i)", purpose: "Zweck \(i)", status: .booked)
+    }
+
+    @Test func topKMatchesAFullSort() {
+        let query = Self.row(999)
+        // Distances repeat (ties) and some entries change sign (penalty).
+        let entries = (0..<60).map { i in
+            let angle = Float(i % 9) * 0.15
+            return NeighbourIndex.Entry(transaction: Self.row(i, amount: i.isMultiple(of: 5) ? 100 : -100), category: CategoryID("c\(i % 4)"),
+                                        vector: VectorMath.normalized([cos(angle), sin(angle)]))
+        }
+        let index = NeighbourIndex(entries: entries, queryVectors: [query.id: [1, 0]])
+        let expected = entries.map { entry -> (TransactionID, Double) in
+            var d = VectorMath.distance([1, 0], entry.vector)
+            if entry.transaction.amountCents > 0 { d += NeighbourIndex.signPenalty }
+            return (entry.transaction.id, d)
+        }
+        .enumerated().sorted { ($0.element.1, $0.offset) < ($1.element.1, $1.offset) }.map(\.element)
+        for k in [0, 1, 7, 60, 100] {
+            let got = index.neighbours(of: query, k: k)
+            #expect(got.map(\.entry.transaction.id) == expected.prefix(k).map(\.0))
+            #expect(got.map(\.distance) == expected.prefix(k).map(\.1))
+        }
+    }
+}

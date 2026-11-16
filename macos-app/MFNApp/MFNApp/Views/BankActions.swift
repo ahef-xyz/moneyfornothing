@@ -81,6 +81,7 @@ struct BankActionsModifier: ViewModifier {
     @Binding var removing: Connection?
     @Environment(AppModel.self) private var model
     @State private var error: String?
+    @State private var errorTitle = "Bank entfernen"
 
     func body(content: Content) -> some View {
         content
@@ -92,15 +93,20 @@ struct BankActionsModifier: ViewModifier {
                 isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
                 presenting: removing
             ) { connection in
-                Button("Entfernen", role: .destructive) {
+                Button(connection.isManual ? "Konto entfernen" : "Entfernen", role: .destructive) {
+                    errorTitle = connection.isManual ? "Konto entfernen" : "Bank entfernen"
                     Task { error = await model.removeConnection(connection) }
                 }
                 Button("Abbrechen", role: .cancel) {}
             } message: { connection in
                 let count = model.ledger.accounts(of: connection.id).count
-                Text("MFN löscht \(count == 1 ? "das Konto" : "die \(count) Konten") dieser Bank mit allen Umsätzen sowie Zugangsdaten und Sitzung aus dem Schlüsselbund. Bei der Bank selbst ändert sich nichts.")
+                if connection.isManual {
+                    Text("MFN löscht das Konto mit allen importierten Umsätzen und dem Startsaldo. Die CSV-Dateien bleiben, wo sie sind.")
+                } else {
+                    Text("MFN löscht \(count == 1 ? "das Konto" : "die \(count) Konten") dieser Bank mit allen Umsätzen sowie Zugangsdaten und Sitzung aus dem Schlüsselbund. Bei der Bank selbst ändert sich nichts.")
+                }
             }
-            .alert("Bank entfernen", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
+            .alert(errorTitle, isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
                 Button("OK") {}
             } message: {
                 Text(error ?? "")

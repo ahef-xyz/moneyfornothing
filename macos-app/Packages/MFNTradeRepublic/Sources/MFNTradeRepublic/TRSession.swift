@@ -45,6 +45,8 @@ actor TRSession {
     private var cookies: [SessionCookie]?
     private var appVersion: String?
     private var loggedInThisRun = false
+    /// Number of completed web logins; lets a request tell whether its session is brand new.
+    private var loginCount = 0
     private var loginTask: Task<[SessionCookie], any Error>?
 
     init(
@@ -70,7 +72,10 @@ actor TRSession {
         guard let url = components?.url else { throw .formatChanged(detail: "Ungültiger Trade-Republic-Pfad") }
 
         for _ in 0 ..< 2 {
+            let loginsBefore = loginCount
             let cookies = try await validCookies()
+            // The session was created by a login during this very request.
+            let freshLogin = loginCount != loginsBefore
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
             request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -98,6 +103,9 @@ actor TRSession {
             case 401, 403:
                 TRLog.log.info("Trade-Republic-Sitzung abgelehnt (HTTP \(response.statusCode, privacy: .public))")
                 invalidate()
+                // Refused right after a fresh login: the login itself did not work. Never log in
+                // again automatically (lockout risk, CLAUDE.md §1).
+                if freshLogin { throw .authFailed }
                 if loggedInThisRun { throw .sessionExpired }
                 continue // next round logs in through the web view, or throws authRequired
             default:
@@ -159,7 +167,17 @@ actor TRSession {
         }
         loginTask = task
         defer { loginTask = nil }
-        do { return try await task.value } catch { throw Self.connectorError(error) }
+        do {
+            // An unstructured task does not see the caller's cancellation: forward it, so a
+            // cancelled sync also closes the login sheet instead of waiting for the user.
+            return try await withTaskCancellationHandler {
+                try await task.value
+            } onCancel: {
+                task.cancel()
+            }
+        } catch {
+            throw Self.connectorError(error)
+        }
     }
 
     private func runLogin(_ presenter: any AuthChallengePresenter) async throws(ConnectorError) -> [SessionCookie] {
@@ -181,6 +199,7 @@ actor TRSession {
         }
         cookies = relevant
         loggedInThisRun = true
+        loginCount += 1
         persist()
         TRLog.log.info("Trade-Republic-Anmeldung erfolgreich (\(relevant.count, privacy: .public) Cookies)")
         return relevant

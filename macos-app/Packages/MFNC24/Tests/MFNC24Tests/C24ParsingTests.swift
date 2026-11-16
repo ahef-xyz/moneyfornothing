@@ -8,6 +8,8 @@ import Testing
     @Test(arguments: [
         ("-1222.01", -122_201), ("2170.00", 217_000), ("0", 0), ("0.00", 0), ("7,09 €", 709),
         ("1.234,56 €", 123_456), ("1,234.56", 123_456), ("−0,99", -99), ("150000", 15_000_000),
+        // Dot followed by exactly three digits and no comma: thousands separator.
+        ("1.234 €", 123_400), ("-1.234", -123_400), ("1.234.567", 123_456_700), ("12.5", 1_250), ("1.2345", 123),
     ])
     func amountText(_ text: String, _ cents: Int) {
         #expect(C24Amount.cents(fromText: text) == cents)

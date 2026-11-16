@@ -52,6 +52,9 @@ private struct TransactionDetails: View {
                         }
                     }
                 }
+                if let importID = transaction.importID {
+                    ImportSourceRows(importID: importID)
+                }
             } header: {
                 Hero(transaction: transaction)
             }
@@ -96,7 +99,7 @@ private struct TransactionDetails: View {
 
             if InspectorFormat.hasRawContent(transaction.rawJSON) {
                 Section {
-                    DisclosureGroup("Antwort der Bank", isExpanded: $showsRaw) {
+                    DisclosureGroup(transaction.isImported ? "Zeile der CSV-Datei" : "Antwort der Bank", isExpanded: $showsRaw) {
                         // Pretty-printed only while expanded.
                         if showsRaw, let raw = InspectorFormat.prettyJSON(transaction.rawJSON) ?? String(data: transaction.rawJSON, encoding: .utf8) {
                             Text(raw)
@@ -142,7 +145,14 @@ private struct TransactionDetails: View {
                 .padding(.vertical, 2)
             } else if let category = transaction.categoryID {
                 LabeledContent {
-                    SourceLabel(source: transaction.categorySource)
+                    if transaction.categoryCameFromImport {
+                        Label("aus Import", systemImage: "square.and.arrow.down")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .help("Kategorie aus der importierten CSV-Datei, geschützt wie eine manuelle")
+                    } else {
+                        SourceLabel(source: transaction.categorySource)
+                    }
                 } label: {
                     Label(category.title, systemImage: category.symbol)
                 }
@@ -170,10 +180,51 @@ private struct TransactionDetails: View {
     }
 }
 
+// MARK: - Import
+
+/// "Quelle: CSV-Import (ING)", when, and "Diesen Import entfernen …" (asks first).
+private struct ImportSourceRows: View {
+    let importID: ImportBatchID
+    @Environment(AppModel.self) private var model
+
+    private static let dateStyle = Date.FormatStyle(date: .numeric, time: .shortened, locale: Locale(identifier: "de_DE"))
+
+    var body: some View {
+        let batch = model.snapshot.importBatch(importID)
+        LabeledContent("Quelle") {
+            Label(batch?.sourceTitle ?? "CSV-Import", systemImage: "square.and.arrow.down")
+                .help("Aus einer CSV-Datei importiert")
+        }
+        if let fileName = batch?.fileName {
+            LabeledContent("Datei") {
+                Text(fileName)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .textSelection(.enabled)
+                    .help(fileName)
+            }
+        }
+        if let batch {
+            LabeledContent("Importiert am", value: batch.importedAt.formatted(Self.dateStyle))
+        }
+        let remaining = model.importedCount(ofImport: importID)
+        HStack {
+            Spacer()
+            Button(remaining > 1 ? "Diesen Import entfernen (\(remaining) Umsätze) …" : "Diesen Import entfernen …") {
+                model.requestRemoveImport(importID)
+            }
+            .controlSize(.small)
+            .disabled(remaining == 0 || model.lock.isLocked)
+            .help("Alle Umsätze dieses CSV-Imports entfernen; Umsätze der Bank bleiben")
+        }
+    }
+}
+
 // MARK: - Hero
 
 private struct Hero: View {
     let transaction: MFNCore.Transaction
+    @Environment(AppModel.self) private var model
 
     var body: some View {
         VStack(spacing: 8) {
@@ -186,7 +237,7 @@ private struct Hero: View {
                 .strikethrough(transaction.status == .cancelled)
             AmountText(cents: transaction.amountCents, currency: transaction.currency,
                        colorsInflow: transaction.status != .cancelled, signed: true)
-                .font(.system(size: 26, weight: .semibold))
+                .font(.largeTitle.weight(.semibold))
                 .italic(transaction.status.isUpcoming)
                 .strikethrough(transaction.status == .cancelled)
             if let line = subtitle {
@@ -204,8 +255,8 @@ private struct Hero: View {
     }
 
     private var subtitle: String? {
-        guard let original = transaction.originalAmountCents, let currency = transaction.originalCurrency else { return nil }
-        return "ursprünglich \(Money.format(original, currency: currency))"
+        // ⇧⌘H hides the original amount as well.
+        model.foreignAmountText(of: transaction).map { "ursprünglich \($0)" }
     }
 }
 
@@ -362,8 +413,10 @@ private struct MultiSelectionSummary: View {
             } header: {
                 VStack(spacing: 6) {
                     Image(systemName: "square.stack.3d.up")
-                        .font(.system(size: 36))
+                        .font(.largeTitle)
+                        .imageScale(.large)
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                     Text("\(selected.count) Buchungen ausgewählt")
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(.primary)

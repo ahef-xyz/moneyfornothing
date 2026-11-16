@@ -123,7 +123,7 @@ public actor C24Connector: BankConnector {
             } catch {
                 throw ConnectorError.formatChanged(detail: "C24: Suchanfrage nicht kodierbar")
             }
-            let page = try C24SearchPage(data: try await send(url, method: "POST", json: body))
+            let page = try C24SearchPage(data: try await send(url, method: "POST", json: body, retryable: true))
             for item in page.items {
                 if let number = item.value.accountNumber, number != entry.number {
                     throw ConnectorError.formatChanged(detail: "C24 Umsätze: Treffer eines anderen Kontos")
@@ -250,12 +250,13 @@ public actor C24Connector: BankConnector {
     // MARK: - Session
 
     /// Request with session handling: auth headers, cookie updates persisted, expired session discarded.
-    private func send(_ url: URL, method: String = "GET", json body: Data? = nil) async throws -> Data {
+    /// `retryable`: `nil` = GET only (see `ScrapeClient.data`); the search POST is a read.
+    private func send(_ url: URL, method: String = "GET", json body: Data? = nil, retryable: Bool? = nil) async throws -> Data {
         let session = try await activeSession()
         var headers = headers(for: session)
         if body != nil { headers["Content-Type"] = "application/json" }
         do {
-            let data = try await session.client.data(url, method: method, body: body, headers: headers)
+            let data = try await session.client.data(url, method: method, body: body, headers: headers, retryable: retryable)
             try await persist(session)
             return data
         } catch ConnectorError.sessionExpired {
@@ -265,7 +266,7 @@ public actor C24Connector: BankConnector {
                 var retry = self.headers(for: renewed)
                 if body != nil { retry["Content-Type"] = "application/json" }
                 do {
-                    let data = try await renewed.client.data(url, method: method, body: body, headers: retry)
+                    let data = try await renewed.client.data(url, method: method, body: body, headers: retry, retryable: retryable)
                     try await persist(renewed)
                     return data
                 } catch ConnectorError.sessionExpired {
@@ -294,7 +295,8 @@ public actor C24Connector: BankConnector {
             var headers = self.headers(for: candidate)
             headers["Authorization"] = nil
             headers["Content-Type"] = "application/json"
-            let data = try await candidate.client.data(try endpoints.url(endpoints.webLoginRefreshPath), method: "POST", body: body, headers: headers)
+            // Not retried: a refresh token may be single-use, a repeat could burn the session.
+            let data = try await candidate.client.data(try endpoints.url(endpoints.webLoginRefreshPath), method: "POST", body: body, headers: headers, retryable: false)
             guard let answer = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
                   let access = (answer["access_token"] as? String).flatMap({ $0.isEmpty ? nil : $0 }),
                   let raw = C24SessionStore.updating(
@@ -326,7 +328,13 @@ public actor C24Connector: BankConnector {
         let task = Task { try await self.startSession() }
         login = task
         defer { login = nil }
-        let session = try await task.value
+        // The unstructured task does not see the caller's cancellation: forward it, so a
+        // cancelled sync also ends the login (sheet) instead of waiting for the user.
+        let session = try await withTaskCancellationHandler {
+            try await task.value
+        } onCancel: {
+            task.cancel()
+        }
         active = session
         return session
     }
@@ -394,7 +402,7 @@ public actor C24Connector: BankConnector {
         }
         let plain = cookies.filter { $0.name != endpoints.sessionStorageKey }
         return ActiveSession(
-            client: ScrapeClient(cookies: plain, transport: transport, policy: policy, sleeper: sleeper),
+            client: ScrapeClient(cookies: plain, transport: transport, policy: policy, sleeper: sleeper, allowedHosts: Set([endpoints.apiBaseURL.host()].compactMap(\.self))),
             storageEntry: entry,
             accessToken: token,
             sessionUUID: UUID().uuidString.lowercased()

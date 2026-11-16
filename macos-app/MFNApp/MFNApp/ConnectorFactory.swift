@@ -24,6 +24,8 @@ enum ConnectorFactory {
         // more: it keeps its data until it is merged or removed.
         case .ing: nil
         case .mock: nil
+        // v10: accounts without a bank connection never get a connector (no sync).
+        case .manual: nil
         }
         return connector
     }

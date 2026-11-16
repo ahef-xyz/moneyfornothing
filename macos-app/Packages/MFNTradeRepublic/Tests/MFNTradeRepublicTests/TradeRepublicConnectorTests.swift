@@ -28,7 +28,7 @@ private func subject() -> ConformanceSubject {
             .init("Web-Login ohne tr_session", expected: .authFailed) {
                 TRWorld().connector(server: TRWorld().server(), presenter: FakePresenter(.webSession(Array(TRWorld.webCookies.dropFirst()))))
             },
-            .init("Sitzung auch nach Login abgelehnt", expected: .sessionExpired) { failing(.sessionRejected) },
+            .init("Sitzung auch nach Login abgelehnt", expected: .authFailed) { failing(.sessionRejected) },
             .init("429", expected: .rateLimited(retryAfter: 120)) { failing(.rateLimited, stored: TRWorld.storedSession) },
             .init("Server 503", expected: .bankUnavailable) { failing(.serverDown, stored: TRWorld.storedSession) },
             .init("WebSocket-Sitzung abgelehnt", expected: .sessionExpired) { failing(.socketAuthError, stored: TRWorld.storedSession) },
@@ -169,6 +169,19 @@ private func subject() -> ConformanceSubject {
         #expect(booked.bookingDate == BankDay(iso: "2026-02-22"))
     }
 
+    @Test func detailsAreFetchedOncePerConnector() async throws {
+        let server = TRWorld().server()
+        let connector = TRWorld().connector(server: server)
+        let cash = try #require(try await connector.accounts().first)
+        let first = try await connector.transactions(for: cash, since: nil)
+        let requested = server.subTypes.filter { $0 == "timelineDetailV2" }.count
+        #expect(requested > 0)
+        let second = try await connector.transactions(for: cash, since: nil)
+        #expect(server.subTypes.filter { $0 == "timelineDetailV2" }.count == requested)
+        #expect(first.map(\.id) == second.map(\.id), "order preserved")
+        #expect(first.map(\.counterpartIBAN) == second.map(\.counterpartIBAN))
+    }
+
     @Test func detailFailureDisablesDetailsButKeepsSync() async throws {
         let world = TRWorld(failure: .detailRejected)
         let server = world.server()
@@ -177,7 +190,8 @@ private func subject() -> ConformanceSubject {
         let transactions = try await connector.transactions(for: cash, since: nil)
         #expect(transactions.count == TRWorld.fixtureTransactionCount + 5)
         #expect(transactions.allSatisfy { $0.counterpartIBAN == nil })
-        #expect(server.subTypes.filter { $0 == "timelineDetailV2" }.count == 1, "no further detail requests after the first failure")
+        // Requests already in flight when the first one failed may still go out, nothing after them.
+        #expect(server.subTypes.filter { $0 == "timelineDetailV2" }.count <= TRService.detailConcurrency, "no further detail requests after the first failure")
     }
 
     @Test func pennyStockCountsInDepotBalance() async throws {
@@ -320,11 +334,12 @@ private func subject() -> ConformanceSubject {
         #expect(server.httpRequests.count == 2)
     }
 
+    /// Refused right after the login → the login did not work: `authFailed`, never retried.
     @Test func rejectedFreshLoginIsNotRetried() async {
         let world = TRWorld(failure: .sessionRejected)
         let server = world.server()
         let presenter = FakePresenter(.webSession(TRWorld.webCookies))
-        await #expect(throws: ConnectorError.sessionExpired) {
+        await #expect(throws: ConnectorError.authFailed) {
             _ = try await world.connector(server: server, presenter: presenter).accounts()
         }
         #expect(presenter.count == 1)

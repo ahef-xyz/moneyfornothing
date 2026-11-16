@@ -155,7 +155,7 @@ struct OverviewView: View {
         if shows(.accounts) {
             for connection in connections {
                 // A disabled button cannot take the focus: the arrows would lose their place.
-                if !model.lock.isLocked, BankOverviewHeader.canSync(model.syncState(connection.id)) {
+                if !model.lock.isLocked, connection.connectorID.hasConnector, BankOverviewHeader.canSync(model.syncState(connection.id)) {
                     list.append(.sync(connection.id))
                 }
                 list += model.orderedAccounts(of: connection.id).map { .account($0.id) }
@@ -929,7 +929,10 @@ private struct BankOverviewHeader: View {
 
     @ViewBuilder
     private var action: some View {
-        if case .waitingForApproval = state.phase, !hasOpenApproval {
+        if connection.isManual {
+            // v10: nothing to sync.
+            EmptyView()
+        } else if case .waitingForApproval = state.phase, !hasOpenApproval {
             Button("Jetzt anmelden") { model.syncConnection(connection.id) }
                 .controlSize(.small)
                 .disabled(model.lock.isLocked)
@@ -985,7 +988,9 @@ private struct BankOverviewHeader: View {
             }
             .help("Speichern fehlgeschlagen: \(message)")
         case .idle:
-            if let last = state.lastSuccess {
+            if connection.isManual {
+                Label("ohne Anbindung", systemImage: "tray.and.arrow.down")
+            } else if let last = state.lastSuccess {
                 Label("abgeglichen \(DayFormat.syncTime(last))", systemImage: "clock")
                     .monospacedDigit()
             } else {

@@ -10,8 +10,8 @@ public protocol SessionCookieStore: Sendable {
 }
 
 /// Session cookies in the keychain (`WhenUnlockedThisDeviceOnly`, CLAUDE.md §6).
-/// A keychain failure degrades to "no stored session" (→ interactive login next time) and is
-/// logged; it never blocks a sync.
+/// A failed read degrades to "no stored session" (→ interactive login) and is logged. A failed
+/// save throws: the user would otherwise log in again on every sync without knowing why.
 public struct KeychainSessionCookieStore: SessionCookieStore {
     private let keychain: Keychain
 
@@ -33,6 +33,7 @@ public struct KeychainSessionCookieStore: SessionCookieStore {
             try keychain.set(cookies, for: key)
         } catch {
             Log.logger("scrape").error("Sitzung nicht speicherbar: \(String(describing: type(of: error)), privacy: .public)")
+            throw .formatChanged(detail: "Sitzung nicht im Schlüsselbund speicherbar")
         }
     }
 

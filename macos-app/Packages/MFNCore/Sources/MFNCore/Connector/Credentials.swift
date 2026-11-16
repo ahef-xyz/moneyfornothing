@@ -89,7 +89,7 @@ extension ConnectorID {
         case .n26:
             [CredentialField(key: "username", label: "E-Mail", kind: .email),
              CredentialField(key: "password", label: "Passwort", kind: .secret)]
-        case .mock:
+        case .mock, .manual:
             []
         }
     }
@@ -99,7 +99,8 @@ extension ConnectorID {
     public var supportsSetup: Bool {
         switch self {
         case .tradeRepublic, .c24, .easybank, .n26, .dkb, .ing: true
-        case .mock: false
+        // v10: `.manual` is created by its own sheet ("Konto ohne Anbindung anlegen"), not the wizard.
+        case .mock, .manual: false
         }
     }
 }

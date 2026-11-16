@@ -293,7 +293,7 @@ public enum BalanceForecast {
         var path = ForecastPath(startCents: start, steps: [], endCents: start, lowestCents: start, lowestDay: today,
                                 firstNegativeDay: start < 0 ? today : nil)
         for event in events where event.day <= until {
-            running += event.cents
+            running = running.addingSaturating(event.cents)
             path.steps.append(.init(day: event.day, cents: running, event: event))
             if running < path.lowestCents {
                 path.lowestCents = running
@@ -314,7 +314,7 @@ public enum BalanceForecast {
         var days: [(day: BankDay, cents: Int)] = [(today, start)]
         var running = start
         for event in events where event.day <= until {
-            running += event.cents
+            running = running.addingSaturating(event.cents)
             if days[days.count - 1].day == event.day {
                 days[days.count - 1].cents = running
             } else {
@@ -328,6 +328,6 @@ public enum BalanceForecast {
             lowest = min(lowest, days[index].cents)
             lowestAfter[index] = lowest
         }
-        return days.indices.first { lowestAfter[$0] - amountCents >= 0 }.map { days[$0].day }
+        return days.indices.first { lowestAfter[$0] >= amountCents }.map { days[$0].day }
     }
 }

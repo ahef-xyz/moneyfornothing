@@ -31,10 +31,13 @@ struct RootView: View {
 
 struct LockView: View {
     @Environment(AppModel.self) private var model
+    @Environment(AppUpdater.self) private var updater: AppUpdater?
     @Environment(\.controlActiveState) private var activeState
+    @Environment(\.openURL) private var openURL
     private let usesTouchID = AppLock.biometryAvailable
 
     var body: some View {
+        let problem = model.lock.lastError
         VStack(spacing: 0) {
             Spacer()
             VStack(spacing: 14) {
@@ -43,34 +46,42 @@ struct LockView: View {
                     .frame(width: 112, height: 112)
                     .accessibilityHidden(true)
                 VStack(spacing: 6) {
-                    Text("MoneyForNothing ist gesperrt")
+                    Text(problem == nil ? "MoneyForNothing ist gesperrt" : "MoneyForNothing lässt sich nicht öffnen")
                         .font(.title2.weight(.semibold))
                         .accessibilityAddTraits(.isHeader)
-                    Text(causeText)
+                    Text(problem?.message ?? causeText)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
+                    if let hint = problem?.hint {
+                        Text(hint)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
                 }
-                Button {
-                    Task { await model.lock.unlock() }
-                } label: {
-                    Label(usesTouchID ? "Mit Touch ID entsperren" : "Entsperren",
-                          systemImage: usesTouchID ? "touchid" : "lock.open")
-                        .padding(.horizontal, 6)
+                .frame(maxWidth: 420)
+                if problem?.action == .update {
+                    updateButtons
+                } else {
+                    unlockButton(title: problem == nil ? nil : "Erneut versuchen")
+                        .buttonStyle(.borderedProminent)
+                        .keyboardShortcut(.defaultAction)
+                        .padding(.top, 6)
+                    if problem == nil {
+                        Text(usesTouchID ? "Oder mit dem Passwort deines Macs." : "Mit dem Passwort deines Macs.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .keyboardShortcut(.defaultAction)
-                .disabled(model.lock.isAuthenticating)
-                .padding(.top, 6)
-                Text(usesTouchID ? "Oder mit dem Passwort deines Macs." : "Mit dem Passwort deines Macs.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                if let error = model.lock.lastError {
-                    Label(error, systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.red)
+                if let detail = problem?.detail {
+                    // Technical detail for a bug report: small, selectable, never in red.
+                    Text(detail)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
-                        .frame(maxWidth: 440)
-                        .padding(.top, 4)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: 420)
+                        .padding(.top, 8)
+                        .accessibilityLabel("Technische Details: \(detail)")
                 }
             }
             .frame(maxWidth: 480)
@@ -92,9 +103,56 @@ struct LockView: View {
             AccessibilityNotification.Announcement(usesTouchID ? "Touch ID wird angefordert" : "Passwort wird angefordert").post()
             Task { await model.lock.unlock() }
         }
-        .onChange(of: model.lock.lastError) { _, error in
-            if let error { AccessibilityNotification.Announcement(error).post() }
+        .onChange(of: model.lock.lastError) { _, problem in
+            guard let problem else { return }
+            AccessibilityNotification.Announcement([problem.message, problem.hint].compactMap(\.self).joined(separator: " ")).post()
         }
+    }
+
+    /// Newer database: updating is the way out; unlocking again only repeats the error.
+    @ViewBuilder private var updateButtons: some View {
+        HStack(spacing: 10) {
+            if let controller = updater?.controller {
+                Button {
+                    controller.checkForUpdates(nil)
+                } label: {
+                    Label("Nach Updates suchen …", systemImage: "arrow.down.circle")
+                        .padding(.horizontal, 6)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .keyboardShortcut(.defaultAction)
+                .accessibilityHint("Sucht nach einer neueren Version von MFN und installiert sie auf Wunsch.")
+            } else if let url = Website.url {
+                // Self-built app without Sparkle: point to the download page.
+                Button {
+                    openURL(url)
+                } label: {
+                    Label("Aktuelle Version laden", systemImage: "safari")
+                        .padding(.horizontal, 6)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .keyboardShortcut(.defaultAction)
+                .help(Website.label)
+                .accessibilityHint("Öffnet \(Website.label) im Browser, dort gibt es die aktuelle Version.")
+            }
+            unlockButton(title: "Erneut versuchen")
+                .buttonStyle(.bordered)
+        }
+        .padding(.top, 6)
+    }
+
+    private func unlockButton(title: String?) -> some View {
+        Button {
+            Task { await model.lock.unlock() }
+        } label: {
+            Label(title ?? (usesTouchID ? "Mit Touch ID entsperren" : "Entsperren"),
+                  systemImage: usesTouchID ? "touchid" : "lock.open")
+                .padding(.horizontal, 6)
+        }
+        .controlSize(.large)
+        .disabled(model.lock.isAuthenticating)
     }
 
     private var causeText: String {
@@ -105,7 +163,6 @@ struct LockView: View {
         case .manual: "Du hast MoneyForNothing gesperrt."
         }
     }
-
 }
 
 /// Bottom line of the lock and password screens: profile marker (demo/test) and the promise.
@@ -212,6 +269,17 @@ struct MainView: View {
         .sheet(item: $model.categorySetup) { setup in
             CategorySetupView(setup: setup)
         }
+        .sheet(item: $model.csvImport) { session in
+            CSVImportSheet(session: session)
+        }
+        .alert("CSV-Datei nicht importierbar", isPresented: Binding(
+            get: { model.csvImportFailure != nil }, set: { if !$0 { model.csvImportFailure = nil } }
+        )) {
+            Button("OK") { model.csvImportFailure = nil }
+        } message: {
+            Text(model.csvImportFailure ?? "")
+        }
+        .modifier(ImportRemovalAlerts())
     }
 
     /// Depot accounts get the positions view instead of the transaction list.

@@ -1,6 +1,6 @@
 # PROTOCOL – BankConnector v6
 
-Version: 9
+Version: 10
 Eingefroren am: 2026-11-10
 
 Dieses Dokument ist der einzige Freeze-Marker. Keine Git-Tags.
@@ -55,7 +55,7 @@ public struct CredentialField { key, label, kind (.text/.email/.phone/.secret), 
 public struct BankCredentials { values: [String: String] }   // v4, description redacted, nur Keychain
 extension ConnectorID { var credentialFields: [CredentialField]; var supportsSetup: Bool }  // v4
 public struct CredentialStore { credentials(for:), set(_:for:), delete(for:) }  // v4, Keychain "credentials.<connectionID>"
-// ConnectorID: .ing, .dkb, .tradeRepublic, .c24, .easybank, .n26 (v4), .mock
+// ConnectorID: .ing, .dkb, .tradeRepublic, .c24, .easybank, .n26 (v4), .mock, .manual (v10)
 public struct StorageKey: Hashable, Codable, Sendable {   // v2, deklariert als WebLoginRequest.StorageKey + Typealias
     var key: String                     // Storage-Key bzw. bei .javaScript der Übergabename
     var source: Source                  // .sessionStorage | .localStorage | .javaScript (v3)
@@ -81,6 +81,15 @@ public struct SessionCookie: Hashable, Codable, Sendable { name, value, domain, 
   Interpretation (JSON, Token) ausschließlich im Connector.
 - Cookies kommen aus `WKHTTPCookieStore` (inkl. HttpOnly und skriptgesetzter Cookies wie `aws-waf-token`), gefiltert auf
   `cookieDomains` samt Subdomains.
+
+**Konten ohne Anbindung (v10):**
+- `ConnectorID.manual` (`displayName` „Ohne Anbindung“, `credentialFields = []`, `supportsSetup = false`, kein Favicon,
+  `hasConnector = false`). Es gibt **keinen** Connector dafür: Die App registriert eine `.manual`-`Connection` nie,
+  `SyncEngine.register` übernimmt nur die `Connection` in den Store und ignoriert den Connector (kein Abgleich, kein
+  Sync-Status). IDs `manual:<UUID>` für `Connection` und `Account`, angelegt über `upsert(connection:)` + `replaceAccounts`.
+- Umsätze nur aus dem CSV-Import. Kontostand = Startsaldo (`OpeningBalance`, im Store, nicht Teil der Modelle) +
+  gebuchte Umsätze in Kontowährung ab dessen Tag (`ManualAccount.balance`), per `setBalance` nach Anlegen/Ändern/Import.
+- Additiv: v9-Daten (JSON/DB) bleiben unverändert dekodierbar.
 
 `ConnectorError` ist zusätzlich `Hashable` und `Codable` (Sync-Status wird persistiert).
 `ConnectorError.forbidsAutomaticRetry`: `authFailed`, `authRequired`, `cancelled`, `formatChanged`, `unsupportedAccount`.
@@ -127,6 +136,11 @@ public struct SessionCookie: Hashable, Codable, Sendable { name, value, domain, 
 - `Transaction` wie CLAUDE.md §4. `bookingDate: BankDay?`, `valueDate: BankDay`, `rawJSON: Data`.
   Connector-Felder sind `let`; `fingerprint` wird im Initialiser über `Fingerprint.make` berechnet.
   `id` = `ext:<externalID>` oder `fp:<fingerprint>`; Kollisionen über `Transaction.uniquingIDs` (`#2`, `#3`).
+  **`importID: ImportBatchID?`** (v10): der CSV-Import, der die Zeile angelegt hat; `nil` = vom Abgleich mit der Bank.
+  Setzt nur der Importer in `MFNCore`, **nie ein Connector**. Fehlt der Schlüssel in älterem JSON, ist er `nil`.
+  `isImported` = `importID != nil`. Nur importierte Zeilen lassen sich entfernen (`LedgerStore.removeImportedTransactions`).
+- **`ImportBatch`** (v10, nicht für Connectoren): id `ImportBatchID`, accountID, importedAt, format? (`CSVPreset.id`),
+  fileName? (nur lokal, nie geloggt), encoding?, rowCount.
 - `Balance` (bookedCents, availableCents?, currency, asOf).
 - `CardStatement` (**accountID**, periodStart, periodEnd, dueDate?, amountCents, **currency**, pdfBlobID?).
 - `SecurityPosition` (**accountID**, isin, **name**, quantity: `Decimal`, priceCents, currency, asOf, **purchasePriceCents: `Int?`** – durchschnittlicher Einstandskurs pro Stück in Cent von `currency`, gleiche Einheit wie `priceCents` (Anleihen pro 100 Nominal), `nil` wenn die Bank keinen liefert).
@@ -142,7 +156,9 @@ Fett = Ergänzung gegenüber der Kurzfassung in CLAUDE.md §4 (Zuordnung, Mehrw�
 ## Änderungshistorie
 | Version | Datum | Änderung | Freigabe |
 | --- | --- | --- | --- |
+| 10 | 2026-11-16 | Teil „Konten ohne Anbindung“ (Branch `manual-accounts`): `ConnectorID.manual` (keine Zugangsdaten, kein Assistent, kein Connector, kein Abgleich), `ConnectorID.hasConnector`. Additiv, v9-Daten bleiben dekodierbar. Store-Migration „openingBalance“ (Startsaldo, `LedgerStore` ist nicht eingefroren). Weitere v10-Änderungen anderer Branches stehen in eigenen Zeilen | Mensch, 2026-11-16 (Freigabe Bump v9 → v10 für `PROPOSALS.md` „Konten ohne Anbindung“) |
 | 1 | 2026-11-09 | Initiales Einfrieren nach M2 (inkl. `WebLoginRequest`, `BankDay`, `accountID` an `CardStatement`/`SecurityPosition`) | Mensch, 2026-11-09 |
+| 10 | 2026-11-16 | `Transaction.importID: ImportBatchID?` (Default `nil`, Codable-tolerant) und Modell `ImportBatch` (Tabelle `importBatch`, Spalte `ledgerTransaction.importID` mit Index); Migration ergänzt für frühere Importe (`rawJSON.source == "csv"`) je Konto einen synthetischen Import `backfill:<accountID>`. Connectoren unberührt. Zusammen mit `ConnectorID.manual` (Agent `manual-accounts`) | Mensch, 2026-11-16 (Auftrag an Agent `csv-imported`) |
 | 9 | 2026-11-12 | `SecurityPosition.purchasePriceCents: Int?` (Default `nil`) für Gewinn/Verlust; FinTS liest `:70E::HOLD//` aus MT535 (ING liefert ihn). Store-Migration 6 | Mensch, 2026-11-12 (Rückfrage „Protokoll v9“: „Yes, bump to v9“) |
 | 8 | 2026-11-12 | `.ing.credentialFields` = Zugangsnummer (oder Benutzername) + PIN für FinTS (Keys `userID`/`pin` statt `username`/`password`); ING nur noch per FinTS, Web-Banking-Connector `MFNING` entfernt. Keine Signaturänderung | Mensch, 2026-11-12 (Chat: „ing webscraping can be removed entirely, when finished“ / „can be deleted“) |
 | 7 | 2026-11-10 | `.ing.credentialFields` = Benutzername + Passwort (Keys `username`/`password` statt `accessNumber`/`pin`), Web-Login-Formular nimmt beides. Keine Signaturänderung | Mensch, 2026-11-10 (Chat: „ing needs username and real password not pin“) |

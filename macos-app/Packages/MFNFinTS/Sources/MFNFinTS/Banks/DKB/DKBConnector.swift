@@ -132,12 +132,17 @@ public actor DKBConnector: BankConnector {
         let transactions = try await withDialog { dialog throws(ConnectorError) in
             let fints = try self.fintsAccount(for: account)
             let bpd = await dialog.bpd
+            // Without `since`, ask for the bank's whole storage period (today counts as day 1).
+            func start(_ parameters: String) -> BankDay? {
+                sinceDay ?? Self.storagePeriod(bpd, parameters: parameters).map { today.adding(days: -($0 - 1)) }
+            }
             if fints.allows("HKCAZ"), let version = bpd.bestVersion(of: "HKCAZ", supported: Self.camtVersions) {
-                let from = sinceDay ?? Self.storagePeriod(bpd).map { today.adding(days: -$0) }
+                let from = start("HICAZS")
                 return try await self.fetchCAMT(dialog: dialog, version: version, format: Self.camtFormat(bpd), fints: fints, account: account, from: from)
             }
             if let mt940 = self.parsers.mt940, fints.allows("HKKAZ"), let version = bpd.bestVersion(of: "HKKAZ", supported: Self.statementVersions) {
-                return try await self.fetchMT940(dialog: dialog, version: version, parser: mt940, fints: fints, account: account, from: sinceDay)
+                let from = start("HIKAZS")
+                return try await self.fetchMT940(dialog: dialog, version: version, parser: mt940, fints: fints, account: account, from: from)
             }
             throw .unsupportedAccount
         }
@@ -276,7 +281,7 @@ public actor DKBConnector: BankConnector {
             let newID = await dialog.systemID
             guard newID != "0", !newID.isEmpty else { throw .formatChanged(detail: "DKB: keine System-ID (HISYN)") }
             systemID = newID
-            await stateStore.saveSystemID(newID)
+            try await stateStore.saveSystemID(newID)
             Self.log.info("DKB: neue System-ID gespeichert")
         }
     }
@@ -340,8 +345,8 @@ public actor DKBConnector: BankConnector {
         return formats.max() ?? defaultCAMTFormat
     }
 
-    /// Days of history the bank keeps (`HICAZS` element 4, component 1).
-    static func storagePeriod(_ bpd: FinTSBPD) -> Int? {
-        bpd.parameters("HICAZS").compactMap { $0[3][0].flatMap(Int.init) }.filter { $0 > 0 }.max()
+    /// Days of history the bank keeps (`HICAZS`/`HIKAZS` element 4, component 1).
+    static func storagePeriod(_ bpd: FinTSBPD, parameters: String = "HICAZS") -> Int? {
+        bpd.parameters(parameters).compactMap { $0[3][0].flatMap(Int.init) }.filter { $0 > 0 }.max()
     }
 }

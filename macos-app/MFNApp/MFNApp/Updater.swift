@@ -6,6 +6,7 @@ import SwiftUI
 /// and get no updater and no menu item. Automatic checks stay off until the user agrees (Sparkle asks
 /// on the second launch); no system profiling.
 @MainActor
+@Observable
 final class AppUpdater {
     let controller: SPUStandardUpdaterController?
 

@@ -124,6 +124,13 @@ struct TransactionContextMenu: View {
             if ids.count == 1, let id = ids.first {
                 Button("Regel erstellen …") { model.showRuleEditor(for: id) }
             }
+            // Only offered when every row is imported: bank data is never removed.
+            if model.areAllImported(ids) {
+                Divider()
+                Button(ids.count == 1 ? "Importierten Umsatz entfernen …" : "\(ids.count) importierte Umsätze entfernen …") {
+                    model.requestRemoveImports(ids)
+                }
+            }
         }
     }
 }

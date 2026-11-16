@@ -120,4 +120,13 @@ enum Money {
         guard number != .notANumber, abs(rounded) < Decimal(Int64.max / 2) else { return nil }
         return number.intValue
     }
+
+    /// `value` × 100 if it has at most two decimals, else `nil` (never rounds).
+    static func exactCents(_ value: Decimal) -> Int? {
+        var scaled = value * 100
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &scaled, 0, .plain)
+        guard rounded == scaled else { return nil }
+        return minorUnits(value, fractionDigits: 2)
+    }
 }

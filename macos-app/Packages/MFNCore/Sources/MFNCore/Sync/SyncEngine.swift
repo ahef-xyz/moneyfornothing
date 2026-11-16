@@ -50,6 +50,8 @@ public actor SyncEngine {
 
     public func register(_ connection: Connection, connector: any BankConnector) async throws {
         try await store.upsert(connection: connection)
+        // v10: an account without a bank connection never syncs, whatever connector is passed.
+        guard connection.connectorID.hasConnector else { return }
         connectors[connection.id] = connector
     }
 
@@ -157,7 +159,8 @@ public actor SyncEngine {
         } catch let error as StoreWriteError {
             state.phase = .storeFailed(error.message)
             state.consecutiveFailures += 1
-            Log.sync.error("Sync \(id.rawValue, privacy: .public): Speichern fehlgeschlagen: \(error.message, privacy: .public)")
+            // The message can carry SQL detail derived from bank data: private.
+            Log.sync.error("Sync \(id.rawValue, privacy: .public): Speichern fehlgeschlagen: \(error.message, privacy: .private)")
         } catch ConnectorError.authRequired(let challenge) {
             // Not a failure: the session ran out and a login needs the user.
             state.phase = .waitingForApproval(challenge)
@@ -169,7 +172,8 @@ public actor SyncEngine {
             if case let .rateLimited(retryAfter) = connectorError {
                 blockedUntil[id] = now().addingTimeInterval(retryAfter)
             }
-            Log.sync.error("Sync failed \(id.rawValue, privacy: .public): \(connectorError.description, privacy: .public)")
+            // Case name public (diagnosable), detail (e.g. `formatChanged` text from bank responses) private.
+            Log.sync.error("Sync failed \(id.rawValue, privacy: .public): \(Self.caseName(of: connectorError), privacy: .public) \(connectorError.description, privacy: .private)")
         }
         await saveState(state, for: id)
         if succeeded, let afterSync { await afterSync(id) }
@@ -181,7 +185,21 @@ public actor SyncEngine {
         do {
             try await store.setSyncState(state, for: id)
         } catch {
-            Log.sync.fault("Sync-Status für \(id.rawValue, privacy: .public) nicht speicherbar: \(String(describing: error), privacy: .public)")
+            Log.sync.fault("Sync-Status für \(id.rawValue, privacy: .public) nicht speicherbar: \(String(describing: error), privacy: .private)")
+        }
+    }
+
+    /// The error's case without associated values, safe to log publicly.
+    static func caseName(of error: ConnectorError) -> String {
+        switch error {
+        case .authRequired: "authRequired"
+        case .authFailed: "authFailed"
+        case .sessionExpired: "sessionExpired"
+        case .rateLimited: "rateLimited"
+        case .bankUnavailable: "bankUnavailable"
+        case .formatChanged: "formatChanged"
+        case .unsupportedAccount: "unsupportedAccount"
+        case .cancelled: "cancelled"
         }
     }
 

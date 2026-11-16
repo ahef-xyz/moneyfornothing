@@ -10,6 +10,9 @@ public enum ConnectorID: String, Codable, Sendable, CaseIterable, Hashable {
     /// v4
     case n26
     case mock
+    /// v10: account without a bank connection ("Ohne Anbindung"). No connector, no sync:
+    /// transactions come from the CSV import only, the balance is computed (`ManualAccount`).
+    case manual
 
     public var displayName: String {
         switch self {
@@ -20,6 +23,7 @@ public enum ConnectorID: String, Codable, Sendable, CaseIterable, Hashable {
         case .easybank: "easybank"
         case .n26: "N26"
         case .mock: "Demo"
+        case .manual: "Ohne Anbindung"
         }
     }
 }
@@ -57,4 +61,16 @@ public struct CategoryID: RawRepresentable, Hashable, Codable, Sendable, Express
     public init(_ rawValue: String) { self.rawValue = rawValue }
     public init(stringLiteral value: String) { self.rawValue = value }
     public var description: String { rawValue }
+}
+
+/// One CSV import (v10): every row it added carries this ID in `Transaction.importID`.
+public struct ImportBatchID: RawRepresentable, Hashable, Codable, Sendable, ExpressibleByStringLiteral, CustomStringConvertible {
+    public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
+    public init(_ rawValue: String) { self.rawValue = rawValue }
+    public init(stringLiteral value: String) { self.rawValue = value }
+    public var description: String { rawValue }
+
+    /// A fresh ID for a new import.
+    public static func make() -> ImportBatchID { ImportBatchID("import:\(UUID().uuidString)") }
 }

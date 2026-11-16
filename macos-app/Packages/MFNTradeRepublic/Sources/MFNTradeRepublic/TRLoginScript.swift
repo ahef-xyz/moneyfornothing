@@ -15,10 +15,9 @@ import MFNCore
 ///    `requiredAction == AUTHENTICATOR_VERIFICATION` → 6-digit code from the user,
 ///    `POST …/processes/{processId}/authenticator-verification` `{code}`.
 ///    Any other non-pending `status` on 2xx (e.g. `REJECTED`, `FAILED`) ends the process → `authFailed`.
-/// 4. Fallback only on the explicit codes `DEVICE_NOT_FOUND` and `MOBILE_APP_VERSION_NOT_SUPPORTED`:
-///    `POST /api/v1/auth/web/login` and a 4-digit SMS/app code, `POST /api/v1/auth/web/login/{processId}/{code}`.
-///    Unlike the web app, HTTP ≥ 500, a missing or unknown code do not fall back: that would send
-///    the PIN a second time (lock risk) for a failure that says nothing about the device.
+/// 4. No automatic v1 fallback: the web app retries with `POST /api/v1/auth/web/login` (SMS/app
+///    code) on `DEVICE_NOT_FOUND`/`MOBILE_APP_VERSION_NOT_SUPPORTED`, which sends the PIN a second
+///    time (lock risk). The script stops with an error instead; any other failure stops too.
 ///
 /// Error codes from the public web bundle (2026-11-10, `LoginFlow-*.js`, `analytics-*.js`):
 /// `AUTHENTICATION_ERROR`/`INVALID_VALUE`/`NUMBER_INVALID` = wrong phone number or PIN →
@@ -29,6 +28,9 @@ import MFNCore
 ///
 /// Re-entry: the returned `state` (`{step, processId}`) and a `sessionStorage` marker (processId
 /// only) resume polling after a navigation instead of starting a second login (second push).
+/// A second marker (`mfn.tr.submitted`), written before the PIN is sent, stops a run that finds
+/// it without a process to resume: the PIN is never sent twice. The page must be exactly on
+/// `webOrigin` (`new URL(url).origin`), never a host that merely starts with it.
 /// Credentials stay in the function argument: never logged, stored or put into `state`.
 enum TRLoginScript {
     static let webOrigin = "https://app.traderepublic.com"
@@ -46,19 +48,24 @@ enum TRLoginScript {
     const ORIGIN = "\#(webOrigin)";
     const FALLBACK_APP_VERSION = "\#(TRSession.fallbackAppVersion)";
     const MARK = "mfn.tr.login";
+    // Set right before the PIN is sent, never holds credentials. A run that finds it without a
+    // process to resume stops: the PIN may already have reached Trade Republic (lockout risk).
+    const SUBMITTED = "mfn.tr.submitted";
     const POLL_MS = 2000;
     const WAF_WAIT_MS = 30000;
     const MARK_MAX_AGE_MS = 5 * 60 * 1000;
     const BAD_CREDENTIALS = ["AUTHENTICATION_ERROR", "INVALID_VALUE", "NUMBER_INVALID"];
     const CODE_INVALID = ["VALIDATION_CODE_INVALID", "VALIDATION_CODE_ALREADY_USED"];
-    const V1_FALLBACK = ["DEVICE_NOT_FOUND", "MOBILE_APP_VERSION_NOT_SUPPORTED"];
     const POLL_PENDING = ["", "PENDING"];
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     const authFailed = (reason) => new Error("authFailed: " + reason);
 
     if (state && state.step === "done") return state;
-    if (typeof url !== "string" || !url.startsWith(ORIGIN)) return state ?? null;
+    let pageOrigin = null;
+    try { pageOrigin = new URL(String(url)).origin; } catch (e) {}
+    // Exact origin: a prefix check would also accept e.g. app.traderepublic.com.example.org.
+    if (pageOrigin !== ORIGIN) return state ?? null;
 
     function cookie(name) {
       for (const part of String(document.cookie || "").split(";")) {
@@ -80,6 +87,16 @@ enum TRLoginScript {
     }
     function forget() {
       try { sessionStorage.removeItem(MARK); } catch (e) {}
+    }
+    function markSubmitted() {
+      // Must succeed: without the marker a reload could send the PIN a second time.
+      sessionStorage.setItem(SUBMITTED, "1");
+    }
+    function wasSubmitted() {
+      try { return sessionStorage.getItem(SUBMITTED) === "1"; } catch (e) { return false; }
+    }
+    function forgetSubmitted() {
+      try { sessionStorage.removeItem(SUBMITTED); } catch (e) {}
     }
 
     function normalizePhone(raw) {
@@ -187,11 +204,6 @@ enum TRLoginScript {
       if (r.status === 405) return new Error("blocked by WAF");
       return new Error("login start HTTP " + r.status + (r.code ? " " + r.code : ""));
     }
-    // Only these explicit codes fall back to the v1 login (SMS/app code): every other failure
-    // would mean a second PIN attempt.
-    function wantsV1(r) {
-      return V1_FALLBACK.includes(r.code);
-    }
 
     async function askCode(prompt, length, submit) {
       for (let attempt = 1; ; attempt++) {
@@ -241,37 +253,31 @@ enum TRLoginScript {
 
     function done() {
       forget();
+      forgetSubmitted();
       mfn.status("Anmeldung bestätigt.");
       return { step: "done" };
-    }
-
-    // UNVERIFIED: v1 answer shape ({processId, countdownInSeconds, "2fa": "SMS"|"APP"|null}) from the bundle only.
-    async function loginV1(body) {
-      const r = await call("POST", "/api/v1/auth/web/login", body);
-      if (!r.ok) throw startError(r);
-      const json = r.json || {};
-      if (!json.processId || json["2fa"] === null) return done();
-      const viaApp = String(json["2fa"] || "").toUpperCase() === "APP";
-      await askCode(viaApp ? "Code aus der Trade-Republic-App" : "Code aus der SMS von Trade Republic", 4, (code) =>
-        call("POST", "/api/v1/auth/web/login/" + encodeURIComponent(json.processId) + "/" + encodeURIComponent(code)));
-      return done();
     }
 
     // Resume a running confirmation instead of starting a second login.
     const resumeId = (state && state.step === "confirm" && state.processId) || (marker() || {}).processId;
     await waitForWaf();
     if (resumeId) return await poll(resumeId, 120);
+    if (wasSubmitted()) throw new Error("login already submitted, not sending the PIN again");
 
     const body = { phoneNumber: normalizePhone(credentials && credentials.phoneNumber), pin: String((credentials && credentials.pin) ?? "") };
     if (!/^\d{4}$/.test(body.pin)) throw authFailed("pin format");
     mfn.status("Anmeldung bei Trade Republic …");
+    markSubmitted();
     const r = await call("POST", "/api/v2/auth/web/login", body);
     if (r.ok) {
       const json = r.json || {};
       if (!json.processId) return done();
       return await poll(json.processId, json.countdownInSeconds);
     }
-    if (wantsV1(r)) return await loginV1(body);
+    // The v1 login (SMS/app code) would need the PIN a second time: never automatically.
+    if (r.code === "DEVICE_NOT_FOUND" || r.code === "MOBILE_APP_VERSION_NOT_SUPPORTED") {
+      throw new Error("login needs the older SMS flow (" + r.code + "), log in once in the Trade Republic web app");
+    }
     throw startError(r);
     """#
 }

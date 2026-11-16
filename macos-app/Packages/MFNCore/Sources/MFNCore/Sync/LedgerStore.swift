@@ -1,4 +1,5 @@
 import Foundation
+import Synchronization
 
 /// Snapshot of everything the UI shows. Value type, cheap to hand to the main actor.
 ///
@@ -8,7 +9,10 @@ public struct LedgerSnapshot: Sendable, Equatable {
     public var connections: [Connection] = []
     public var accounts: [Account] = []
     public var balances: [AccountID: Balance] = [:]
-    public var transactions: [Transaction] = []
+    public var transactions: [Transaction] = [] {
+        // Any change (also via this public setter) drops the lookups; they are rebuilt on demand.
+        didSet { transactionIndex = TransactionIndex() }
+    }
     public var cardStatements: [CardStatement] = []
     public var securities: [SecurityPosition] = []
     public var syncStates: [ConnectionID: SyncState] = [:]
@@ -23,6 +27,13 @@ public struct LedgerSnapshot: Sendable, Equatable {
     public var depotHistory: [AccountID: [DepotValuePoint]] = [:]
     /// One-off payments the user expects (`PlannedItem`), by day.
     public var plannedItems: [PlannedItem] = []
+    /// Opening balances of accounts without a bank connection (`ConnectorID.manual`); their
+    /// balance is computed from it (`ManualAccount.balance`).
+    public var openingBalances: [AccountID: OpeningBalance] = [:]
+    /// CSV imports (v10), oldest first. Rows they added carry `Transaction.importID`.
+    public var importBatches: [ImportBatch] = []
+    /// Lookups by account, ID and import over `transactions`; not part of `==`.
+    private var transactionIndex = TransactionIndex()
 
     public init() {}
 
@@ -35,8 +46,54 @@ public struct LedgerSnapshot: Sendable, Equatable {
         accounts.filter { $0.connectionID == connection }
     }
 
+    /// Newest first, like `transactions`.
     public func transactions(of account: AccountID) -> [Transaction] {
-        transactions.filter { $0.accountID == account }
+        transactionIndex.lookups(for: transactions).byAccount[account]?.map { transactions[$0] } ?? []
+    }
+
+    public func transaction(_ id: TransactionID) -> Transaction? {
+        index(of: id).map { transactions[$0] }
+    }
+
+    /// Position of a transaction in `transactions`.
+    func index(of id: TransactionID) -> Int? {
+        transactionIndex.lookups(for: transactions).byID[id]
+    }
+
+    /// Positions of these IDs in `transactions`, ascending (newest first); unknown IDs are skipped.
+    func indices<S: Sequence>(of ids: S) -> [Int] where S.Element == TransactionID {
+        let byID = transactionIndex.lookups(for: transactions).byID
+        return ids.compactMap { byID[$0] }.sorted()
+    }
+
+    /// Changes only category fields of the rows at `indices`, keeping the lookups (IDs,
+    /// accounts and order are unchanged, so they stay valid).
+    mutating func updateCategories(at indices: [Int], _ body: (inout Transaction) -> Void) {
+        let index = transactionIndex
+        for position in indices { body(&transactions[position]) }
+        transactionIndex = index
+    }
+
+    /// The rows at `indices` after `body`, without changing the snapshot.
+    private func categoryChanges(at indices: [Int], _ body: (inout Transaction) -> Void) -> [Transaction] {
+        indices.map { position in
+            var transaction = transactions[position]
+            body(&transaction)
+            return transaction
+        }
+    }
+
+    /// Puts rows computed by the `…Changes` methods back in place. Only their category fields
+    /// differ from the stored rows; unknown IDs are skipped.
+    public mutating func replaceCategorized(_ changed: [Transaction]) {
+        let positions = changed.compactMap { transaction in index(of: transaction.id).map { ($0, transaction) } }
+        let index = transactionIndex
+        for (position, transaction) in positions {
+            transactions[position].categoryID = transaction.categoryID
+            transactions[position].categorySource = transaction.categorySource
+            transactions[position].confidence = transaction.confidence
+        }
+        transactionIndex = index
     }
 
     // MARK: - Mutations
@@ -52,11 +109,16 @@ public struct LedgerSnapshot: Sendable, Equatable {
     /// Accounts that disappeared keep their data until the user removes them explicitly
     /// (banks hide accounts temporarily).
     public mutating func replaceAccounts(_ incoming: [Account], of connection: ConnectionID) {
+        accounts = accountsReplacing(incoming, of: connection)
+    }
+
+    /// `accounts` after `replaceAccounts(_:of:)`, without changing the snapshot.
+    public func accountsReplacing(_ incoming: [Account], of connection: ConnectionID) -> [Account] {
         let byID = Dictionary(incoming.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         var merged = accounts.map { byID[$0.id] ?? $0 }
         let known = Set(merged.map(\.id))
         merged.append(contentsOf: incoming.filter { !known.contains($0.id) })
-        accounts = merged
+        return merged
     }
 
     /// Drops a connection with everything that belongs to it (accounts, balances, transactions,
@@ -74,6 +136,85 @@ public struct LedgerSnapshot: Sendable, Equatable {
         for account in accountIDs { budgets[account] = nil }
         for account in accountIDs { depotHistory[account] = nil }
         plannedItems.removeAll { accountIDs.contains($0.accountID) }
+        for account in accountIDs { openingBalances[account] = nil }
+        importBatches.removeAll { accountIDs.contains($0.accountID) }
+    }
+
+    /// Balance of an account without a bank connection: opening balance plus its booked
+    /// transactions. `nil` for unknown accounts and accounts of a real bank (the bank reports theirs).
+    public func computedManualBalance(of account: AccountID, asOf: Date) -> Balance? {
+        guard let stored = accounts.first(where: { $0.id == account }),
+              connections.first(where: { $0.id == stored.connectionID })?.isManual == true else { return nil }
+        return ManualAccount.balance(opening: openingBalances[account], transactions: transactions(of: account), currency: stored.currency, asOf: asOf)
+    }
+
+    // MARK: Imports
+
+    public func importBatch(_ id: ImportBatchID) -> ImportBatch? {
+        importBatches.first { $0.id == id }
+    }
+
+    /// Rows a CSV import added that are still stored, newest first.
+    public func transactions(ofImport id: ImportBatchID) -> [Transaction] {
+        transactionIndex.lookups(for: transactions).byImport[id]?.map { transactions[$0] } ?? []
+    }
+
+    public mutating func upsert(importBatch batch: ImportBatch) {
+        if let index = importBatches.firstIndex(where: { $0.id == batch.id }) {
+            importBatches[index] = batch
+        } else {
+            importBatches.append(batch)
+            importBatches.sort { ($0.importedAt, $0.id.rawValue) < ($1.importedAt, $1.id.rawValue) }
+        }
+    }
+
+    /// A CSV import: its batch and the merged rows in one go.
+    public mutating func recordImport(_ batch: ImportBatch, merge: TransactionMerger.Result) {
+        upsert(importBatch: batch)
+        apply(merge)
+    }
+
+    /// What `removeImportedTransactions` takes away.
+    public struct ImportRemoval: Sendable, Equatable {
+        public var transactions: Set<TransactionID> = []
+        /// Batches left without any row; they go too.
+        public var emptiedBatches: Set<ImportBatchID> = []
+        /// Accounts that lost rows (balance recompute for accounts without a bank).
+        public var accounts: Set<AccountID> = []
+        public var isEmpty: Bool { transactions.isEmpty }
+    }
+
+    /// The plan for removing these rows. Throws `TransactionRemovalError.notImported` if any
+    /// known ID is bank data: synced transactions are never deleted. Unknown IDs are ignored.
+    public func importRemoval(_ ids: Set<TransactionID>) throws(TransactionRemovalError) -> ImportRemoval {
+        var removal = ImportRemoval()
+        var notImported: Set<TransactionID> = []
+        // Removed rows per batch; a batch is emptied when that equals all its rows.
+        var removedPerBatch: [ImportBatchID: Int] = [:]
+        let lookups = transactionIndex.lookups(for: transactions)
+        for id in ids {
+            guard let position = lookups.byID[id] else { continue }
+            let transaction = transactions[position]
+            guard let batch = transaction.importID else {
+                notImported.insert(transaction.id)
+                continue
+            }
+            removal.transactions.insert(transaction.id)
+            removal.accounts.insert(transaction.accountID)
+            removedPerBatch[batch, default: 0] += 1
+        }
+        guard notImported.isEmpty else { throw .notImported(notImported) }
+        let known = Set(importBatches.map(\.id))
+        removal.emptiedBatches = Set(removedPerBatch.compactMap { batch, removed in
+            known.contains(batch) && lookups.byImport[batch]?.count == removed ? batch : nil
+        })
+        return removal
+    }
+
+    public mutating func apply(_ removal: ImportRemoval) {
+        guard !removal.isEmpty else { return }
+        transactions.removeAll { removal.transactions.contains($0.id) }
+        importBatches.removeAll { removal.emptiedBatches.contains($0.id) }
     }
 
     public mutating func upsertPlannedItem(_ item: PlannedItem) {
@@ -99,47 +240,108 @@ public struct LedgerSnapshot: Sendable, Equatable {
     /// Returns the changed transactions (for persisting).
     @discardableResult
     public mutating func setCategories(_ suggestions: [TransactionID: CategorySuggestion]) -> [Transaction] {
-        guard !suggestions.isEmpty else { return [] }
-        var changed: [Transaction] = []
-        for index in transactions.indices {
-            guard let suggestion = suggestions[transactions[index].id], transactions[index].categorySource != .manual else { continue }
-            transactions[index].categoryID = suggestion.categoryID
-            transactions[index].categorySource = suggestion.source
-            transactions[index].confidence = suggestion.confidence
-            changed.append(transactions[index])
-        }
+        let changed = categoryChanges(suggestions)
+        replaceCategorized(changed)
         return changed
+    }
+
+    /// What `setCategories` would change, without changing the snapshot.
+    public func categoryChanges(_ suggestions: [TransactionID: CategorySuggestion]) -> [Transaction] {
+        guard !suggestions.isEmpty else { return [] }
+        let targets = indices(of: suggestions.keys).filter { transactions[$0].categorySource != .manual }
+        return categoryChanges(at: targets) { transaction in
+            guard let suggestion = suggestions[transaction.id] else { return }
+            transaction.categoryID = suggestion.categoryID
+            transaction.categorySource = suggestion.source
+            transaction.confidence = suggestion.confidence
+        }
     }
 
     /// Removes machine categories (everything but manual) in one go, e.g. after the rule that
     /// set them was removed. Returns the changed transactions (for persisting).
     @discardableResult
     public mutating func clearCategories(_ ids: Set<TransactionID>) -> [Transaction] {
-        guard !ids.isEmpty else { return [] }
-        var changed: [Transaction] = []
-        for index in transactions.indices {
-            guard ids.contains(transactions[index].id), transactions[index].categorySource != .manual,
-                  transactions[index].categoryID != nil else { continue }
-            transactions[index].categoryID = nil
-            transactions[index].categorySource = nil
-            transactions[index].confidence = nil
-            changed.append(transactions[index])
-        }
+        let changed = clearedCategoryChanges(ids)
+        replaceCategorized(changed)
         return changed
+    }
+
+    /// What `clearCategories` would change, without changing the snapshot.
+    public func clearedCategoryChanges(_ ids: Set<TransactionID>) -> [Transaction] {
+        guard !ids.isEmpty else { return [] }
+        let targets = indices(of: ids).filter { transactions[$0].categorySource != .manual && transactions[$0].categoryID != nil }
+        return categoryChanges(at: targets) { transaction in
+            transaction.categoryID = nil
+            transaction.categorySource = nil
+            transaction.confidence = nil
+        }
     }
 
     /// `nil` or blank restores the bank's name.
     public mutating func setCustomName(_ name: String?, for account: AccountID) {
-        let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        customAccountNames[account] = trimmed.isEmpty ? nil : trimmed
+        customAccountNames[account] = Self.normalizedCustomName(name)
     }
 
+    /// What `setCustomName` stores: trimmed, `nil` for blank.
+    public static func normalizedCustomName(_ name: String?) -> String? {
+        let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    /// Applies the merge; import batches it leaves without rows (`importBatchesEmptied(by:)`) go too.
     public mutating func apply(_ merge: TransactionMerger.Result) {
         guard !merge.isEmpty else { return }
+        let emptied = importBatchesEmptied(by: merge)
         let upsertIDs = Set(merge.upserts.map(\.id))
         transactions.removeAll { merge.deletions.contains($0.id) || upsertIDs.contains($0.id) }
-        transactions.append(contentsOf: merge.upserts)
-        transactions.sort(by: Self.newestFirst)
+        if !merge.upserts.isEmpty {
+            // Both runs are sorted: merging them is linear, no full re-sort.
+            transactions = Self.mergeSorted(transactions, merge.upserts.sorted(by: Self.newestFirst))
+        }
+        if !emptied.isEmpty { importBatches.removeAll { emptied.contains($0.id) } }
+    }
+
+    /// Import batches whose remaining rows this merge all deletes or takes over (a synced row
+    /// without `importID` replacing an imported one with the same ID). Batches that had no rows
+    /// before are not touched.
+    public func importBatchesEmptied(by merge: TransactionMerger.Result) -> Set<ImportBatchID> {
+        guard !importBatches.isEmpty, !merge.isEmpty else { return [] }
+        let lookups = transactionIndex.lookups(for: transactions)
+        let replaced = merge.deletions.union(merge.upserts.map(\.id))
+        // Batches the merge's rows still (or newly) belong to.
+        let incoming = Set(merge.upserts.compactMap(\.importID))
+        var touched: Set<ImportBatchID> = []
+        for id in replaced {
+            guard let position = lookups.byID[id], let batch = transactions[position].importID,
+                  !incoming.contains(batch) else { continue }
+            touched.insert(batch)
+        }
+        return touched.filter { batch in
+            !(lookups.byImport[batch] ?? []).contains { !replaced.contains(transactions[$0].id) }
+        }
+    }
+
+    /// Two runs sorted by `newestFirst` as one sorted array.
+    static func mergeSorted(_ lhs: [Transaction], _ rhs: [Transaction]) -> [Transaction] {
+        guard !lhs.isEmpty else { return rhs }
+        guard !rhs.isEmpty else { return lhs }
+        var result: [Transaction] = []
+        result.reserveCapacity(lhs.count + rhs.count)
+        var left = lhs.startIndex
+        var right = rhs.startIndex
+        while left < lhs.endIndex, right < rhs.endIndex {
+            // Stable for equal keys: the stored row first.
+            if newestFirst(rhs[right], lhs[left]) {
+                result.append(rhs[right])
+                right += 1
+            } else {
+                result.append(lhs[left])
+                left += 1
+            }
+        }
+        result.append(contentsOf: lhs[left...])
+        result.append(contentsOf: rhs[right...])
+        return result
     }
 
     public mutating func replaceCardStatements(_ statements: [CardStatement], of account: AccountID) {
@@ -155,26 +357,26 @@ public struct LedgerSnapshot: Sendable, Equatable {
     /// Returns the updated transaction, or `nil` if the ID is unknown.
     @discardableResult
     public mutating func setCategory(_ category: CategoryID?, source: CategorySource, confidence: Double?, for id: TransactionID) -> Transaction? {
-        guard let index = transactions.firstIndex(where: { $0.id == id }) else { return nil }
-        transactions[index].categoryID = category
-        transactions[index].categorySource = category == nil ? nil : source
-        transactions[index].confidence = category == nil ? nil : confidence
-        return transactions[index]
+        setCategory(category, source: source, confidence: confidence, for: [id] as Set<TransactionID>).first
     }
 
     /// One category for many transactions (manual correction of a selection). Unknown IDs are
     /// skipped. Returns the changed transactions (for persisting).
     @discardableResult
     public mutating func setCategory(_ category: CategoryID?, source: CategorySource, confidence: Double?, for ids: Set<TransactionID>) -> [Transaction] {
-        guard !ids.isEmpty else { return [] }
-        var changed: [Transaction] = []
-        for index in transactions.indices where ids.contains(transactions[index].id) {
-            transactions[index].categoryID = category
-            transactions[index].categorySource = category == nil ? nil : source
-            transactions[index].confidence = category == nil ? nil : confidence
-            changed.append(transactions[index])
-        }
+        let changed = categoryChanges(category, source: source, confidence: confidence, for: ids)
+        replaceCategorized(changed)
         return changed
+    }
+
+    /// What `setCategory(_:source:confidence:for:)` would change, without changing the snapshot.
+    public func categoryChanges(_ category: CategoryID?, source: CategorySource, confidence: Double?, for ids: Set<TransactionID>) -> [Transaction] {
+        guard !ids.isEmpty else { return [] }
+        return categoryChanges(at: indices(of: ids)) { transaction in
+            transaction.categoryID = category
+            transaction.categorySource = category == nil ? nil : source
+            transaction.confidence = category == nil ? nil : confidence
+        }
     }
 
     /// Everything one account delivered in a sync, applied in one go. The merge runs against
@@ -182,13 +384,23 @@ public struct LedgerSnapshot: Sendable, Equatable {
     /// inherited, not overwritten. Returns the merge (for persisting).
     @discardableResult
     public mutating func apply(_ update: AccountUpdate) -> TransactionMerger.Result {
+        let merge = merge(for: update)
+        apply(update, merge: merge)
+        return merge
+    }
+
+    /// The merge `apply(_ update:)` would run against the stored transactions.
+    public func merge(for update: AccountUpdate) -> TransactionMerger.Result {
+        TransactionMerger.merge(stored: transactions(of: update.accountID), incoming: update.transactions, since: update.since)
+    }
+
+    /// `apply(_ update:)` with its merge computed beforehand (`merge(for:)`).
+    public mutating func apply(_ update: AccountUpdate, merge: TransactionMerger.Result) {
         balances[update.accountID] = update.balance
-        let merge = TransactionMerger.merge(stored: transactions(of: update.accountID), incoming: update.transactions, since: update.since)
         apply(merge)
         if let statements = update.cardStatements { replaceCardStatements(statements, of: update.accountID) }
         if let positions = update.securities { replaceSecurities(positions, of: update.accountID) }
         if let point = DepotValuePoint.recorded(from: update) { record(point) }
-        return merge
     }
 
     public static func newestFirst(_ lhs: Transaction, _ rhs: Transaction) -> Bool {
@@ -246,6 +458,47 @@ public enum PlannedItemError: Error, Equatable, Sendable {
     case unknownAccount(AccountID)
 }
 
+public enum ImportBatchError: Error, Equatable, Sendable {
+    /// The account the CSV import is for is not in the ledger.
+    case unknownAccount(AccountID)
+}
+
+/// Lazily built lookups over `LedgerSnapshot.transactions`, shared by copies of one snapshot
+/// value and rebuilt after a change. Always equal: a cache, not data.
+struct TransactionIndex: Sendable, Equatable {
+    struct Lookups: Sendable {
+        /// Positions per account, ascending (so newest first).
+        var byAccount: [AccountID: [Int]] = [:]
+        var byID: [TransactionID: Int] = [:]
+        /// Positions per CSV import, ascending.
+        var byImport: [ImportBatchID: [Int]] = [:]
+    }
+
+    private final class Storage: Sendable {
+        let lookups = Mutex<Lookups?>(nil)
+    }
+
+    private let storage = Storage()
+
+    static func == (lhs: TransactionIndex, rhs: TransactionIndex) -> Bool { true }
+
+    func lookups(for transactions: [Transaction]) -> Lookups {
+        storage.lookups.withLock { cached in
+            if let cached { return cached }
+            var built = Lookups()
+            built.byID.reserveCapacity(transactions.count)
+            for (position, transaction) in transactions.enumerated() {
+                built.byAccount[transaction.accountID, default: []].append(position)
+                // First occurrence wins, like `firstIndex(where:)`.
+                if built.byID[transaction.id] == nil { built.byID[transaction.id] = position }
+                if let batch = transaction.importID { built.byImport[batch, default: []].append(position) }
+            }
+            cached = built
+            return built
+        }
+    }
+}
+
 /// Persistence boundary of MFN. The UI and `SyncEngine` only talk to this protocol.
 ///
 /// `InMemoryLedgerStore` backs previews, tests and the mock app; `EncryptedLedgerStore`
@@ -261,6 +514,8 @@ public protocol LedgerStore: Actor {
     func applyMerge(_ changes: ConnectionMerge.Changes) async throws
     func replaceAccounts(_ accounts: [Account], of connection: ConnectionID) async throws
     func setBalance(_ balance: Balance, for account: AccountID) async throws
+    /// Opening balance of an account without a bank connection; `nil` removes it.
+    func setOpeningBalance(_ opening: OpeningBalance?, for account: AccountID) async throws
     func storedTransactions(of account: AccountID) -> [Transaction]
     func apply(_ merge: TransactionMerger.Result) async throws
     func replaceCardStatements(_ statements: [CardStatement], of account: AccountID) async throws
@@ -289,6 +544,13 @@ public protocol LedgerStore: Actor {
     func apply(_ update: AccountUpdate) async throws
     /// Depot history points in one write (upsert by account and day); demo data and imports.
     func recordDepotValues(_ points: [DepotValuePoint]) async throws
+    /// A CSV import (v10): the batch and the merged rows (which carry its `importID`) in one write.
+    func recordImport(_ batch: ImportBatch, merge: TransactionMerger.Result) async throws
+    /// Deletes CSV-imported rows in one write; batches left empty go too. Throws
+    /// `TransactionRemovalError.notImported` and removes nothing if any ID is bank data.
+    /// Returns what was removed.
+    @discardableResult
+    func removeImportedTransactions(_ ids: Set<TransactionID>) async throws -> LedgerSnapshot.ImportRemoval
 }
 
 extension LedgerStore {
@@ -385,6 +647,10 @@ public actor InMemoryLedgerStore: LedgerStore {
         change { $0.balances[account] = balance }
     }
 
+    public func setOpeningBalance(_ opening: OpeningBalance?, for account: AccountID) {
+        change { $0.openingBalances[account] = opening }
+    }
+
     public func storedTransactions(of account: AccountID) -> [Transaction] {
         state.transactions(of: account)
     }
@@ -456,6 +722,20 @@ public actor InMemoryLedgerStore: LedgerStore {
 
     public func removePlannedItem(_ id: UUID) {
         change { $0.removePlannedItem(id) }
+    }
+
+    public func recordImport(_ batch: ImportBatch, merge: TransactionMerger.Result) throws {
+        // Like the encrypted store (foreign key): a batch needs its account.
+        guard state.accounts.contains(where: { $0.id == batch.accountID }) else { throw ImportBatchError.unknownAccount(batch.accountID) }
+        change { $0.recordImport(batch, merge: merge) }
+    }
+
+    @discardableResult
+    public func removeImportedTransactions(_ ids: Set<TransactionID>) throws -> LedgerSnapshot.ImportRemoval {
+        let removal = try state.importRemoval(ids)
+        guard !removal.isEmpty else { return removal }
+        change { $0.apply(removal) }
+        return removal
     }
 
     public func clearCategories(_ ids: Set<TransactionID>) {

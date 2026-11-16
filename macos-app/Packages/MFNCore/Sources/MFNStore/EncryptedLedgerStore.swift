@@ -6,8 +6,11 @@ public enum StoreError: Error, Equatable, Sendable {
     case encryptionUnavailable
     /// Wrong key or not a MFN database.
     case cannotDecrypt
+    /// Column (or table) name only, never the cell value: the message may reach logs and UI.
     case corruptRow(String)
     case closed
+    /// The database was migrated by a newer MFN (schema `found` > `supported`); left untouched.
+    case newerSchema(found: Int, supported: Int)
     case database(String)
 }
 
@@ -127,16 +130,22 @@ public actor EncryptedLedgerStore: LedgerStore {
     /// Merging connections: moves, categories, names, budgets and the removal of the source in
     /// one SQL transaction (all or nothing), published once.
     public func applyMerge(_ changes: ConnectionMerge.Changes) throws {
-        var next = state
-        next.applyMerge(changes)
-        let categorized = next.transactions.filter { changes.categories[$0.id] != nil }
+        // Computed from the current state without copying it; the state changes only after commit.
+        let moved = Dictionary(changes.moves.map { ($0.id, $0) }, uniquingKeysWith: { _, last in last })
+        let categorized: [Transaction] = changes.categories.compactMap { id, change in
+            guard var transaction = moved[id] ?? state.transaction(id) else { return nil }
+            transaction.categoryID = change.categoryID
+            transaction.categorySource = change.source
+            transaction.confidence = change.confidence
+            return transaction
+        }
         let sourceAccounts = state.accounts(of: changes.source).map(\.id)
         try write { db in
             for transaction in changes.moves + categorized {
                 try db.run(TransactionTable.upsert, TransactionTable.values(transaction))
             }
-            for account in changes.names.keys {
-                try Self.writeCustomName(next.customAccountNames[account], for: account, in: db)
+            for (account, name) in changes.names {
+                try Self.writeCustomName(LedgerSnapshot.normalizedCustomName(name), for: account, in: db)
             }
             for budget in changes.budgets {
                 try Self.writeBudget(budget, in: db)
@@ -147,14 +156,24 @@ public actor EncryptedLedgerStore: LedgerStore {
             for item in changes.plannedItems {
                 try db.run(PlannedItemTable.upsert, try PlannedItemTable.values(item))
             }
+            // Re-pointed before the source accounts go (their batches would cascade otherwise).
+            for batch in changes.importBatches {
+                try db.run(ImportBatchTable.upsert, ImportBatchTable.values(batch))
+            }
             try Self.deleteConnection(changes.source, accounts: sourceAccounts, in: db)
         }
-        change { $0 = next }
+        change { $0.applyMerge(changes) }
+    }
+
+    private static func deleteImportBatches(_ batches: Set<ImportBatchID>, in db: SQLiteConnection) throws {
+        for batch in batches {
+            try db.run("DELETE FROM importBatch WHERE id = ?", [.text(batch.rawValue)])
+        }
     }
 
     private static func deleteConnection(_ id: ConnectionID, accounts: [AccountID], in db: SQLiteConnection) throws {
         for account in accounts {
-            for table in ["ledgerTransaction", "cardStatement", "securityPosition", "balance", "accountName", "budget", "depotValue", "plannedItem"] {
+            for table in ["ledgerTransaction", "cardStatement", "securityPosition", "balance", "accountName", "budget", "depotValue", "plannedItem", "openingBalance", "importBatch"] {
                 try db.run("DELETE FROM \(table) WHERE accountID = ?", [.text(account.rawValue)])
             }
         }
@@ -183,14 +202,13 @@ public actor EncryptedLedgerStore: LedgerStore {
     }
 
     public func replaceAccounts(_ accounts: [Account], of connection: ConnectionID) throws {
-        var next = state
-        next.replaceAccounts(accounts, of: connection)
+        let merged = state.accountsReplacing(accounts, of: connection)
         try write { db in
-            for (position, account) in next.accounts.enumerated() where account.connectionID == connection {
+            for (position, account) in merged.enumerated() where account.connectionID == connection {
                 try db.run(AccountTable.upsert, AccountTable.values(account, position: position))
             }
         }
-        change { $0 = next }
+        change { $0.accounts = merged }
     }
 
     public func setBalance(_ balance: Balance, for account: AccountID) throws {
@@ -198,19 +216,31 @@ public actor EncryptedLedgerStore: LedgerStore {
         change { $0.balances[account] = balance }
     }
 
+    public func setOpeningBalance(_ opening: OpeningBalance?, for account: AccountID) throws {
+        try write { db in
+            if let opening {
+                try db.run(OpeningBalanceTable.upsert, OpeningBalanceTable.values(opening, account: account))
+            } else {
+                try db.run("DELETE FROM openingBalance WHERE accountID = ?", [.text(account.rawValue)])
+            }
+        }
+        change { $0.openingBalances[account] = opening }
+    }
+
     public func apply(_ merge: TransactionMerger.Result) throws {
         guard !merge.isEmpty else { return }
-        try write { db in try Self.write(merge, to: db) }
+        let emptied = state.importBatchesEmptied(by: merge)
+        try write { db in try Self.write(merge, emptying: emptied, to: db) }
         change { $0.apply(merge) }
     }
 
     /// One transaction, one published snapshot for everything a sync delivered for the account.
     public func apply(_ update: AccountUpdate) throws {
-        var next = state
-        let merge = next.apply(update)
+        let merge = state.merge(for: update)
+        let emptied = state.importBatchesEmptied(by: merge)
         try write { db in
             try db.run(BalanceTable.upsert, BalanceTable.values(update.balance, account: update.accountID))
-            try Self.write(merge, to: db)
+            try Self.write(merge, emptying: emptied, to: db)
             if let statements = update.cardStatements {
                 try db.run("DELETE FROM cardStatement WHERE accountID = ?", [.text(update.accountID.rawValue)])
                 for statement in statements {
@@ -227,7 +257,7 @@ public actor EncryptedLedgerStore: LedgerStore {
                 try db.run(DepotValueTable.upsert, DepotValueTable.values(point))
             }
         }
-        change { $0 = next }
+        change { $0.apply(update, merge: merge) }
     }
 
     public func recordDepotValues(_ points: [DepotValuePoint]) throws {
@@ -238,13 +268,15 @@ public actor EncryptedLedgerStore: LedgerStore {
         change { $0.record(points) }
     }
 
-    private static func write(_ merge: TransactionMerger.Result, to db: SQLiteConnection) throws {
+    /// The merge plus the import batches it leaves without rows (`importBatchesEmptied(by:)`).
+    private static func write(_ merge: TransactionMerger.Result, emptying emptied: Set<ImportBatchID>, to db: SQLiteConnection) throws {
         for id in merge.deletions {
             try db.run("DELETE FROM ledgerTransaction WHERE id = ?", [.text(id.rawValue)])
         }
         for transaction in merge.upserts {
             try db.run(TransactionTable.upsert, TransactionTable.values(transaction))
         }
+        try deleteImportBatches(emptied, in: db)
     }
 
     public func replaceCardStatements(_ statements: [CardStatement], of account: AccountID) throws {
@@ -272,54 +304,40 @@ public actor EncryptedLedgerStore: LedgerStore {
         change { $0.syncStates[connection] = syncState }
     }
 
+    // Category writes: the changed rows are computed without touching the state, written, and
+    // only then put in place (no `var next = state` copy of the whole transaction list).
+
     public func setCategory(_ category: CategoryID?, source: CategorySource, confidence: Double?, for transaction: TransactionID) throws {
-        var next = state
-        guard let updated = next.setCategory(category, source: source, confidence: confidence, for: transaction) else { return }
-        try write { try $0.run(TransactionTable.upsert, TransactionTable.values(updated)) }
-        change { $0 = next }
+        try setCategory(category, source: source, confidence: confidence, for: [transaction] as Set<TransactionID>)
     }
 
     public func setCategory(_ category: CategoryID?, source: CategorySource, confidence: Double?, for transactions: Set<TransactionID>) throws {
-        var next = state
-        let changed = next.setCategory(category, source: source, confidence: confidence, for: transactions)
-        guard !changed.isEmpty else { return }
-        try write { db in
-            for transaction in changed {
-                try db.run(TransactionTable.upsert, TransactionTable.values(transaction))
-            }
-        }
-        change { $0 = next }
+        try writeChangedRows(state.categoryChanges(category, source: source, confidence: confidence, for: transactions))
     }
 
     public func setCustomName(_ name: String?, for account: AccountID) throws {
-        var next = state
-        next.setCustomName(name, for: account)
-        try write { try Self.writeCustomName(next.customAccountNames[account], for: account, in: $0) }
-        change { $0 = next }
+        let normalized = LedgerSnapshot.normalizedCustomName(name)
+        try write { try Self.writeCustomName(normalized, for: account, in: $0) }
+        change { $0.customAccountNames[account] = normalized }
     }
 
     public func setCategories(_ suggestions: [TransactionID: CategorySuggestion]) throws {
-        var next = state
-        let changed = next.setCategories(suggestions)
-        guard !changed.isEmpty else { return }
-        try write { db in
-            for transaction in changed {
-                try db.run(TransactionTable.upsert, TransactionTable.values(transaction))
-            }
-        }
-        change { $0 = next }
+        try writeChangedRows(state.categoryChanges(suggestions))
     }
 
     public func clearCategories(_ ids: Set<TransactionID>) throws {
-        var next = state
-        let changed = next.clearCategories(ids)
+        try writeChangedRows(state.clearedCategoryChanges(ids))
+    }
+
+    /// Persists rows from the snapshot's `…Changes` methods, then puts them in place in the state.
+    private func writeChangedRows(_ changed: [Transaction]) throws {
         guard !changed.isEmpty else { return }
         try write { db in
             for transaction in changed {
                 try db.run(TransactionTable.upsert, TransactionTable.values(transaction))
             }
         }
-        change { $0 = next }
+        change { $0.replaceCategorized(changed) }
     }
 
     public func upsertRule(_ rule: CategoryRule) throws {
@@ -358,6 +376,32 @@ public actor EncryptedLedgerStore: LedgerStore {
         change { $0.removePlannedItem(id) }
     }
 
+    public func recordImport(_ batch: ImportBatch, merge: TransactionMerger.Result) throws {
+        let emptied = state.importBatchesEmptied(by: merge)
+        try write { db in
+            try db.run(ImportBatchTable.upsert, ImportBatchTable.values(batch))
+            try Self.write(merge, emptying: emptied, to: db)
+        }
+        change { $0.recordImport(batch, merge: merge) }
+    }
+
+    @discardableResult
+    public func removeImportedTransactions(_ ids: Set<TransactionID>) throws -> LedgerSnapshot.ImportRemoval {
+        let removal = try state.importRemoval(ids)
+        guard !removal.isEmpty else { return removal }
+        try write { db in
+            for id in removal.transactions {
+                // `importID IS NOT NULL` again in SQL: bank rows are never deleted here.
+                try db.run("DELETE FROM ledgerTransaction WHERE id = ? AND importID IS NOT NULL", [.text(id.rawValue)])
+            }
+            for batch in removal.emptiedBatches {
+                try db.run("DELETE FROM importBatch WHERE id = ?", [.text(batch.rawValue)])
+            }
+        }
+        change { $0.apply(removal) }
+        return removal
+    }
+
     public func removeRule(_ id: UUID) throws {
         try write { try $0.run("DELETE FROM categoryRule WHERE id = ?", [.text(id.uuidString)]) }
         change { $0.removeRule(id) }
@@ -388,7 +432,17 @@ public actor EncryptedLedgerStore: LedgerStore {
             let (account, balance) = try BalanceTable.model(row)
             snapshot.balances[account] = balance
         }
-        snapshot.transactions = try db.query("SELECT * FROM ledgerTransaction").map(TransactionTable.model).sorted(by: LedgerSnapshot.newestFirst)
+        // Same order as `LedgerSnapshot.newestFirst` (effective date = booking date, else value
+        // date, descending; then ID ascending), so no sort afterwards. ISO dates sort as text.
+        let rows = try db.query("SELECT * FROM ledgerTransaction ORDER BY coalesce(bookingDate, valueDate) DESC, id ASC")
+        var transactions: [Transaction] = []
+        transactions.reserveCapacity(rows.count)
+        for row in rows { transactions.append(try TransactionTable.model(row)) }
+        // Safety net (linear check): SQLite's byte order of IDs must match Swift's string order.
+        if zip(transactions, transactions.dropFirst()).contains(where: { LedgerSnapshot.newestFirst($1, $0) }) {
+            transactions.sort(by: LedgerSnapshot.newestFirst)
+        }
+        snapshot.transactions = transactions
         snapshot.cardStatements = try db.query("SELECT * FROM cardStatement ORDER BY periodEnd DESC").map(CardStatementTable.model)
         snapshot.securities = try db.query("SELECT * FROM securityPosition").map(SecurityPositionTable.model)
         for point in try db.query("SELECT * FROM depotValue ORDER BY day").map(DepotValueTable.model) {
@@ -412,6 +466,11 @@ public actor EncryptedLedgerStore: LedgerStore {
             snapshot.budgets[account] = AccountBudget(accountID: account, amountCents: try row.int("amountCents"), period: period, startDay: try row.int("startDay"), anchor: anchor)
         }
         snapshot.plannedItems = try db.query("SELECT * FROM plannedItem ORDER BY day, createdAt").map(PlannedItemTable.model)
+        for row in try db.query("SELECT * FROM openingBalance") {
+            let (account, opening) = try OpeningBalanceTable.model(row)
+            snapshot.openingBalances[account] = opening
+        }
+        snapshot.importBatches = try db.query("SELECT * FROM importBatch ORDER BY importedAt, id").map(ImportBatchTable.model)
         for row in try db.query("SELECT accountID, name FROM accountName") {
             snapshot.customAccountNames[AccountID(try row.string("accountID"))] = try row.string("name")
         }

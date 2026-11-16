@@ -30,8 +30,8 @@ public enum FinTSCode {
     public static let scaRequired = "3955"
     /// Decoupled: approve in the app, then poll with HKTAN process S.
     public static let decoupledPending = "3956"
-    /// Decoupled: approval still pending (answer to a poll).
-    public static let decoupledStillPending = "3076"
+    /// Strong customer authentication not required (`3076`): the order runs without approval.
+    public static let scaNotRequired = "3076"
     /// Account without any booking (ING): no transactions available.
     public static let noTransactions = "9010"
     /// PIN wrong / access blocked family.

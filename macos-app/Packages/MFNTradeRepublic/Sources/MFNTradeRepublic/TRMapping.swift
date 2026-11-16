@@ -313,13 +313,16 @@ enum TRMapping {
 
     // MARK: - Primitives
 
-    /// `{"value": -12.34, "currency": "EUR", "fractionDigits": 2}`.
+    /// `{"value": -12.34, "currency": "EUR", "fractionDigits": 2}` → cents.
+    ///
+    /// Always cents (`amountCents` is ×100 for every currency, `fractionDigits` is not used for
+    /// scaling). A value with more than two decimals is not rounded: `nil`, which the callers
+    /// report as `formatChanged`, since silently rounding would change a booking.
     static func money(_ json: JSONValue) -> (cents: Int, currency: String)? {
         guard let value = json["value"]?.decimal else { return nil }
         let currency = json["currency"]?.string ?? "EUR"
         guard currency.count == 3, currency.allSatisfy({ $0.isASCII && $0.isUppercase }) else { return nil }
-        let digits = json["fractionDigits"]?.int ?? 2
-        guard let cents = Money.minorUnits(value, fractionDigits: digits) else { return nil }
+        guard let cents = Money.exactCents(value) else { return nil }
         return (cents, currency)
     }
 

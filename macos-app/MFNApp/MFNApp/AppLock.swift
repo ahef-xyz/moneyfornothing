@@ -15,6 +15,22 @@ final class AppLock {
         case launch, idle, system, manual
     }
 
+    /// Why the data could not be opened, shown on the lock screen instead of the cause.
+    struct Problem: Equatable {
+        enum Action: Equatable {
+            /// The database is from a newer MFN: offer "Nach Updates suchen …".
+            case update
+        }
+
+        /// One plain sentence: what happened.
+        var message: String
+        /// What the user can do about it.
+        var hint: String?
+        /// Technical detail (selectable, for a bug report); never contents, keys or IBANs.
+        var detail: String?
+        var action: Action?
+    }
+
     /// Touch ID usable on this Mac (else the system asks for the Mac password).
     static var biometryAvailable: Bool {
         let context = LAContext()
@@ -23,7 +39,7 @@ final class AppLock {
     }
 
     private(set) var isLocked = true
-    private(set) var lastError: String?
+    private(set) var lastError: Problem?
     private(set) var isAuthenticating = false
     private(set) var cause: Cause = .launch
 
@@ -80,9 +96,9 @@ final class AppLock {
     }
 
     /// Locks because the data could not be opened; the message is shown on the lock screen.
-    func lock(reason: String) {
+    func lock(problem: Problem) {
         lock()
-        lastError = reason
+        lastError = problem
     }
 
     /// The lock screen's window became key: true if it should ask now (then call `unlock()`).
@@ -113,11 +129,12 @@ final class AppLock {
             lastActivity = .now
             isLocked = false
             await onUnlock?(context)
-            Log.core.info("App entsperrt")
+            // Opening may fail (`lock(problem:)`) or the Mac may lock meanwhile.
+            if !isLocked { Log.core.info("App entsperrt") }
         } catch let error as LAError where error.code == .userCancel || error.code == .appCancel || error.code == .systemCancel {
             // A cancel keeps an earlier error (e.g. the data could not be opened) on screen.
         } catch {
-            lastError = error.localizedDescription
+            lastError = Problem(message: error.localizedDescription)
         }
     }
 }

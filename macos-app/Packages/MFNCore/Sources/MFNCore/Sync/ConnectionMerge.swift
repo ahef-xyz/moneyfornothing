@@ -285,6 +285,8 @@ extension ConnectionMerge {
         public var depotValues: [DepotValuePoint] = []
         /// The source's planned items, now for the target account.
         public var plannedItems: [PlannedItem] = []
+        /// The source's CSV imports, now for the target account (moved rows keep their `importID`).
+        public var importBatches: [ImportBatch] = []
 
         public init(source: ConnectionID) {
             self.source = source
@@ -319,6 +321,9 @@ extension ConnectionMerge {
                 item.ignoredMatches = Set(item.ignoredMatches.map { twins[$0] ?? $0 })
                 changes.plannedItems.append(item)
             }
+            changes.importBatches += snapshot.importBatches
+                .filter { $0.accountID == account.pair.source.id }
+                .map { $0.moved(to: target) }
         }
         return changes
     }
@@ -329,17 +334,19 @@ extension LedgerSnapshot {
     /// The encrypted store runs the same steps inside one SQL transaction.
     public mutating func applyMerge(_ changes: ConnectionMerge.Changes) {
         apply(TransactionMerger.Result(upserts: changes.moves))
-        for (id, change) in changes.categories {
-            guard let index = transactions.firstIndex(where: { $0.id == id }) else { continue }
-            transactions[index].categoryID = change.categoryID
-            transactions[index].categorySource = change.source
-            transactions[index].confidence = change.confidence
+        updateCategories(at: indices(of: changes.categories.keys)) { transaction in
+            guard let change = changes.categories[transaction.id] else { return }
+            transaction.categoryID = change.categoryID
+            transaction.categorySource = change.source
+            transaction.confidence = change.confidence
         }
         for (account, name) in changes.names { setCustomName(name, for: account) }
         for budget in changes.budgets { budgets[budget.accountID] = budget }
         record(changes.depotValues)
         for item in changes.plannedItems { upsertPlannedItem(item) }
         removeConnection(changes.source)
+        // After the removal, which drops the source accounts' batches.
+        for batch in changes.importBatches { upsert(importBatch: batch) }
     }
 }
 
@@ -352,7 +359,7 @@ extension Transaction {
             currency: currency, counterpartName: counterpartName, counterpartIBAN: counterpartIBAN, purpose: purpose,
             eref: eref, mref: mref, creditorID: creditorID, status: status, externalID: externalID,
             originalAmountCents: originalAmountCents, originalCurrency: originalCurrency, rawJSON: rawJSON,
-            categoryID: categoryID, categorySource: categorySource, confidence: confidence
+            categoryID: categoryID, categorySource: categorySource, confidence: confidence, importID: importID
         )
     }
 }

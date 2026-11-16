@@ -147,11 +147,26 @@ public actor FinTSDialog {
         guard isOpen else { return }
         isOpen = false
         guard dialogID != "0" else { return }
+        let message: [UInt8]
         do {
-            let message = try FinTSMessage.build(dialogID: dialogID, messageNumber: messageNumber, segments: [FinTSSegments.dialogEnd(dialogID: dialogID)], security: security(tan: nil), now: now())
-            messageNumber += 1
-            _ = try await transport.exchange(message)
+            message = try FinTSMessage.build(dialogID: dialogID, messageNumber: messageNumber, segments: [FinTSSegments.dialogEnd(dialogID: dialogID)], security: security(tan: nil), now: now())
         } catch {
+            Self.log.error("HKEND nicht kodierbar: \(String(describing: error), privacy: .public)")
+            return
+        }
+        messageNumber += 1
+        // An unstructured task does not inherit the caller's cancellation: HKEND must reach the
+        // bank also when the sync was cancelled, or the bank keeps the dialog open (and blocks).
+        let transport = transport
+        let exchange = Task { () async -> ConnectorError? in
+            do throws(ConnectorError) {
+                _ = try await transport.exchange(message)
+                return nil
+            } catch {
+                return error
+            }
+        }
+        if let error = await exchange.value {
             Self.log.error("HKEND fehlgeschlagen: \(String(describing: error), privacy: .public)")
         }
     }
@@ -174,12 +189,14 @@ public actor FinTSDialog {
             segments.append(FinTSSegments.tanProcess4(version: mechanism.hktanVersion, referenceSegment: first.type, tanMedium: tanMedium))
         }
         let requestTypes = segments.map(\.type)
+        try Self.checkOutgoing(requestTypes)
 
         let bytes: [UInt8]
         do {
             bytes = try FinTSMessage.build(dialogID: dialogID, messageNumber: messageNumber, segments: segments, security: security(tan: nil), now: now())
         } catch {
-            throw .formatChanged(detail: "FinTS-Nachricht nicht kodierbar: \(error)")
+            // No payload in the detail: it is logged publicly and the segments carry account data.
+            throw .formatChanged(detail: "FinTS-Nachricht nicht kodierbar")
         }
         messageNumber += 1
         let answer = try await transport.exchange(bytes)
@@ -188,12 +205,14 @@ public actor FinTSDialog {
         do {
             response = try FinTSResponse(bytes: answer)
         } catch {
-            throw .formatChanged(detail: "FinTS-Antwort nicht lesbar: \(error)")
+            throw .formatChanged(detail: Self.wireErrorDetail(error, context: "FinTS-Antwort nicht lesbar"))
         }
         if let id = response.dialogID, dialogID == "0" { dialogID = id }
         Self.log.info("FinTS \(requestTypes.joined(separator: ","), privacy: .public) → \(response.allCodes.map(\.code).joined(separator: ","), privacy: .public)")
 
-        try Self.checkMessageErrors(response, acceptedSegmentErrors: acceptedSegmentErrors)
+        // A decoupled status poll (HKTAN process S) carries the original order's answer: its
+        // segment errors come with the generic HIRMG 9050 and are judged by the TAN handler.
+        try Self.checkMessageErrors(response, acceptedSegmentErrors: acceptedSegmentErrors, isTANPoll: requestTypes.first == "HKTAN")
 
         let tanCodes = response.allCodes.filter { [FinTSCode.tanRequired, FinTSCode.scaRequired, FinTSCode.decoupledPending].contains($0.code) }
         if !tanCodes.isEmpty, !requestTypes.contains("HKEND") {
@@ -219,13 +238,17 @@ public actor FinTSDialog {
     /// to the connector (e.g. ING `9010` = account without transactions).
     /// `acceptedSegmentErrors`: if every segment-level error is in this set and the message-level
     /// error is only the generic `9050`, the response is returned for the caller to inspect.
-    static func checkMessageErrors(_ response: FinTSResponse, acceptedSegmentErrors: Set<String> = []) throws(ConnectorError) {
+    static func checkMessageErrors(_ response: FinTSResponse, acceptedSegmentErrors: Set<String> = [], isTANPoll: Bool = false) throws(ConnectorError) {
         guard let error = response.messageCodes.first(where: \.isError) else { return }
         let allErrors = response.errors.map(\.code)
         if allErrors.contains(where: { $0 == FinTSCode.pinWrong || $0 == FinTSCode.pinBlocked || $0.hasPrefix("993") || $0 == "9931" }) {
             throw .authFailed
         }
         let segmentErrors = response.segmentCodes.filter(\.isError).map(\.code)
+        if isTANPoll, !segmentErrors.isEmpty,
+           response.messageCodes.filter(\.isError).allSatisfy({ $0.code == FinTSCode.partiallyFaulty }) {
+            return
+        }
         if !acceptedSegmentErrors.isEmpty, !segmentErrors.isEmpty,
            segmentErrors.allSatisfy(acceptedSegmentErrors.contains),
            response.messageCodes.filter(\.isError).allSatisfy({ $0.code == FinTSCode.partiallyFaulty }) {
@@ -244,6 +267,30 @@ public actor FinTSDialog {
         throw .formatChanged(detail: "FinTS \(reason.code)")
     }
 
+    /// Read-only allowlist of request segments. MFN never moves money: anything else (transfers,
+    /// standing orders, …) is refused before it is encoded.
+    static let allowedRequestSegments: Set<String> = [
+        "HKIDN", "HKVVB", "HKSYN", "HKTAN", "HKEND", "HKSPA", "HKSAL", "HKKAZ", "HKCAZ", "HKWPD",
+    ]
+
+    static func checkOutgoing(_ types: [String]) throws(ConnectorError) {
+        guard let refused = types.first(where: { !allowedRequestSegments.contains($0) }) else { return }
+        log.fault("FinTS-Segment \(refused, privacy: .public) ist nicht erlaubt (nur lesen)")
+        throw .formatChanged(detail: "FinTS: Segment \(refused) ist nicht erlaubt")
+    }
+
+    /// Fixed text per wire error, without bank payload (the detail is logged publicly).
+    static func wireErrorDetail(_ error: FinTSWireError, context: String) -> String {
+        let reason = switch error {
+        case .unterminatedSegment: "Segment nicht abgeschlossen"
+        case .invalidBinaryLength: "ungültige Binärlänge"
+        case .binaryOutOfBounds: "Binärdaten außerhalb der Nachricht"
+        case .invalidHeader: "ungültiger Segmentkopf"
+        case .notLatin1: "Zeichen außerhalb ISO-8859-1"
+        }
+        return "\(context): \(reason)"
+    }
+
     // MARK: - Anonymous BPD
 
     /// Fetches the BPD anonymously (no credentials): HKIDN 9999999999 + HKVVB, then HKEND.
@@ -252,14 +299,17 @@ public actor FinTSDialog {
             FinTSSegments.identification(bank: bank, customerID: "", systemID: "0", anonymous: true),
             FinTSSegments.processingPreparation(bpdVersion: 0, updVersion: 0, product: product),
         ]
+        try checkOutgoing(initSegments.map(\.type))
         let response: FinTSResponse
         do {
             let message = try FinTSMessage.build(dialogID: "0", messageNumber: 1, segments: initSegments, security: nil, now: now)
             response = try FinTSResponse(bytes: try await transport.exchange(message))
         } catch let error as ConnectorError {
             throw error
+        } catch let error as FinTSWireError {
+            throw .formatChanged(detail: wireErrorDetail(error, context: "FinTS anonym"))
         } catch {
-            throw .formatChanged(detail: "FinTS anonym: \(error)")
+            throw .formatChanged(detail: "FinTS anonym: unerwarteter Fehler")
         }
         try checkMessageErrors(response)
         if let id = response.dialogID, id != "0" {
