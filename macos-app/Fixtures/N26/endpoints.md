@@ -1,72 +1,72 @@
-# N26 Endpunkte (aus Firefox-HAR der Web-App, anonymisiert)
+# N26 endpoints (from Firefox HAR of the web app, anonymized)
 
-Aufgezeichnet: Login mit Push-Freigabe, Feed des Hauptkontos (Seite 1 + 2), beider Spaces und „Alle Aktivitäten“.
-Werte von Headern, Cookies und verschlüsselten Payloads entfernt. Antworten anonymisiert (siehe `README.md`).
+Recorded: login with push approval, feed of the main account (pages 1 + 2), both Spaces and "Alle Aktivitäten" (all activities).
+Values of headers, cookies and encrypted payloads removed. Responses anonymized (see `README.md`).
 
 ## Hosts
-- `app.n26.com`: Web-App (HTML) und `POST /graphql?op=<operationName>` – der einzige Daten-Endpunkt.
-- `spc.n26.com` (Snowplow-Tracking) und `flags.n26.com` (Statsig-Feature-Flags): ignoriert, nicht nötig.
+- `app.n26.com`: web app (HTML) and `POST /graphql?op=<operationName>`, the only data endpoint.
+- `spc.n26.com` (Snowplow tracking) and `flags.n26.com` (Statsig feature flags): ignored, not needed.
 
-## Aufrufe (GraphQL, in Reihenfolge)
+## Calls (GraphQL, in order)
 
-| Operation | Zweck | Antwort-Fixture |
+| Operation | Purpose | Response fixture |
 | --- | --- | --- |
-| `requestBiometricChallengeMutation` | Login: `username`, `password`, `fp`, `fpc`, `requestId` → `challengeType: "PUSH"` | `login-request-biometric-challenge.json` |
-| `verifyLoginWithPushMutation` | Pollen (ca. alle 2 s), bis in der App bestätigt: `isAuthorizationPending`, `shouldAbortLoginAttempt`, `rateLimit {limit: 60, current}` | `login-verify-push-pending.json`, `login-verify-push-success.json` |
-| `getTransactionsList(accountId)` | Feed: `balance` („Aktueller Kontostand“), `activities` (Kontoumschalter), `modules[FeedTimelineModule]` (erste Seite + `paginationKey`) | `feed-main.json`, `feed-space-1.json`, `feed-space-2.json`, `feed-all.json` |
-| `getTimeline(paginationKey, activity, accountId)` | nächste (ältere) Seite: `timelineItems`, `paginationKey` (`null` = Ende) | `timeline-main-page2.json` |
+| `requestBiometricChallengeMutation` | login: `username`, `password`, `fp`, `fpc`, `requestId` → `challengeType: "PUSH"` | `login-request-biometric-challenge.json` |
+| `verifyLoginWithPushMutation` | polling (about every 2 s) until confirmed in the app: `isAuthorizationPending`, `shouldAbortLoginAttempt`, `rateLimit {limit: 60, current}` | `login-verify-push-pending.json`, `login-verify-push-success.json` |
+| `getTransactionsList(accountId)` | feed: `balance` ("Aktueller Kontostand", current balance), `activities` (account switcher), `modules[FeedTimelineModule]` (first page + `paginationKey`) | `feed-main.json`, `feed-space-1.json`, `feed-space-2.json`, `feed-all.json` |
+| `getTimeline(paginationKey, activity, accountId)` | next (older) page: `timelineItems`, `paginationKey` (`null` = end) | `timeline-main-page2.json` |
 
-Queries im Wortlaut: `*.graphql` (der Connector sendet `getTransactionsList` und `getTimeline` unverändert).
+Queries verbatim: `*.graphql` (the connector sends `getTransactionsList` and `getTimeline` unchanged).
 
 ## Request
 - `POST https://app.n26.com/graphql?op=<operationName>`, `Content-Type: application/json`
-- Header: `csrf-token`, `x-requested-with: XMLHttpRequest`, `Origin`, `Referer` (`/login` bzw. `/feed/transactions/<accountId>`).
-- `csrf-token` ist **nicht** der Cookie `n26.csrf`, sondern der Inhalt von `<meta name="csrf-token" content="…">` (36 Zeichen) im HTML.
+- Headers: `csrf-token`, `x-requested-with: XMLHttpRequest`, `Origin`, `Referer` (`/login` or `/feed/transactions/<accountId>`).
+- `csrf-token` is **not** the cookie `n26.csrf` but the content of `<meta name="csrf-token" content="…">` (36 characters) in the HTML.
 - Body: `{"operationName": …, "variables": {"payload": "<SJCL-JSON>"}, "query": …}`
 
-### Verschlüsselte Variablen (`variables.payload`)
-Die Web-App verschlüsselt **alle** Variablen (Bundle-Chunk `1917`, `client.*.js` → `window.__PEK__`):
+### Encrypted variables (`variables.payload`)
+The web app encrypts **all** variables (bundle chunk `1917`, `client.*.js` → `window.__PEK__`):
 
 ```js
 sjcl.encrypt(new sjcl.ecc.elGamal.publicKey(sjcl.ecc.curves.c384, sjcl.codec.base64.toBits(window.__PEK__)),
              JSON.stringify(variables), { ts: 128, ks: 256, adata: Date.now().toString() })
 ```
 
-- `window.__PEK__`: Base64, 96 Byte = x‖y eines P-384-Punkts, steht im HTML jeder Seite (auch anonym auf `/login`).
-- KEM: zufälliger Skalar d, `kemtag` = d·G (x‖y, Base64), Schlüssel = SHA-256(x‖y von d·PEK). AES-256-CCM, IV 16 Byte
-  (CCM nutzt 15 − L Byte), Tag 128 Bit, `adata` = Zeitstempel in ms als Text.
-- Payload-Form (Schlüsselreihenfolge wie SJCL):
+- `window.__PEK__`: Base64, 96 bytes = x‖y of a P-384 point, present in the HTML of every page (also anonymously on `/login`).
+- KEM: random scalar d, `kemtag` = d·G (x‖y, Base64), key = SHA-256(x‖y of d·PEK). AES-256-CCM, IV 16 bytes
+  (CCM uses 15 − L bytes), tag 128 bit, `adata` = timestamp in ms as text.
+- Payload form (key order as in SJCL):
   `{"iv":"<24>","v":1,"iter":10000,"ks":256,"ts":128,"mode":"ccm","adata":"<Base64 ms>","cipher":"aes","kemtag":"<128>","ct":"<…>"}`
-- Lehnt der Server einen Payload ab (nicht `ok`), antwortet er mit `{"key": "<neuer PEK>"}`; die App setzt `__PEK__` neu
-  und wiederholt einmal (Status nicht aufgezeichnet).
-- Variablen (aus den Längen von `ct` abgeleitet, Klartext ist nicht einsehbar):
-  - `getTransactionsList`: `{"accountId":"<uuid>"}` (Konto/Space) bzw. `{"accountId":null}` (Alle Aktivitäten)
-  - `getTimeline`: `{"paginationKey":"<key>","accountId":"<uuid>"}` (ohne `activity`)
+- If the server rejects a payload (not `ok`), it answers with `{"key": "<new PEK>"}`; the app sets `__PEK__` anew
+  and retries once (status not recorded).
+- Variables (derived from the lengths of `ct`; plaintext is not visible):
+  - `getTransactionsList`: `{"accountId":"<uuid>"}` (account/space) or `{"accountId":null}` ("Alle Aktivitäten")
+  - `getTimeline`: `{"paginationKey":"<key>","accountId":"<uuid>"}` (without `activity`)
 
-## Antworten (Klartext-JSON)
-- Feed: `balance.money = {unscaledAmount: "<Minor Units als String>", currency: {code, decimals}}`.
-- `activities.values[]`: `title`, `accountId` (UUID, `null` bei „Alle Aktivitäten“), `tracking.label` `ALL` / `MAIN` / `SPACE`.
-- `timelineItems[]`: `FeedTimelineGroupHeading` (Tages-/Jahresüberschrift) und `FeedTimelineTransaction`:
-  `externalId` (UUID), `accountId`, `title` (Gegenpartei), `tintedSubtitle.elements[].value` (Verwendungszweck/„Online“),
-  `secondarySubtitle` („Von Hauptkonto“ in „Alle Aktivitäten“), `styledAmount.money` (vorzeichenbehaftet), `timestamp`
-  (ms, Buchungs-/Zahlungszeitpunkt), `category` (`micro-v2-…`), `balance` (Kontostand danach, Float), `icon` (`CATEGORY`/`MERCHANT`,
-  `statusIcon` z. B. `installment_eligible.png`), `deeplink`.
-- `paginationKey`: Base64-JSON `{"transaction":{"lastId":"<uuid>"},"lastBalance":<float>,"lastItemTs":<ms>,"pageIndex":<n>}`.
-- Keine IBAN, keine SEPA-Felder (EREF/MREF/Gläubiger-ID), kein separates Valutadatum im Feed.
+## Responses (plaintext JSON)
+- Feed: `balance.money = {unscaledAmount: "<minor units as string>", currency: {code, decimals}}`.
+- `activities.values[]`: `title`, `accountId` (UUID, `null` for "Alle Aktivitäten"), `tracking.label` `ALL` / `MAIN` / `SPACE`.
+- `timelineItems[]`: `FeedTimelineGroupHeading` (day/year heading) and `FeedTimelineTransaction`:
+  `externalId` (UUID), `accountId`, `title` (counterparty), `tintedSubtitle.elements[].value` (purpose/"Online"),
+  `secondarySubtitle` ("Von Hauptkonto" in "Alle Aktivitäten"), `styledAmount.money` (signed), `timestamp`
+  (ms, booking/payment time), `category` (`micro-v2-…`), `balance` (balance afterwards, float), `icon` (`CATEGORY`/`MERCHANT`,
+  `statusIcon` e.g. `installment_eligible.png`), `deeplink`.
+- `paginationKey`: Base64 JSON `{"transaction":{"lastId":"<uuid>"},"lastBalance":<float>,"lastItemTs":<ms>,"pageIndex":<n>}`.
+- No IBAN, no SEPA fields (EREF/MREF/creditor ID), no separate value date in the feed.
 
-## Login und Sitzung
-- Login-Seite `https://app.n26.com/login`: Formular `input[name=username]` (type email, id `email`), `input[name=password]`
-  (id `password`), versteckt `fp`, `fpc`, `requestId` (füllt die App), Button `data-testid="login-button"`,
-  Fehlercontainer `#login-errors`, `#abort-login-attempt-errors`, Push-Fallback-Button `data-testid="verify-login-push-poll-button"`.
-- Cookies (nur Namen): `n26.csrf`, `n26.fp`, `n26.mfa_token` / `n26.mfa_recovery` (300 s, während des Logins),
-  nach Freigabe `n26.token` (Max-Age 900 s), `num26refresh` (7200 s), `num26expires_at` (900 s), alle HttpOnly; dazu
+## Login and session
+- Login page `https://app.n26.com/login`: form `input[name=username]` (type email, id `email`), `input[name=password]`
+  (id `password`), hidden `fp`, `fpc`, `requestId` (filled by the app), button `data-testid="login-button"`,
+  error containers `#login-errors`, `#abort-login-attempt-errors`, push fallback button `data-testid="verify-login-push-poll-button"`.
+- Cookies (names only): `n26.csrf`, `n26.fp`, `n26.mfa_token` / `n26.mfa_recovery` (300 s, during login),
+  after approval `n26.token` (Max-Age 900 s), `num26refresh` (7200 s), `num26expires_at` (900 s), all HttpOnly; plus
   `num26UniqueDeviceToken`, `n26.timezone*`, `num26locale`, `num26DarkMode`, `n26.render_js_version`, Snowplow `_sp_*`.
-- Abgelaufene Sitzung: Die Web-App behandelt den GraphQL-Fehler `message == "401 Unauthorized"` als Logout (Bundle);
-  HTTP-Status dazu nicht aufgezeichnet.
+- Expired session: the web app treats the GraphQL error `message == "401 Unauthorized"` as logout (bundle);
+  HTTP status for this not recorded.
 
-## Lücken (nicht im HAR)
-- Vorgemerkte (pending) Kartenzahlungen: keine im Mitschnitt, Kennzeichnung unbekannt.
-- Antwort einer abgelaufenen Sitzung (Status/Body), Antwort bei abgelehntem Payload-Schlüssel.
-- Ob `num26refresh` beim Laden einer Seite ein neues `n26.token` liefert.
-- Feed-Seite 3 des Hauptkontos, Seite 2 von Space 01, Feed mit `FeedPendingModule`/`FeedRecurringModule`.
-- Falsches Passwort (Inhalt von `#login-errors`), SMS-Fallback ohne gekoppeltes Gerät.
+## Gaps (not in the HAR)
+- Pending card payments: none in the capture, marking unknown.
+- Response of an expired session (status/body), response when the payload key is rejected.
+- Whether `num26refresh` returns a new `n26.token` when a page loads.
+- Feed page 3 of the main account, page 2 of Space 01, feed with `FeedPendingModule`/`FeedRecurringModule`.
+- Wrong password (content of `#login-errors`), SMS fallback without a paired device.

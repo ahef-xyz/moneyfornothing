@@ -1,13 +1,13 @@
-# Fixtures ING (FinTS 3.0, PIN ohne TAN)
+# Fixtures ING (FinTS 3.0, PIN without TAN)
 
-Vom Menschen angelegt, anonymisiert mit `scripts/fixtures-anonymize`. FinTS-Antworten roh (`HNHBK…`) oder Base64.
+Created by a human, anonymized with `scripts/fixtures-anonymize`. FinTS responses raw (`HNHBK…`) or Base64.
 
-| Datei | Inhalt | Status |
+| File | Content | Status |
 | --- | --- | --- |
-| `bpd-anonymous.fints` | Antwort auf anonymen Dialog (HIBPA, HIKAZS, HISALS, HIWPDS, HIPINS, HITANS) | fehlt |
-| `init.fints` | Antwort auf Dialog-Init mit Kennung (HIUPA, HIUPD Giro + Extra-Konto + Depot, HISYN) | fehlt |
-| `hksal-giro.fints` | Saldo Girokonto (HISAL) | fehlt |
-| `hkkaz-giro-page1.fints`, `hkkaz-giro-page2.fints` | MT940 mehrseitig (erste Seite mit 3040 + Aufsetzpunkt) | fehlt |
-| `hkkaz-9010.fints` | Konto ohne Zahlungseingang (Rückmeldung 9010) | fehlt |
-| `mt940-giro.sta` | Reines MT940 (aus HIKAZ extrahiert), Umlaute, `?20`–`?29`, SEPA-Tags | fehlt |
-| `hkwpd-depot.fints`, `mt535-depot.sta` | Depotbestand | fehlt |
+| `bpd-anonymous.fints` | response to anonymous dialog (HIBPA, HIKAZS, HISALS, HIWPDS, HIPINS, HITANS) | missing |
+| `init.fints` | response to dialog init with ID (HIUPA, HIUPD current account + extra account + securities account, HISYN) | missing |
+| `hksal-giro.fints` | balance of current account (HISAL) | missing |
+| `hkkaz-giro-page1.fints`, `hkkaz-giro-page2.fints` | MT940 multi-page (first page with 3040 + continuation point) | missing |
+| `hkkaz-9010.fints` | account without incoming payments (response 9010) | missing |
+| `mt940-giro.sta` | plain MT940 (extracted from HIKAZ), umlauts, `?20`–`?29`, SEPA tags | missing |
+| `hkwpd-depot.fints`, `mt535-depot.sta` | securities holdings | missing |

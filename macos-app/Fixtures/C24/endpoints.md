@@ -1,14 +1,14 @@
-# C24 Endpunkte (aus Safari-HAR, anonymisiert)
+# C24 endpoints (from Safari HAR, anonymized)
 
-Aufgezeichnet nach dem Login (Push-TAN nicht enthalten). Header-Werte und Cookie-Werte entfernt, Request-Bodies anonymisiert.
+Recorded after login (push TAN not included). Header values and cookie values removed, request bodies anonymized.
 
-## Authentifizierung
-- Jeder API-Aufruf trägt `Authorization: Bearer <token>` (Wert entfernt). Zusätzliche Header: `x-c24-guid`, `x-c24-timestamp`, `x-c24-tracingsession`, `x-c24-unicorn-guid`.
-- Cookie-Namen (nur Namen): `c24Cookies_v1`, `c24GDPR_v1`, `cid_v1`, `devicetype_v1`, `keyword_v1`, `matchtype_v1`, `source_v1`. Ein Session-Cookie ist nicht darunter – die Sitzung hängt am Bearer-Token.
+## Authentication
+- Every API call carries `Authorization: Bearer <token>` (value removed). Additional headers: `x-c24-guid`, `x-c24-timestamp`, `x-c24-tracingsession`, `x-c24-unicorn-guid`.
+- Cookie names (names only): `c24Cookies_v1`, `c24GDPR_v1`, `cid_v1`, `devicetype_v1`, `keyword_v1`, `matchtype_v1`, `source_v1`. There is no session cookie among them; the session depends on the bearer token.
 
-## Aufrufe (eindeutig, in Reihenfolge des ersten Auftretens)
+## Calls (unique, in order of first appearance)
 
-| Methode | URL | Query-Parameter | Status | Typ |
+| Method | URL | Query parameters | Status | Type |
 | --- | --- | --- | --- | --- |
 | POST | `api.c24.de/api/webconfig.json` | – | 200 | application/json |
 | POST | `banking.c24.de/cdn-cgi/rum` | – | 204 | text/plain |
@@ -31,11 +31,11 @@ Aufgezeichnet nach dem Login (Push-TAN nicht enthalten). Header-Werte und Cookie
 | GET | `api.c24.de/api/etl/product-api/{id}/tax-exemption` | – | 204 | application/octet-stream |
 | POST | `api.c24.de/api/v3/transactions/search/` | – | 200 | application/json |
 
-## Ablauf beim Klicken
-- Übersicht (nach Login): `webconfig.json`, `user/me`, `accounts/internal`, `accounts/external`, `v3/pockets`, `v2/upcoming-transactions?future_days`, …
-- Umsätze eines Kontos/Pockets: `POST /api/v3/transactions/search/`, Paging über `pagination.offset` (+30), Ende bei `pagination.more == false`.
+## Flow when clicking
+- Overview (after login): `webconfig.json`, `user/me`, `accounts/internal`, `accounts/external`, `v3/pockets`, `v2/upcoming-transactions?future_days`, …
+- Transactions of an account/pocket: `POST /api/v3/transactions/search/`, paging via `pagination.offset` (+30), ends when `pagination.more == false`.
 
-## Request-Body `POST /api/v3/transactions/search/` (Beispiel, anonymisiert)
+## Request body `POST /api/v3/transactions/search/` (example, anonymized)
 ```json
 {
   "criteria": {
@@ -50,8 +50,8 @@ Aufgezeichnet nach dem Login (Push-TAN nicht enthalten). Header-Werte und Cookie
 }
 ```
 
-## Lücken
-- Keine Giro-Umsätze aufgezeichnet (alle drei Suchen betreffen Pockets).
-- Keine vorgemerkten Umsätze (`preliminary: true` kam nicht vor).
-- Keine Antwort auf abgelaufene Sitzung (`session-expired.json` fehlt).
-- Kein eigener Saldo-Endpunkt: Salden stehen in `accounts/internal` (`total_balance`, `available_balance`, `hold_balance`).
+## Gaps
+- No current account transactions recorded (all three searches concern pockets).
+- No pending transactions (`preliminary: true` did not occur).
+- No response for an expired session (`session-expired.json` missing).
+- No dedicated balance endpoint: balances are in `accounts/internal` (`total_balance`, `available_balance`, `hold_balance`).

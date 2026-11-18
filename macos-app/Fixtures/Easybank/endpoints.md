@@ -1,14 +1,14 @@
-# easybank Endpunkte (aus Safari-HAR, anonymisiert)
+# easybank endpoints (from Safari HAR, anonymized)
 
-Host: `https://banking.easybank.de`. Header- und Cookie-Werte entfernt; Login-Request-Bodies nicht übernommen.
+Host: `https://banking.easybank.de`. Header and cookie values removed; login request bodies not carried over.
 
-## Sitzung
-- Request-Header (nur Namen): `accept`, `accept-encoding`, `accept-language`, `content-length`, `content-type`, `cookie`, `dl`, `keepreferrer`, `keepstate`, `origin`, `pcid`, `priority`, `referer`, `request-id`, `sec-fetch-dest`, `sec-fetch-mode`, `sec-fetch-site`, `uniquekey`, `user-agent`, `x-requested-with`, `x-xsrf-token`.
-- Cookie-Namen: `ARRAffinity`, `ARRAffinitySameSite`, `ASP.NET_SessionId`, `FedAuth`, `VB_BTID`, `XSRF-TOKEN`, `__RequestVerificationToken`, `ab.storage.deviceId.9d9e94f9-b9f3-41a2-8f01-3ed6f1c0074e`, `ab.storage.sessionId.9d9e94f9-b9f3-41a2-8f01-3ed6f1c0074e`, `ab.storage.userId.9d9e94f9-b9f3-41a2-8f01-3ed6f1c0074e`, `ai_session`, `ai_user`.
+## Session
+- Request headers (names only): `accept`, `accept-encoding`, `accept-language`, `content-length`, `content-type`, `cookie`, `dl`, `keepreferrer`, `keepstate`, `origin`, `pcid`, `priority`, `referer`, `request-id`, `sec-fetch-dest`, `sec-fetch-mode`, `sec-fetch-site`, `uniquekey`, `user-agent`, `x-requested-with`, `x-xsrf-token`.
+- Cookie names: `ARRAffinity`, `ARRAffinitySameSite`, `ASP.NET_SessionId`, `FedAuth`, `VB_BTID`, `XSRF-TOKEN`, `__RequestVerificationToken`, `ab.storage.deviceId.9d9e94f9-b9f3-41a2-8f01-3ed6f1c0074e`, `ab.storage.sessionId.9d9e94f9-b9f3-41a2-8f01-3ed6f1c0074e`, `ab.storage.userId.9d9e94f9-b9f3-41a2-8f01-3ed6f1c0074e`, `ai_session`, `ai_user`.
 
-## Aufrufe (eindeutig, Reihenfolge des ersten Auftretens)
+## Calls (unique, in order of first appearance)
 
-| Methode | Pfad | Query | Status | Typ |
+| Method | Path | Query | Status | Type |
 | --- | --- | --- | --- | --- |
 | GET | `/services/customstaticdata/GetApplicationParameters` | v | 200 | application/json |
 | GET | `/services/staticdata/ConfigurationParameterList` | v | 200 | application/json |
@@ -26,27 +26,27 @@ Host: `https://banking.easybank.de`. Header- und Cookie-Werte entfernt; Login-Re
 | POST | `/call/flow/SecureInboxManagementDashboard/GetUnreadMessageCount` | – | 200 | application/json |
 | POST | `/services/flow/AccountTransactionDetail` | – | 200 | application/json |
 
-Drittanbieter (Tracking, für den Connector irrelevant): `northeurope-0.in.applicationinsights.azure.com`, `sdk.fra-02.braze.eu`, `whn11ewowu.crashninja.net`, `www.googletagmanager.com`.
+Third parties (tracking, irrelevant for the connector): `northeurope-0.in.applicationinsights.azure.com`, `sdk.fra-02.braze.eu`, `whn11ewowu.crashninja.net`, `www.googletagmanager.com`.
 
-## Ablauf
-1. Login: `POST /services/flow/LoginTransaction` → `POST /services/flow/logintransaction/firstlevel/next` (App-Freigabe) → `POST /call/flow/Login/AfterLogin`.
-2. Übersicht: `POST /services/flow/RetailLanding` – enthält in `Item.InitialCallResponses[].Response.Item.AccountListResponse.AccountList[]`
-   die Kartenkonten (→ `cards.json`) und `DashboardTransactionItemList`.
-3. Kartenkonto öffnen: `POST /services/flow/AccountTransactionHistory` mit dem kompletten `Account`-Objekt aus der Kontenliste
+## Flow
+1. Login: `POST /services/flow/LoginTransaction` → `POST /services/flow/logintransaction/firstlevel/next` (app approval) → `POST /call/flow/Login/AfterLogin`.
+2. Overview: `POST /services/flow/RetailLanding`. It contains in `Item.InitialCallResponses[].Response.Item.AccountListResponse.AccountList[]`
+   the card accounts (→ `cards.json`) and `DashboardTransactionItemList`.
+3. Open card account: `POST /services/flow/AccountTransactionHistory` with the complete `Account` object from the account list
    (→ `account-transaction-history-request.json` / `account-transaction-history.json`).
-4. Umsätze: `POST /call/directive/TransactionViewDirective/GetTransactions` (Body: Flow-Flags + `Account`, siehe `get-transactions-request.json`).
-   Erster Aufruf liefert `Item.OTPRequired: true` ohne Umsätze (→ `get-transactions-otp-required.json`),
-   dann `POST /call/directive/VbOtpboxDirective/SendOTP` (→ `send-otp.json`, `Password`/`Reference` entfernt),
-   dann erneut `GetTransactions` → 50 Umsätze, `HasMore: true` (→ `transactions-page1.json`).
-5. Umsatzdetail: `POST /services/flow/AccountTransactionDetail` mit `Account` + komplettem `Transaction`-Objekt aus der Liste
-   (→ `transaction-detail-request.json` / `transaction-detail.json`; `TwoFactorAuthentication.Password` entfernt).
+4. Transactions: `POST /call/directive/TransactionViewDirective/GetTransactions` (body: flow flags + `Account`, see `get-transactions-request.json`).
+   The first call returns `Item.OTPRequired: true` without transactions (→ `get-transactions-otp-required.json`),
+   then `POST /call/directive/VbOtpboxDirective/SendOTP` (→ `send-otp.json`, `Password`/`Reference` removed),
+   then `GetTransactions` again → 50 transactions, `HasMore: true` (→ `transactions-page1.json`).
+5. Transaction detail: `POST /services/flow/AccountTransactionDetail` with `Account` + complete `Transaction` object from the list
+   (→ `transaction-detail-request.json` / `transaction-detail.json`; `TwoFactorAuthentication.Password` removed).
 
-## Umsatzstatus
-`IsPending` war in allen 50 Umsätzen `false`. Der Status steckt in `TransactionType`: `Billed` (abgerechnet), `Unbilled`
-(gebucht, noch nicht abgerechnet), `Pending` (vorgemerkt/autorisiert). `TransactionNature`: `Debit`/`Credit`.
+## Transaction status
+`IsPending` was `false` in all 50 transactions. The status is in `TransactionType`: `Billed` (settled), `Unbilled`
+(booked, not yet settled), `Pending` (pending/authorized). `TransactionNature`: `Debit`/`Credit`.
 
-## Lücken
-- Keine zweite Seite (`HasMore: true`, Folgeaufruf nicht aufgezeichnet) – Paging-Parameter unbekannt.
-- Keine Abrechnungsliste (`statements.json`), kein CSV-Export (`export.csv`).
-- Unklar, wodurch der OTP-Schritt ausgelöst wird (Zeitraum > 90 Tage? jeder Abruf?).
-- Abgelaufene Sitzung nicht aufgezeichnet.
+## Gaps
+- No second page (`HasMore: true`, follow-up call not recorded): paging parameter unknown.
+- No statement list (`statements.json`), no CSV export (`export.csv`).
+- Unclear what triggers the OTP step (period longer than 90 days? every call?).
+- Expired session not recorded.

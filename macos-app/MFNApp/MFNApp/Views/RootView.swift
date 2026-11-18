@@ -279,6 +279,13 @@ struct MainView: View {
         } message: {
             Text(model.csvImportFailure ?? "")
         }
+        .alert("Schlüssel nicht im Schlüsselbund", isPresented: Binding(
+            get: { model.keychainNotice != nil }, set: { if !$0 { model.keychainNotice = nil } }
+        )) {
+            Button("OK") { model.keychainNotice = nil }
+        } message: {
+            Text(model.keychainNotice ?? "")
+        }
         .modifier(ImportRemovalAlerts())
     }
 

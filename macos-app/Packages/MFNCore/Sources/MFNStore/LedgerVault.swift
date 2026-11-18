@@ -1,5 +1,6 @@
 import Foundation
 import MFNCore
+import Security
 
 public enum VaultError: Error, Equatable, Sendable {
     case wrongPassword
@@ -18,6 +19,7 @@ public enum VaultError: Error, Equatable, Sendable {
 /// - `ready`: key in this Mac's keychain → open directly (Touch ID already happened in `AppLock`).
 /// - `needsPassword`: database + `ledger.key` present, key not on this Mac (copied database,
 ///   new Mac, keychain reset) → ask for the password once, then the key goes into the keychain.
+///   If the keychain refuses the key, this repeats on every unlock (`Opened.keyNotStored`).
 /// - `needsSetup`: first start → ask the user to choose a password; a new key is created.
 public struct LedgerVault: Sendable {
     public enum State: Equatable, Sendable {
@@ -57,6 +59,11 @@ public struct LedgerVault: Sendable {
         let hasKey: Bool
         do {
             hasKey = try keyStore.read() != nil
+        } catch .keychain(errSecDecode), .keychain(errSecAuthFailed) {
+            // An item that is corrupt or that this unlock may not read is as good as none: with
+            // `ledger.key` the password path replaces it, instead of failing on every unlock.
+            Log.store.error("Datenbankschlüssel im Schlüsselbund nicht lesbar, weiter ohne")
+            hasKey = false
         } catch {
             throw .key(error)
         }
@@ -85,33 +92,50 @@ public struct LedgerVault: Sendable {
         return try await openStore(with: key)
     }
 
+    /// An opened store, and why its key is not in this Mac's keychain (`nil`: it is).
+    public struct Opened: Sendable {
+        public let store: EncryptedLedgerStore
+        /// The keychain refused the key. The store is open with the key in memory only, so the
+        /// next unlock asks for the password again (`.needsPassword`).
+        public let keyNotStored: DatabaseKeyError?
+    }
+
     /// `.needsSetup`: creates key and envelope, stores the key in the keychain, creates the database.
-    public func setUp(password: String) async throws(VaultError) -> EncryptedLedgerStore {
+    public func setUp(password: String) async throws(VaultError) -> Opened {
         try Self.validate(password)
         var key = try Data.randomKey()
         defer { key.wipe() }
         try writeEnvelope(KeyEnvelope.seal(key, password: password, iterations: iterations))
-        do {
-            try keyStore.save(key)
-        } catch {
-            throw .key(error)
-        }
-        return try await openStore(with: key)
+        let keyNotStored = try saveKey(key)
+        return Opened(store: try await openStore(with: key), keyNotStored: keyNotStored)
     }
 
     /// `.needsPassword`: recovers the key from `ledger.key`, stores it in this Mac's keychain.
-    public func recover(password: String) async throws(VaultError) -> EncryptedLedgerStore {
+    public func recover(password: String) async throws(VaultError) -> Opened {
         var key = try readEnvelope().open(password: password, acceptedIterations: acceptedIterations)
         defer { key.wipe() }
         // Open first: only a key that actually decrypts the database is worth keeping.
         let store = try await openStore(with: key)
         do {
-            try keyStore.save(key)
+            return Opened(store: store, keyNotStored: try saveKey(key))
         } catch {
             await store.close()
+            throw error
+        }
+    }
+
+    /// Saves the key in the keychain. A keychain that refuses it is not fatal: the password in
+    /// `ledger.key` still opens the database, so the refusal is returned and the caller goes on
+    /// with the key in memory. Without this, setup could never finish on such a Mac.
+    private func saveKey(_ key: Data) throws(VaultError) -> DatabaseKeyError? {
+        do {
+            try keyStore.save(key)
+            return nil
+        } catch .keychain(let status) {
+            return .keychain(status)
+        } catch {
             throw .key(error)
         }
-        return store
     }
 
     /// Re-wraps the key with a new password. The database itself is not touched.

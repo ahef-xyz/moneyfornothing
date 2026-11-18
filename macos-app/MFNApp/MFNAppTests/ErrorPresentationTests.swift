@@ -67,6 +67,22 @@ import Testing
         #expect(problem.action == nil)
     }
 
+    @Test func keychainFailureShowsItsStatusNotACancel() {
+        let problem = AppModel.problem(for: VaultError.key(.keychain(-25293)))
+        #expect(problem.message.contains("Schlüsselbund"))
+        #expect(!problem.message.contains("abgebrochen"))
+        #expect(problem.detail == "Schlüsselbund-Fehler -25293")
+        #expect(problem.hint != nil)
+        #expect(problem.action == nil)
+    }
+
+    @Test func refusedKeychainNoticeNamesTheCodeAndThePasswordPrompt() {
+        let notice = AppModel.keychainNotice(for: .keychain(-25293))
+        #expect(notice.contains("Schlüsselbund-Fehler -25293"))
+        #expect(notice.contains("Datenbank-Passwort"))
+        #expect(!notice.contains("\u{2014}"))
+    }
+
     @Test(arguments: [
         VaultError.wrongPassword, VaultError.weakPassword(minimumLength: 12), VaultError.keyUnrecoverable,
         VaultError.key(.authenticationCancelled), VaultError.key(.missingEntitlement), VaultError.store(.cannotDecrypt),

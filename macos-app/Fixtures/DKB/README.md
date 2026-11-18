@@ -1,20 +1,20 @@
-# Fixtures DKB (FinTS 3.0, Decoupled-TAN)
+# Fixtures DKB (FinTS 3.0, decoupled TAN)
 
-Vom Menschen angelegt, anonymisiert mit `scripts/fixtures-anonymize`. FinTS-Antworten roh (`HNHBK…`) oder Base64.
+Created by a human, anonymized with `scripts/fixtures-anonymize`. FinTS responses raw (`HNHBK…`) or Base64.
 
-| Datei | Inhalt | Status |
+| File | Content | Status |
 | --- | --- | --- |
-| `bpd-anonymous.fints` | BPD mit HITANS v6/v7 (Verfahren 942, Decoupled-Parameter), HICAZS, HIPINS | fehlt |
-| `init.fints` | Init-Antwort mit HIUPD inkl. Kreditkartenkonto | fehlt |
-| `decoupled-3956.fints` | Antwort mit HITAN (Auftragsreferenz) + 3956 | fehlt |
-| `decoupled-poll-3076.fints` | Poll-Antwort „noch nicht freigegeben“ | fehlt |
-| `decoupled-poll-0020.fints` | Poll-Antwort nach Freigabe mit Ergebnis | fehlt |
-| `hkcaz-giro.fints`, `camt052-giro.xml` | Umsätze camt.052 (BOOK und PDNG) | fehlt |
-| `hksal-giro.fints`, `hksal-card.fints` | Salden | fehlt |
-| `hkwpd-depot.fints`, `mt535-depot.sta` | Depotbestand | fehlt |
+| `bpd-anonymous.fints` | BPD with HITANS v6/v7 (procedure 942, decoupled parameters), HICAZS, HIPINS | missing |
+| `init.fints` | init response with HIUPD incl. credit card account | missing |
+| `decoupled-3956.fints` | response with HITAN (order reference) + 3956 | missing |
+| `decoupled-poll-3076.fints` | poll response "not yet approved" | missing |
+| `decoupled-poll-0020.fints` | poll response after approval with result | missing |
+| `hkcaz-giro.fints`, `camt052-giro.xml` | transactions camt.052 (BOOK and PDNG) | missing |
+| `hksal-giro.fints`, `hksal-card.fints` | balances | missing |
+| `hkwpd-depot.fints`, `mt535-depot.sta` | securities holdings | missing |
 
-## Web-Banking (`web/`, Scraping bis zur FinTS-Registrierung)
+## Web banking (`web/`, scraping until FinTS registration)
 
-Aus einem Firefox-HAR des Web-Bankings `banking.dkb.de`, anonymisiert per Skript außerhalb des Repos, mit
-`scripts/fixtures-scrub` verfremdet (Beträge, Daten, IDs) und automatisch geprüft (kein Cookie-, Token-, IBAN-, Namens- oder Zweck-Wert aus dem HAR im Ordner). Endpunkte, Ablauf
-und Anonymisierung: `web/endpoints.md`.
+From a Firefox HAR of the web banking `banking.dkb.de`, anonymized by a script outside the repo, altered with
+`scripts/fixtures-scrub` (amounts, dates, IDs) and checked automatically (no cookie, token, IBAN, name or purpose value from the HAR in the folder). Endpoints, flow
+and anonymization: `web/endpoints.md`.

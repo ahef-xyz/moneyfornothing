@@ -1,17 +1,17 @@
-# Fixtures C24 (Web-Banking JSON)
+# Fixtures C24 (web banking JSON)
 
-Vom Menschen angelegt (Safari → Entwickler → Netzwerk), anonymisiert und mit `scripts/fixtures-scrub` verfremdet (Beträge, Daten, IDs). Agents lesen sie nur.
+Created by a human (Safari → Developer → Network), anonymized and altered with `scripts/fixtures-scrub` (amounts, dates, IDs). Agents only read them.
 
-| Datei | Inhalt | Status |
+| File | Content | Status |
 | --- | --- | --- |
-| `endpoints.md` | Aufrufe, Header-Namen, Cookie-Namen, Request-Body der Umsatzsuche, Lücken | vorhanden |
-| `accounts.json` | `GET /api/user/me/accounts/internal/`: Konten + Pockets mit Salden | vorhanden |
-| `pockets.json` | `GET /api/v3/pockets/` | vorhanden (`id` durch Anonymisierung gleich – Connector nutzt `pocket_number`) |
-| `transactions-page1.json`, `transactions-page2.json` | `POST /api/v3/transactions/search/`, Pocket Plus, Offset 0/30 | vorhanden, **nur gebuchte** |
-| `transactions-other-pocket-page1.json` | dito, anderer Pocket mit Kartenzahlungen | vorhanden |
-| `upcoming-transactions.json` | `GET /api/v2/upcoming-transactions/`: Daueraufträge, angekündigte Lastschriften | vorhanden |
-| `balance.json` | – | entfällt (Salden stehen in `accounts.json`) |
-| `transactions-giro-page1.json` | Umsatzsuche für ein Girokonto (`account_numbers` = Kontonummer des Smartkontos) | **fehlt** |
-| `transactions-preliminary.json` | Umsatzsuche mit vorgemerkter Kartenzahlung (`preliminary: true`), möglichst Fremdwährung; dieselbe Zahlung später gebucht | **fehlt** |
-| `session-expired.json` | Status + Body eines API-Aufrufs nach ~15 min Inaktivität | **fehlt** |
-| Login (in `endpoints.md`) | Start-URL, Ablauf bis Push-Freigabe, **wo die Web-App das Bearer-Token ablegt** (Local/Session Storage-Key oder Antwort eines Login-Aufrufs), Format der `x-c24-*`-Header-Werte, Wert von `future_days` | **fehlt** |
+| `endpoints.md` | Calls, header names, cookie names, request body of the transaction search, gaps | present |
+| `accounts.json` | `GET /api/user/me/accounts/internal/`: accounts + pockets with balances | present |
+| `pockets.json` | `GET /api/v3/pockets/` | present (`id` is the same after anonymization; the connector uses `pocket_number`) |
+| `transactions-page1.json`, `transactions-page2.json` | `POST /api/v3/transactions/search/`, Pocket Plus, offset 0/30 | present, **booked only** |
+| `transactions-other-pocket-page1.json` | same, other pocket with card payments | present |
+| `upcoming-transactions.json` | `GET /api/v2/upcoming-transactions/`: standing orders, announced direct debits | present |
+| `balance.json` | – | not needed (balances are in `accounts.json`) |
+| `transactions-giro-page1.json` | transaction search for a current account (`account_numbers` = account number of the smart account) | **missing** |
+| `transactions-preliminary.json` | transaction search with a pending card payment (`preliminary: true`), foreign currency if possible; the same payment later booked | **missing** |
+| `session-expired.json` | status and body of an API call after about 15 min of inactivity | **missing** |
+| Login (in `endpoints.md`) | start URL, flow up to push approval, **where the web app stores the bearer token** (local/session storage key or response of a login call), format of the `x-c24-*` header values, value of `future_days` | **missing** |

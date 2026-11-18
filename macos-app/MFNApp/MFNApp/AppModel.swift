@@ -72,6 +72,10 @@ final class AppModel {
     }
     private(set) var vaultPrompt: VaultPrompt?
     private(set) var vaultError: String?
+    /// The keychain refused the database key: the data is open, but every unlock asks for the
+    /// database password. Shown as an alert.
+    var keychainNotice: String?
+    @ObservationIgnored private var keychainNoticeShown = false
     private(set) var isWorking = false
     var selection: SidebarItem? {
         didSet {
@@ -383,13 +387,18 @@ final class AppModel {
         isWorking = true
         defer { isWorking = false }
         do {
-            let store = switch prompt {
+            let opened = switch prompt {
             case .setup: try await vault.setUp(password: password)
             case .password: try await vault.recover(password: password)
             }
             vaultPrompt = nil
             vaultError = nil
-            await finishOpening(store, session: session)
+            await finishOpening(opened.store, session: session)
+            // Once per launch: the password prompt on every unlock explains itself after that.
+            if let refusal = opened.keyNotStored, !keychainNoticeShown, !isStale(session) {
+                keychainNoticeShown = true
+                keychainNotice = Self.keychainNotice(for: refusal)
+            }
         } catch {
             switch error {
             case .wrongPassword, .weakPassword:
@@ -553,6 +562,8 @@ final class AppModel {
             "Das Passwort muss mindestens \(minimum) Zeichen haben."
         case VaultError.key(.authenticationCancelled):
             "Entsperren abgebrochen."
+        case VaultError.key(.keychain):
+            "MFN konnte den Schlüssel der Datenbank nicht im Schlüsselbund speichern oder lesen."
         case VaultError.key(.missingEntitlement):
             "Die App ist nicht korrekt signiert (Schlüsselbund-Berechtigung fehlt)."
         case VaultError.keyUnrecoverable:
@@ -566,6 +577,12 @@ final class AppModel {
         }
     }
 
+    /// The status code is not sensitive and is what a bug report needs.
+    static func keychainNotice(for error: DatabaseKeyError) -> String {
+        let code = if case let .keychain(status) = error { "Schlüsselbund-Fehler \(status)" } else { errorKind(error) }
+        return "Deine Daten sind geöffnet und bleiben verschlüsselt. MFN konnte den Schlüssel der Datenbank aber nicht im Schlüsselbund dieses Macs ablegen und fragt deshalb bei jedem Entsperren nach dem Datenbank-Passwort. Bitte schick uns diesen Code: \(code)"
+    }
+
     /// What the lock screen shows when the data could not be opened: a plain sentence, what to do,
     /// and the technical detail only where the sentence cannot say more.
     static func problem(for error: any Error) -> AppLock.Problem {
@@ -577,6 +594,13 @@ final class AppModel {
                 hint: "Deine Daten sind unverändert. Mit der aktuellen Version von MFN lässt sich die Datenbank wieder öffnen.",
                 detail: "MFN \(version) kennt Schema bis \(supported), die Datenbank hat Schema \(found).",
                 action: .update
+            )
+        case let VaultError.key(.keychain(status)):
+            // The status code is not sensitive and is what a bug report needs.
+            return AppLock.Problem(
+                message: message(for: error),
+                hint: "Deine Daten bleiben unverändert. Versuche es erneut. Wenn es wieder passiert, schick uns bitte den Code unten.",
+                detail: "Schlüsselbund-Fehler \(status)"
             )
         case VaultError.wrongPassword, VaultError.weakPassword, VaultError.key(.authenticationCancelled),
              VaultError.key(.missingEntitlement), VaultError.keyUnrecoverable, VaultError.store(.cannotDecrypt):
