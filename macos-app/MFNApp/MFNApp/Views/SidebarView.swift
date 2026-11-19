@@ -89,6 +89,9 @@ struct SidebarView: View {
                                 Button("Nach unten") { model.moveAccount(account, by: 1) }
                                     .disabled(accounts.last?.id == account.id)
                                 Divider()
+                                let newCount = model.newCount(of: account.id)
+                                Button(newCount > 0 ? "Als gelesen markieren (\(newCount))" : "Als gelesen markieren") { model.markAllRead(of: account.id) }
+                                    .disabled(newCount == 0 || model.lock.isLocked)
                                 Button("Umbenennen …") { renaming = .account(account) }
                                 if connection.isManual {
                                     Button("Konto bearbeiten …") { model.showManualAccountEditor(for: account) }
@@ -703,6 +706,15 @@ private struct AccountRow: View {
     }
 
 
+    /// Name plus what the row's symbols say (shortfall, new transactions).
+    private var accessibilityName: String {
+        var parts = [account.name]
+        if let shortfall = model.shortfall(for: account.id) { parts.append("Warnung: \(ShortfallFormat.short(shortfall))") }
+        let newCount = model.newCount(of: account.id)
+        if newCount > 0 { parts.append(NewCountBadge.text(newCount)) }
+        return parts.joined(separator: ", ")
+    }
+
     var body: some View {
         HStack {
             Text(account.name)
@@ -714,8 +726,14 @@ private struct AccountRow: View {
                 .fontWeight(isSelected ? .semibold : .regular)
                 .help(account.cardLast4.map { "\(account.name) ·· \($0)" } ?? account.name)
                 // The shortfall warning belongs to the account, not to a separate symbol element.
-                .accessibilityLabel(model.shortfall(for: account.id).map { "\(account.name), Warnung: \(ShortfallFormat.short($0))" } ?? account.name)
+                .accessibilityLabel(accessibilityName)
             Spacer(minLength: 8)
+            let newCount = model.newCount(of: account.id)
+            if newCount > 0 {
+                NewCountBadge(count: newCount)
+                    // Read with the account name (see above), not as a separate element.
+                    .accessibilityHidden(true)
+            }
             if let shortfall = model.shortfall(for: account.id) {
                 Image(systemName: ShortfallFormat.symbol)
                     .font(.caption)

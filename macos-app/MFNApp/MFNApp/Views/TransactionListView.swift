@@ -82,7 +82,7 @@ struct TransactionListView: View {
                     }
                     if !ledger.upcoming.isEmpty {
                         Section {
-                            ForEach(ledger.upcoming) { TransactionRow(transaction: $0, info: ledger.rowInfo(for: $0)).equatable() }
+                            ForEach(ledger.upcoming) { TransactionRow(transaction: $0, info: ledger.rowInfo(for: $0, isNew: model.isNew($0.id))).equatable() }
                         } header: {
                             SectionHeaderRow(
                                 title: "Vorgemerkt und geplant",
@@ -93,7 +93,7 @@ struct TransactionListView: View {
                     if ledger.query.sort.isChronological {
                         ForEach(page.days) { day in
                             Section {
-                                ForEach(day.transactions) { TransactionRow(transaction: $0, info: ledger.rowInfo(for: $0)).equatable() }
+                                ForEach(day.transactions) { TransactionRow(transaction: $0, info: ledger.rowInfo(for: $0, isNew: model.isNew($0.id))).equatable() }
                             } header: {
                                 SectionHeaderRow(
                                     title: day.title,
@@ -103,7 +103,7 @@ struct TransactionListView: View {
                         }
                     } else if !ledger.flat.isEmpty {
                         Section {
-                            ForEach(page.flat) { TransactionRow(transaction: $0, info: ledger.rowInfo(for: $0)).equatable() }
+                            ForEach(page.flat) { TransactionRow(transaction: $0, info: ledger.rowInfo(for: $0, isNew: model.isNew($0.id))).equatable() }
                         } header: {
                             SectionHeaderRow(title: ledger.query.sort.title, trailing: "\(ledger.flat.count) Umsätze")
                         }
@@ -393,7 +393,7 @@ struct LedgerContent {
     /// Index into `ordered`.
     private let positions: [TransactionID: Int]
 
-    init(base: LedgerBase, query: TransactionQuery, showCancelled: Bool, today: BankDay) {
+    init(base: LedgerBase, query: TransactionQuery, showCancelled: Bool, today: BankDay, new: Set<TransactionID> = []) {
         self.base = base
         var query = query
         if case .account = base.item { query.accounts = [] }
@@ -401,14 +401,14 @@ struct LedgerContent {
         let names = base.accountNames
         let lookup = base.initiatorLookup
         let matching = query.isFiltering
-            ? query.filter(base.source, today: today, accountName: { names[$0] }, initiator: { lookup[$0.id] })
+            ? query.filter(base.source, today: today, accountName: { names[$0] }, initiator: { lookup[$0.id] }, new: new)
             : base.source
 
-        upcoming = query.sorted(matching.filter(\.status.isUpcoming))
+        upcoming = query.sorted(matching.filter(\.status.isUpcoming), new: new)
         cancelledCount = matching.count(where: { $0.status == .cancelled })
         let booked = matching.filter { $0.status == .booked }
         bookedCount = booked.count
-        let listed = query.sorted(showCancelled ? matching.filter { !$0.status.isUpcoming } : booked)
+        let listed = query.sorted(showCancelled ? matching.filter { !$0.status.isUpcoming } : booked, new: new)
         var days: [Day] = []
         if query.sort.isChronological {
             var current: [MFNCore.Transaction] = []
@@ -486,8 +486,9 @@ struct LedgerContent {
     }
 
     /// Everything a row shows besides the transaction itself; equatable so unchanged rows are skipped.
-    func rowInfo(for transaction: MFNCore.Transaction) -> TransactionRow.Info {
+    func rowInfo(for transaction: MFNCore.Transaction, isNew: Bool = false) -> TransactionRow.Info {
         TransactionRow.Info(
+            isNew: isNew,
             showsDate: showsDate,
             showsAccountName: showsAccountName,
             accountName: showsAccountName ? accountName(transaction.accountID) : nil,
@@ -810,6 +811,14 @@ private struct LedgerHeader: View {
                 } else if let lastSync = model.snapshot.syncStates[account.connectionID]?.lastSuccess {
                     Label("abgeglichen \(DayFormat.syncTime(lastSync))", systemImage: "clock")
                 }
+                let newCount = model.newCount(of: account.id)
+                if newCount > 0 {
+                    // Short, so the header keeps room for its chart; the full sentence on hover and for VoiceOver.
+                    Label("\(newCount) neu", systemImage: "sparkle")
+                        .foregroundStyle(Color.accentColor)
+                        .help(NewCountBadge.text(newCount))
+                        .accessibilityLabel(NewCountBadge.text(newCount))
+                }
             }
         }
         .monospacedDigit()
@@ -978,6 +987,8 @@ private struct SectionHeaderRow: View {
 
 struct TransactionRow: View, Equatable {
     struct Info: Equatable {
+        /// Came in with a sync and not read (selected) yet ("Neu").
+        var isNew = false
         let showsDate: Bool
         let showsAccountName: Bool
         let accountName: String?
@@ -1053,6 +1064,7 @@ struct TransactionRow: View, Equatable {
 
     private var accessibilityText: String {
         var parts = [transaction.counterpartName]
+        if info.isNew { parts.append("neu") }
         switch status {
         case .pending: parts.append("vorgemerkt")
         case .planned: parts.append("geplant")
@@ -1090,6 +1102,9 @@ struct TransactionRow: View, Equatable {
     @ViewBuilder
     private var hints: some View {
         HStack(spacing: 4) {
+            if info.isNew {
+                AccentBadge(text: "Neu")
+            }
             switch status {
             case .pending:
                 HintChip(text: "Vorgemerkt", dashed: true)
@@ -1197,6 +1212,7 @@ extension TransactionQuery.Sort {
         case .largestOutflow: "Größte Ausgaben zuerst"
         case .largestInflow: "Größte Eingänge zuerst"
         case .counterpart: "Empfänger/Auftraggeber A–Z"
+        case .newFirst: "Neue zuerst"
         }
     }
 }
@@ -1256,6 +1272,8 @@ private struct FilterMenu: View {
             }
             .pickerStyle(.inline)
             Toggle("Nur ohne Kategorie", isOn: $query.onlyUncategorized)
+            Toggle("Nur neue", isOn: $query.onlyNew)
+                .help("Nur Umsätze, die seit dem Abgleich neu sind; gelesene bleiben bis zum Wechsel der Liste stehen (⌃⌘N)")
             Toggle(ledger.importedCount > 0 ? "Nur importierte (\(ledger.importedCount))" : "Nur importierte", isOn: $query.onlyImported)
                 .help("Nur Umsätze aus CSV-Importen (⌃⌘I)")
             if !ledger.categories.isEmpty || query.category != nil {
@@ -1342,6 +1360,7 @@ private struct FilterBar: View {
             parts.append(category.title)
         }
         if query.onlyImported { parts.append("importiert") }
+        if query.onlyNew { parts.append("neu") }
         if let key = query.initiator { parts.append("von \(ledger.person(key)?.name ?? "…")") }
         if let account = query.accounts.first { parts.append(ledger.accountName(account)) }
         return parts.joined(separator: " · ")
@@ -1358,6 +1377,7 @@ extension TransactionQuery {
         initiator = nil
         onlyUncategorized = false
         onlyImported = false
+        onlyNew = false
     }
 }
 

@@ -1025,6 +1025,12 @@ private struct AccountOverviewRow: View {
                     .lineLimit(1)
             }
             Spacer(minLength: 8)
+            let newCount = model.newCount(of: account.id)
+            if newCount > 0 {
+                NewCountBadge(count: newCount)
+                    // Read with the row's label, not as a separate element.
+                    .accessibilityHidden(true)
+            }
             if let shortfall = model.shortfall(for: account.id) {
                 Image(systemName: ShortfallFormat.symbol)
                     .foregroundStyle(.orange)
@@ -1078,6 +1084,8 @@ private struct AccountOverviewRow: View {
 
     private var accountLabel: String {
         var parts = [account.name, detail]
+        let newCount = model.newCount(of: account.id)
+        if newCount > 0 { parts.append(NewCountBadge.text(newCount)) }
         if !model.isCountedInTotals(account.id) { parts.append("nicht in der Summe") }
         if let shortfall = model.shortfall(for: account.id) { parts.append(ShortfallFormat.short(shortfall)) }
         if let status = model.budgetStatus(for: account.id) {
@@ -1138,6 +1146,10 @@ private struct OverviewTransactionLine: View {
                         HintChip(text: "Vorgemerkt", dashed: true)
                             .italic(false)
                     }
+                    if model.isNew(transaction.id) {
+                        AccentBadge(text: "Neu")
+                            .italic(false)
+                    }
                 }
                 Text([Self.date(transaction.effectiveDate), accountName].compactMap { $0 }.joined(separator: " · "))
                     .font(.caption)
@@ -1158,6 +1170,7 @@ private struct OverviewTransactionLine: View {
     private var label: String {
         var parts = [transaction.counterpartName]
         if isPending { parts.append("vorgemerkt") }
+        if model.isNew(transaction.id) { parts.append("neu") }
         parts.append(Self.date(transaction.effectiveDate))
         if let accountName { parts.append(accountName) }
         // The purpose is otherwise only in the tooltip.

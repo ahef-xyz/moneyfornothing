@@ -153,6 +153,13 @@ enum Schema {
         """,
         // 10 – CSV imports (`importBatchMigration`)
         importBatchMigration,
+        // 11 – transactions a sync brought in that the user has not looked at yet
+        // (`LedgerSnapshot.newTransactionIDs`); they go with their row.
+        """
+        CREATE TABLE newTransaction (
+            id TEXT PRIMARY KEY NOT NULL REFERENCES ledgerTransaction(id) ON DELETE CASCADE
+        );
+        """,
     ]
 
     /// 10 – CSV imports (protocol v10): `importBatch` plus `ledgerTransaction.importID` (NULL = bank

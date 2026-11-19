@@ -108,6 +108,14 @@ struct MFNApp: App {
                 ))
                 .keyboardShortcut("i", modifiers: [.command, .control])
                 .disabled(model.lock.isLocked)
+                Toggle("Nur neue Umsätze", isOn: Binding(
+                    get: { model.ledgerQuery.onlyNew }, set: { _ in model.toggleNewFilter() }
+                ))
+                .keyboardShortcut("n", modifiers: [.command, .control])
+                .disabled(model.lock.isLocked)
+                Button("Alle als gelesen markieren") { model.markAllRead() }
+                    .keyboardShortcut("u", modifiers: [.command, .shift])
+                    .disabled(!model.canMarkAllRead)
                 Button("Filter zurücksetzen") {
                     model.ledgerQuery.resetFilters()
                     model.ledgerQuery.text = ""

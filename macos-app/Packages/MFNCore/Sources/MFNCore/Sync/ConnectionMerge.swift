@@ -287,6 +287,8 @@ extension ConnectionMerge {
         public var plannedItems: [PlannedItem] = []
         /// The source's CSV imports, now for the target account (moved rows keep their `importID`).
         public var importBatches: [ImportBatch] = []
+        /// Target rows that take over the "Neu" mark of their source twin (which goes away).
+        public var newMarks: Set<TransactionID> = []
 
         public init(source: ConnectionID) {
             self.source = source
@@ -299,6 +301,9 @@ extension ConnectionMerge {
             let target = account.pair.target.id
             changes.accounts[account.pair.source.id] = target
             changes.moves += account.moving.map { $0.moved(to: target) }
+            for pair in account.matched where snapshot.newTransactionIDs.contains(pair.source.id) {
+                changes.newMarks.insert(pair.target.id)
+            }
             for pair in account.matched where AccountPlan.carriesCategory(from: pair.source, to: pair.target) {
                 changes.categories[pair.target.id] = CategoryChange(
                     categoryID: pair.source.categoryID, source: pair.source.categorySource, confidence: pair.source.confidence
@@ -347,6 +352,7 @@ extension LedgerSnapshot {
         removeConnection(changes.source)
         // After the removal, which drops the source accounts' batches.
         for batch in changes.importBatches { upsert(importBatch: batch) }
+        newTransactionIDs.formUnion(changes.newMarks.filter { transaction($0) != nil })
     }
 }
 

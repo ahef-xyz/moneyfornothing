@@ -238,3 +238,22 @@ import Testing
         #expect(await store.snapshot().transactions.contains { $0.id == twin.id } == false)
     }
 }
+
+extension ConnectionMergeTests {
+    @Test func newMarkPassesToTheTargetTwin() throws {
+        let w: AccountID = "w-giro"
+        let f: AccountID = "f-giro"
+        let accounts = [
+            Account(id: w, connectionID: Self.web.id, iban: "DE02120300000000202051", type: .giro, name: "Giro"),
+            Account(id: f, connectionID: Self.fints.id, iban: "DE02120300000000202051", type: .giro, name: "Giro"),
+        ]
+        let source = Self.booking(w, "2026-10-10", 250_000, "Arbeitgeber AG", iban: "DE89370400440532013000")
+        let target = Self.booking(f, "2026-10-10", 250_000, "Lohn/Gehalt", iban: "DE89370400440532013000")
+        var snapshot = Self.snapshot(accounts: accounts, transactions: [source, target])
+        snapshot.newTransactionIDs = [source.id]
+        let changes = ConnectionMerge.changes(try ConnectionMerge.plan(snapshot, source: Self.web.id, target: Self.fints.id), in: snapshot)
+        #expect(changes.newMarks == [target.id])
+        snapshot.applyMerge(changes)
+        #expect(snapshot.newTransactionIDs == [target.id])
+    }
+}

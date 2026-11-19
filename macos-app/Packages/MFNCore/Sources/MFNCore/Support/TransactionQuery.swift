@@ -12,6 +12,8 @@ public struct TransactionQuery: Hashable, Sendable {
         case largestInflow
         /// Counterpart A–Z, then newest first.
         case counterpart
+        /// New since the last sync (not read yet) first, then newest first.
+        case newFirst
 
         /// Only date sorts keep the day sections and running balances in the list.
         public var isChronological: Bool { self == .newestFirst || self == .oldestFirst }
@@ -58,6 +60,8 @@ public struct TransactionQuery: Hashable, Sendable {
     public var onlyUncategorized = false
     /// Only rows a CSV import added (`Transaction.importID`).
     public var onlyImported = false
+    /// Only new rows (`LedgerSnapshot.newTransactionIDs`, passed in as `new`).
+    public var onlyNew = false
 
     public init(
         text: String = "",
@@ -77,17 +81,22 @@ public struct TransactionQuery: Hashable, Sendable {
 
     /// Something narrows the list (sorting alone does not).
     public var isFiltering: Bool {
-        !tokens.isEmpty || direction != .all || period != .all || category != nil || !accounts.isEmpty || initiator != nil || onlyUncategorized || onlyImported
+        !tokens.isEmpty || direction != .all || period != .all || category != nil || !accounts.isEmpty || initiator != nil || onlyUncategorized || onlyImported || onlyNew
     }
+
+    /// The query reads which rows are new (`onlyNew`, `.newFirst`).
+    public var dependsOnNew: Bool { onlyNew || sort == .newFirst }
 
     /// Filters only, keeps the order of `transactions`.
     /// - Parameter initiator: the person behind a transaction (shared accounts), for the
     ///   `initiator` filter and the text search.
+    /// - Parameter new: the rows that count as new, for `onlyNew`.
     public func filter(
         _ transactions: [Transaction],
         today: BankDay = .today,
         accountName: (AccountID) -> String? = { _ in nil },
-        initiator: (Transaction) -> TransactionInitiator? = { _ in nil }
+        initiator: (Transaction) -> TransactionInitiator? = { _ in nil },
+        new: Set<TransactionID> = []
     ) -> [Transaction] {
         let range = period.range(today: today)
         let tokens = self.tokens.map(SearchToken.init)
@@ -99,6 +108,7 @@ public struct TransactionQuery: Hashable, Sendable {
             }
             if let range, !range.contains(transaction.effectiveDate) { return false }
             if onlyImported, transaction.importID == nil { return false }
+            if onlyNew, !new.contains(transaction.id) { return false }
             if onlyUncategorized {
                 if transaction.categoryID != nil { return false }
             } else if let category, transaction.categoryID != category { return false }
@@ -117,13 +127,14 @@ public struct TransactionQuery: Hashable, Sendable {
         _ transactions: [Transaction],
         today: BankDay = .today,
         accountName: (AccountID) -> String? = { _ in nil },
-        initiator: (Transaction) -> TransactionInitiator? = { _ in nil }
+        initiator: (Transaction) -> TransactionInitiator? = { _ in nil },
+        new: Set<TransactionID> = []
     ) -> [Transaction] {
-        sorted(filter(transactions, today: today, accountName: accountName, initiator: initiator))
+        sorted(filter(transactions, today: today, accountName: accountName, initiator: initiator, new: new), new: new)
     }
 
-    /// Stable sort by `sort`; ties keep newest first.
-    public func sorted(_ transactions: [Transaction]) -> [Transaction] {
+    /// Stable sort by `sort`; ties keep newest first. `new`: the rows `.newFirst` puts on top.
+    public func sorted(_ transactions: [Transaction], new: Set<TransactionID> = []) -> [Transaction] {
         let newestFirst: (Transaction, Transaction) -> Bool = { $0.effectiveDate > $1.effectiveDate }
         let indexed = Array(transactions.enumerated())
         func order(_ a: (offset: Int, element: Transaction), _ b: (offset: Int, element: Transaction), _ less: (Transaction, Transaction) -> Bool?) -> Bool {
@@ -139,6 +150,14 @@ public struct TransactionQuery: Hashable, Sendable {
             indexed.sorted { order($0, $1) { $0.amountCents == $1.amountCents ? nil : $0.amountCents < $1.amountCents } }
         case .largestInflow:
             indexed.sorted { order($0, $1) { $0.amountCents == $1.amountCents ? nil : $0.amountCents > $1.amountCents } }
+        case .newFirst:
+            indexed.sorted {
+                order($0, $1) { a, b in
+                    let (aNew, bNew) = (new.contains(a.id), new.contains(b.id))
+                    if aNew != bNew { return aNew }
+                    return a.effectiveDate == b.effectiveDate ? nil : newestFirst(a, b)
+                }
+            }
         case .counterpart:
             indexed.sorted {
                 order($0, $1) { a, b in

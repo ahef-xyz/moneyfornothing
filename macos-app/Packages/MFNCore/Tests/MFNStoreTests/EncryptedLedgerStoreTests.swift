@@ -601,3 +601,44 @@ private struct ProbeConnector: BankConnector {
         await third.close()
     }
 }
+
+@Suite struct NewTransactionStoreTests {
+    @Test func newMarksPersistAndClearOnDisk() async throws {
+        let url = tempURL()
+        let store = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        try await Fixture.fill(store)
+        let fresh = Transaction(accountID: "a-giro", bookingDate: day("2026-05-08"), valueDate: day("2026-05-08"), amountCents: -1_299,
+                                counterpartName: "Buchhandlung", purpose: "Buch", status: .booked)
+        let stored = await store.snapshot().transactions(of: Fixture.giro.id)
+        try await store.apply(AccountUpdate(accountID: Fixture.giro.id, balance: Balance(bookedCents: 1, asOf: asOf),
+                                            transactions: stored + [fresh], since: day("2026-05-01")))
+        #expect(await store.snapshot().newTransactionIDs == [fresh.id])
+        await store.close()
+
+        let reopened = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await reopened.snapshot().newTransactionIDs == [fresh.id])
+        try await reopened.markSeen([fresh.id])
+        await reopened.close()
+
+        let third = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await third.snapshot().newTransactionIDs.isEmpty)
+        await third.close()
+    }
+
+    @Test func removingTheBankDeletesItsMarks() async throws {
+        let url = tempURL()
+        let store = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        try await Fixture.fill(store)
+        let fresh = Transaction(accountID: "a-giro", bookingDate: day("2026-05-08"), valueDate: day("2026-05-08"), amountCents: -1_299,
+                                counterpartName: "Buchhandlung", purpose: "Buch", status: .booked)
+        let stored = await store.snapshot().transactions(of: Fixture.giro.id)
+        try await store.apply(AccountUpdate(accountID: Fixture.giro.id, balance: Balance(bookedCents: 1, asOf: asOf),
+                                            transactions: stored + [fresh], since: day("2026-05-01")))
+        try await store.removeConnection(Fixture.connection.id)
+        await store.close()
+
+        let reopened = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await reopened.snapshot().newTransactionIDs.isEmpty)
+        await reopened.close()
+    }
+}

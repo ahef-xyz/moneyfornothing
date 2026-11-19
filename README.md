@@ -47,6 +47,8 @@ yourself, but you may not pass it on (see [License](#license)).
   Credentials and sessions live only in the Keychain.
 - **On-device categorisation.** Rules, then nearest-neighbour matching on your own history, then
   Apple Foundation Models. Nothing leaves the machine.
+- **New since the last sync.** New transactions are counted per account and marked in the list until you
+  select them; filter or sort by them.
 - **Forecast.** Note one-off expenses for a future date and see the projected balance. Monthly payments
   such as salary and rent are estimated from your own history. Planned entries are local notes, not orders.
 

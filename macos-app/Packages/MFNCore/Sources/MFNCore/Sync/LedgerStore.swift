@@ -32,6 +32,9 @@ public struct LedgerSnapshot: Sendable, Equatable {
     public var openingBalances: [AccountID: OpeningBalance] = [:]
     /// CSV imports (v10), oldest first. Rows they added carry `Transaction.importID`.
     public var importBatches: [ImportBatch] = []
+    /// Transactions a sync brought in that the user has not looked at yet ("Neu"). Filled by
+    /// `apply(_ update:)` (`newTransactionIDs(after:merge:)`), emptied by `markSeen(_:)`.
+    public var newTransactionIDs: Set<TransactionID> = []
     /// Lookups by account, ID and import over `transactions`; not part of `==`.
     private var transactionIndex = TransactionIndex()
 
@@ -128,6 +131,9 @@ public struct LedgerSnapshot: Sendable, Equatable {
         connections.removeAll { $0.id == id }
         accounts.removeAll { $0.connectionID == id }
         for account in accountIDs { balances[account] = nil }
+        if !newTransactionIDs.isEmpty {
+            newTransactionIDs.subtract(transactions.lazy.filter { accountIDs.contains($0.accountID) }.map(\.id))
+        }
         transactions.removeAll { accountIDs.contains($0.accountID) }
         cardStatements.removeAll { accountIDs.contains($0.accountID) }
         securities.removeAll { accountIDs.contains($0.accountID) }
@@ -215,6 +221,7 @@ public struct LedgerSnapshot: Sendable, Equatable {
         guard !removal.isEmpty else { return }
         transactions.removeAll { removal.transactions.contains($0.id) }
         importBatches.removeAll { removal.emptiedBatches.contains($0.id) }
+        newTransactionIDs.subtract(removal.transactions)
     }
 
     public mutating func upsertPlannedItem(_ item: PlannedItem) {
@@ -299,6 +306,34 @@ public struct LedgerSnapshot: Sendable, Equatable {
             transactions = Self.mergeSorted(transactions, merge.upserts.sorted(by: Self.newestFirst))
         }
         if !emptied.isEmpty { importBatches.removeAll { emptied.contains($0.id) } }
+        if !newTransactionIDs.isEmpty { newTransactionIDs.subtract(merge.deletions) }
+    }
+
+    /// The user looked at these transactions: they are no longer "Neu". Unknown IDs are ignored.
+    public mutating func markSeen(_ ids: Set<TransactionID>) {
+        newTransactionIDs.subtract(ids)
+    }
+
+    /// `newTransactionIDs` once `merge` (computed for `update`) is applied.
+    ///
+    /// New are booked and pending rows the account did not hold before. Not new:
+    /// - anything from the first sync of an account (`since == nil`, or nothing stored yet): that
+    ///   is its history, not news,
+    /// - a booking that resolves a stored reservation the user already saw (it is the same
+    ///   payment); a booking of an unseen reservation stays new,
+    /// - planned and cancelled rows.
+    public func newTransactionIDs(after update: AccountUpdate, merge: TransactionMerger.Result) -> Set<TransactionID> {
+        var result = newTransactionIDs.subtracting(merge.deletions)
+        guard update.since != nil else { return result }
+        let lookups = transactionIndex.lookups(for: transactions)
+        guard let stored = lookups.byAccount[update.accountID], !stored.isEmpty else { return result }
+        let reservation = Dictionary(merge.resolved.map { ($0.value, $0.key) }, uniquingKeysWith: { first, _ in first })
+        for transaction in merge.upserts where transaction.status == .booked || transaction.status == .pending {
+            guard lookups.byID[transaction.id] == nil else { continue }
+            if let pending = reservation[transaction.id], lookups.byID[pending] != nil, !newTransactionIDs.contains(pending) { continue }
+            result.insert(transaction.id)
+        }
+        return result
     }
 
     /// Import batches whose remaining rows this merge all deletes or takes over (a synced row
@@ -394,10 +429,13 @@ public struct LedgerSnapshot: Sendable, Equatable {
         TransactionMerger.merge(stored: transactions(of: update.accountID), incoming: update.transactions, since: update.since)
     }
 
-    /// `apply(_ update:)` with its merge computed beforehand (`merge(for:)`).
-    public mutating func apply(_ update: AccountUpdate, merge: TransactionMerger.Result) {
+    /// `apply(_ update:)` with its merge computed beforehand (`merge(for:)`), and optionally
+    /// `newTransactionIDs(after:merge:)` too.
+    public mutating func apply(_ update: AccountUpdate, merge: TransactionMerger.Result, newTransactionIDs precomputed: Set<TransactionID>? = nil) {
+        let fresh = precomputed ?? newTransactionIDs(after: update, merge: merge)
         balances[update.accountID] = update.balance
         apply(merge)
+        newTransactionIDs = fresh
         if let statements = update.cardStatements { replaceCardStatements(statements, of: update.accountID) }
         if let positions = update.securities { replaceSecurities(positions, of: update.accountID) }
         if let point = DepotValuePoint.recorded(from: update) { record(point) }
@@ -521,6 +559,8 @@ public protocol LedgerStore: Actor {
     func replaceCardStatements(_ statements: [CardStatement], of account: AccountID) async throws
     func replaceSecurities(_ positions: [SecurityPosition], of account: AccountID) async throws
     func setSyncState(_ state: SyncState, for connection: ConnectionID) async throws
+    /// The user looked at these transactions: drops them from `newTransactionIDs`.
+    func markSeen(_ ids: Set<TransactionID>) async throws
     func syncState(for connection: ConnectionID) -> SyncState
 
     func setCategory(_ category: CategoryID?, source: CategorySource, confidence: Double?, for transaction: TransactionID) async throws
@@ -684,6 +724,11 @@ public actor InMemoryLedgerStore: LedgerStore {
 
     public func syncState(for connection: ConnectionID) -> SyncState {
         state.syncStates[connection] ?? SyncState()
+    }
+
+    public func markSeen(_ ids: Set<TransactionID>) {
+        guard !state.newTransactionIDs.isDisjoint(with: ids) else { return }
+        change { $0.markSeen(ids) }
     }
 
     public func setCategory(_ category: CategoryID?, source: CategorySource, confidence: Double?, for transaction: TransactionID) {

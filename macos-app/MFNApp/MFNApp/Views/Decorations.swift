@@ -1,3 +1,4 @@
+import AppKit
 import MFNCore
 import SwiftUI
 
@@ -131,6 +132,22 @@ struct HintChip: View {
     }
 }
 
+/// New since the last sync, for sidebar and overview rows: the count in the accent colour.
+struct NewCountBadge: View {
+    let count: Int
+
+    var body: some View {
+        AccentBadge(text: "\(count)")
+            .help(Self.text(count))
+            .accessibilityLabel(Self.text(count))
+    }
+
+    /// "1 neuer Umsatz seit dem Abgleich" / "3 neue Umsätze seit dem Abgleich".
+    static func text(_ count: Int) -> String {
+        count == 1 ? "1 neuer Umsatz seit dem Abgleich" : "\(count) neue Umsätze seit dem Abgleich"
+    }
+}
+
 /// "Neu" / count badge in the accent colour (accent = "Zu prüfen"/new only).
 struct AccentBadge: View {
     let text: String
@@ -139,10 +156,21 @@ struct AccentBadge: View {
         Text(text)
             .font(.caption.weight(.semibold))
             .monospacedDigit()
-            .foregroundStyle(.white)
+            .foregroundStyle(Self.textColor)
             .padding(.horizontal, 6)
             .padding(.vertical, 1)
             .background(Color.accentColor, in: Capsule())
+    }
+
+    /// White, like system badges (blue, purple, pink, red, graphite). Black only where white falls
+    /// below 3:1 (bold caption) on a light accent colour: yellow, orange, green. Read per redraw:
+    /// the user can change the accent colour at any time.
+    private static var textColor: Color {
+        guard let accent = NSColor.controlAccentColor.usingColorSpace(.sRGB) else { return .white }
+        func linear(_ c: CGFloat) -> CGFloat { c <= 0.04045 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4) }
+        let luminance = 0.2126 * linear(accent.redComponent) + 0.7152 * linear(accent.greenComponent) + 0.0722 * linear(accent.blueComponent)
+        // Contrast of white on the accent: 1.05 / (L + 0.05).
+        return 1.05 / (luminance + 0.05) >= 3 ? .white : .black
     }
 }
 

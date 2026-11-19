@@ -27,6 +27,11 @@ final class AppModel {
     /// on read it (bank menus, Settings → Banken).
     private(set) var ledger = LedgerSnapshot() {
         didSet {
+            // Only read marks changed (a row selected, ⇧⌘U): no rebuild of index and lists.
+            if Self.differsOnlyInNew(oldValue, ledger) {
+                refreshNewState()
+                return
+            }
             ledgerRevision &+= 1
             refreshSnapshot()
         }
@@ -85,16 +90,25 @@ final class AppModel {
             // focus hand-over from the sidebar.
             searchFocusRequested = false
             focusRequest = nil
+            readInThisList = []
         }
     }
     /// Selected rows in the transaction list. Selecting exactly one opens the inspector.
     var selectedTransactionIDs: Set<TransactionID> = [] {
-        didSet { if selectedTransactionIDs.count == 1, oldValue != selectedTransactionIDs { showsInspector = true } }
+        didSet {
+            guard selectedTransactionIDs.count == 1, oldValue != selectedTransactionIDs else { return }
+            showsInspector = true
+            // Focusing one row reads it (a multiple selection does not, nor moving on after a review).
+            if !selectsWithoutReading { markRead(selectedTransactionIDs) }
+        }
     }
     var showsInspector = false
     /// Search, filter and sort of the transaction list. Kept while switching lists (like Finder's
     /// search); the account filter only applies to the overview lists.
-    var ledgerQuery = TransactionQuery()
+    var ledgerQuery = TransactionQuery() {
+        // Switching "Nur neue" / "Neue zuerst" on starts from what is unread now.
+        didSet { if ledgerQuery.dependsOnNew, !oldValue.dependsOnNew { readInThisList = [] } }
+    }
     /// ⌘F: set by the menu, the transaction list focuses its search field and resets it.
     var searchFocusRequested = false
     /// Keyboard: hands the focus between sidebar and content (→ or Return in the sidebar, ← or
@@ -320,9 +334,16 @@ final class AppModel {
                 pairs = dataset.connections.map { ($0, MockConnector(connection: $0.id, dataset: dataset, latency: .milliseconds(200))) }
             }
             #endif
+            #if DEBUG
+            let freshBookings = await !ScreenshotMode.isActive
+            #else
+            let freshBookings = true
+            #endif
             for (connection, connector) in pairs {
                 var connector = connector
                 connector.presenter = presenter.scoped(to: connection)
+                // Something new on every sync, so the demo shows "Neu seit dem Abgleich".
+                connector.deliversFreshBookings = freshBookings
                 try await engine.register(connection, connector: connector)
             }
         }
@@ -1239,6 +1260,9 @@ final class AppModel {
         guard let last = positions.max(), let first = positions.min() else { return }
         let candidate: (MFNCore.Transaction) -> Bool = { !done.contains($0.id) && self.needsReview($0) }
         if let next = order[(last + 1)...].first(where: candidate) ?? order[..<first].last(where: candidate) {
+            // The user did not pick this row: it stays unread.
+            selectsWithoutReading = true
+            defer { selectsWithoutReading = false }
             selectedTransactionIDs = [next.id]
         } else if case .review = item {
             selectedTransactionIDs = []
@@ -1349,8 +1373,11 @@ final class AppModel {
     /// query-independent part is cached apart, so a new search or filter only refilters.
     func ledgerContent(for item: SidebarItem) -> LedgerContent {
         let today = BankDay.today
-        let key = LedgerCacheKey(item: item, query: ledgerQuery, showCancelled: showCancelled, revision: snapshotRevision, today: today)
+        // Only a query that reads the new rows depends on them (reading one changes the set).
+        let key = LedgerCacheKey(item: item, query: ledgerQuery, showCancelled: showCancelled, revision: snapshotRevision, today: today,
+                                 newRevision: ledgerQuery.dependsOnNew ? newRevision : 0)
         if let cache = ledgerCache, cache.key == key { return cache.content }
+        let new = ledgerQuery.dependsOnNew ? newForQuery : []
         let baseKey = LedgerBaseKey(item: item, revision: snapshotRevision, today: today)
         let base: LedgerBase
         if let cache = ledgerBaseCache, cache.key == baseKey {
@@ -1359,7 +1386,7 @@ final class AppModel {
             base = LedgerBase(item: item, model: self, today: today)
             ledgerBaseCache = (baseKey, base)
         }
-        let content = LedgerContent(base: base, query: ledgerQuery, showCancelled: showCancelled, today: today)
+        let content = LedgerContent(base: base, query: ledgerQuery, showCancelled: showCancelled, today: today, new: new)
         ledgerCache = (key, content)
         return content
     }
@@ -1647,6 +1674,114 @@ final class AppModel {
         snapshotRevision &+= 1
     }
 
+    // MARK: - New since the last sync
+
+    /// Rows read since this list was opened. "Nur neue" and "Neue zuerst" still treat them as
+    /// new, so a row does not vanish or jump the moment it is selected (like Mail).
+    private(set) var readInThisList: Set<TransactionID> = [] {
+        didSet { newRevision &+= 1 }
+    }
+    /// Bumped when `newForQuery` changes without a new `snapshotRevision` (keys `ledgerContent`).
+    @ObservationIgnored private var newRevision = 0
+    /// Set while the app itself moves the selection (`selectNextReview`): that does not read.
+    @ObservationIgnored private var selectsWithoutReading = false
+
+    /// Everything but the read marks is the same (also when nothing changed, e.g. the store
+    /// confirming an optimistic `markRead`). Unchanged arrays compare by storage first: cheap.
+    private static func differsOnlyInNew(_ old: LedgerSnapshot, _ new: LedgerSnapshot) -> Bool {
+        var old = old
+        old.newTransactionIDs = new.newTransactionIDs
+        return old == new
+    }
+
+    /// Read marks into `snapshot` and the counts, without rebuilding anything else.
+    private func refreshNewState() {
+        let visible = ledger.newTransactionIDs.filter { index.transactionsByID[$0] != nil }
+        var counts: [AccountID: Int] = [:]
+        for id in visible {
+            if let account = index.transactionsByID[id]?.accountID { counts[account, default: 0] += 1 }
+        }
+        snapshot.newTransactionIDs = visible
+        index.newCounts = counts
+        newRevision &+= 1
+    }
+
+    /// New transactions of an account ("Neu"), for the sidebar, the overview and the header.
+    func newCount(of account: AccountID) -> Int {
+        index.newCounts[account] ?? 0
+    }
+
+    /// New transactions in all visible accounts.
+    var totalNewCount: Int { index.newCounts.values.reduce(0, +) }
+
+    /// Not read yet: marked "Neu" in lists.
+    func isNew(_ id: TransactionID) -> Bool {
+        snapshot.newTransactionIDs.contains(id)
+    }
+
+    /// What "Nur neue" and "Neue zuerst" go by: unread plus read in this list.
+    var newForQuery: Set<TransactionID> {
+        readInThisList.isEmpty ? snapshot.newTransactionIDs : snapshot.newTransactionIDs.union(readInThisList)
+    }
+
+    /// Marks rows read (selecting one row, "Alle als gelesen markieren"). The marks go at once;
+    /// if the store cannot save it, they come back.
+    func markRead(_ ids: Set<TransactionID>) {
+        guard !lock.isLocked, let store else { return }
+        let read = snapshot.newTransactionIDs.intersection(ids)
+        guard !read.isEmpty else { return }
+        readInThisList.formUnion(read)
+        ledger.newTransactionIDs.subtract(read)
+        Task {
+            do {
+                try await store.markSeen(read)
+            } catch {
+                // Locked meanwhile: the database is closed and the marks stay on disk.
+                guard self.store === store else {
+                    Log.store.notice("Gelesen-Markierung nicht gespeichert, Datenbank gesperrt")
+                    return
+                }
+                Log.store.error("Neue Umsätze nicht als gelesen gespeichert: \(String(describing: error), privacy: .private)")
+                ledger.newTransactionIDs.formUnion(read.filter { ledger.transaction($0) != nil })
+                readInThisList.subtract(read)
+            }
+        }
+    }
+
+    /// The new rows "Alle als gelesen markieren" (⇧⌘U) applies to: the selected account's, or
+    /// all of them.
+    private var newInScope: Set<TransactionID> {
+        guard let account = selectedAccountID else { return snapshot.newTransactionIDs }
+        return snapshot.newTransactionIDs.filter { index.transactionsByID[$0]?.accountID == account }
+    }
+
+    var canMarkAllRead: Bool {
+        !lock.isLocked && (selectedAccountID.map { newCount(of: $0) > 0 } ?? (totalNewCount > 0))
+    }
+
+    func markAllRead() {
+        guard !lock.isLocked else { return }
+        markRead(newInScope)
+    }
+
+    /// Sidebar context menu of an account.
+    func markAllRead(of account: AccountID) {
+        guard !lock.isLocked else { return }
+        markRead(snapshot.newTransactionIDs.filter { index.transactionsByID[$0]?.accountID == account })
+    }
+
+    /// "Nur neue Umsätze" (⌃⌘N). The overview and depots have no list: switches to "Alle Konten"
+    /// first, like ⌃⌘I.
+    func toggleNewFilter() {
+        guard !lock.isLocked else { return }
+        let isDepot = if case let .account(id)? = selection { account(id)?.type == .depot } else { false }
+        if !ledgerQuery.onlyNew, selection == .overview || selection == nil || isDepot {
+            selection = .allAccounts
+            AccessibilityNotification.Announcement("Alle Konten, nur neue Umsätze").post()
+        }
+        ledgerQuery.onlyNew.toggle()
+    }
+
     // MARK: - Renaming
 
     /// The name the bank gives the account (what "Originalnamen verwenden" restores).
@@ -1846,6 +1981,10 @@ extension LedgerSnapshot {
         result.securities.removeAll { hidden.contains($0.accountID) }
         result.plannedItems.removeAll { hidden.contains($0.accountID) }
         result.importBatches.removeAll { hidden.contains($0.accountID) }
+        // "Neu" counts, ⇧⌘U and the new filter only see visible accounts.
+        if !result.newTransactionIDs.isEmpty {
+            result.newTransactionIDs = result.newTransactionIDs.filter { result.transaction($0) != nil }
+        }
         return result
     }
 }
@@ -1857,6 +1996,8 @@ struct SnapshotIndex {
     var position: [TransactionID: Int] = [:]
     var accountsByID: [AccountID: Account] = [:]
     var reviewCount = 0
+    /// Transactions not seen since a sync brought them in, per account (`LedgerSnapshot.newTransactionIDs`).
+    var newCounts: [AccountID: Int] = [:]
     /// Pending EUR transactions (other currencies are left out, not converted).
     var pendingTotalCents = 0
     var uncategorizedCount = 0
@@ -2017,12 +2158,14 @@ struct SnapshotIndex {
         var recentByAccount: [AccountID: [MFNCore.Transaction]] = [:]
         var pendingByAccount: [AccountID: Int] = [:]
         var forecastInputs: [AccountID: Hasher] = [:]
+        let hasNew = !snapshot.newTransactionIDs.isEmpty
         for (offset, transaction) in snapshot.transactions.enumerated() {
             // A duplicate ID (should not happen) is counted once, not twice.
             guard transactionsByID[transaction.id] == nil else { continue }
             transactionsByID[transaction.id] = transaction
             position[transaction.id] = offset
             if needsReview(transaction) { reviewCount += 1 }
+            if hasNew, snapshot.newTransactionIDs.contains(transaction.id) { newCounts[transaction.accountID, default: 0] += 1 }
             if transaction.status == .pending, transaction.currency == "EUR" {
                 pendingTotalCents += transaction.amountCents
                 pendingCount += 1
@@ -2203,6 +2346,7 @@ struct LedgerCacheKey: Equatable {
     let showCancelled: Bool
     let revision: Int
     let today: BankDay
+    let newRevision: Int
 }
 
 #if DEBUG

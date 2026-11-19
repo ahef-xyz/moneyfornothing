@@ -161,6 +161,9 @@ public actor EncryptedLedgerStore: LedgerStore {
                 try db.run(ImportBatchTable.upsert, ImportBatchTable.values(batch))
             }
             try Self.deleteConnection(changes.source, accounts: sourceAccounts, in: db)
+            for id in changes.newMarks where state.transaction(id) != nil {
+                try db.run("INSERT OR IGNORE INTO newTransaction (id) VALUES (?)", [.text(id.rawValue)])
+            }
         }
         change { $0.applyMerge(changes) }
     }
@@ -238,9 +241,15 @@ public actor EncryptedLedgerStore: LedgerStore {
     public func apply(_ update: AccountUpdate) throws {
         let merge = state.merge(for: update)
         let emptied = state.importBatchesEmptied(by: merge)
+        // Deleted rows take their mark along (`ON DELETE CASCADE`); only additions are written.
+        let fresh = state.newTransactionIDs(after: update, merge: merge)
+        let added = fresh.subtracting(state.newTransactionIDs)
         try write { db in
             try db.run(BalanceTable.upsert, BalanceTable.values(update.balance, account: update.accountID))
             try Self.write(merge, emptying: emptied, to: db)
+            for id in added {
+                try db.run("INSERT OR IGNORE INTO newTransaction (id) VALUES (?)", [.text(id.rawValue)])
+            }
             if let statements = update.cardStatements {
                 try db.run("DELETE FROM cardStatement WHERE accountID = ?", [.text(update.accountID.rawValue)])
                 for statement in statements {
@@ -257,7 +266,7 @@ public actor EncryptedLedgerStore: LedgerStore {
                 try db.run(DepotValueTable.upsert, DepotValueTable.values(point))
             }
         }
-        change { $0.apply(update, merge: merge) }
+        change { $0.apply(update, merge: merge, newTransactionIDs: fresh) }
     }
 
     public func recordDepotValues(_ points: [DepotValuePoint]) throws {
@@ -306,6 +315,15 @@ public actor EncryptedLedgerStore: LedgerStore {
 
     // Category writes: the changed rows are computed without touching the state, written, and
     // only then put in place (no `var next = state` copy of the whole transaction list).
+
+    public func markSeen(_ ids: Set<TransactionID>) throws {
+        let seen = state.newTransactionIDs.intersection(ids)
+        guard !seen.isEmpty else { return }
+        try write { db in
+            for id in seen { try db.run("DELETE FROM newTransaction WHERE id = ?", [.text(id.rawValue)]) }
+        }
+        change { $0.markSeen(seen) }
+    }
 
     public func setCategory(_ category: CategoryID?, source: CategorySource, confidence: Double?, for transaction: TransactionID) throws {
         try setCategory(category, source: source, confidence: confidence, for: [transaction] as Set<TransactionID>)
@@ -474,6 +492,7 @@ public actor EncryptedLedgerStore: LedgerStore {
         for row in try db.query("SELECT accountID, name FROM accountName") {
             snapshot.customAccountNames[AccountID(try row.string("accountID"))] = try row.string("name")
         }
+        snapshot.newTransactionIDs = Set(try db.query("SELECT id FROM newTransaction").map { TransactionID(try $0.string("id")) })
         for row in try db.query("SELECT * FROM syncState") {
             let (connection, syncState) = try SyncStateTable.model(row)
             snapshot.syncStates[connection] = syncState

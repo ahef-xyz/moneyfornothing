@@ -29,6 +29,10 @@ public struct MockConnector: BankConnector {
     public var phase: MockPhase
     public var presenter: (any AuthChallengePresenter)?
     public var latency: Duration
+    /// Demo app only: syncs also deliver one or two bookings per giro/card account that the bank
+    /// made today (one set per day, included in the balance), so "Neu seit dem Abgleich" has
+    /// something to show.
+    public var deliversFreshBookings = false
 
     private static let log = Log.logger("mock")
 
@@ -57,14 +61,21 @@ public struct MockConnector: BankConnector {
     public func balance(for account: Account) async throws -> Balance {
         try await gate()
         try check(account)
-        return dataset.balance(for: account.id, afterBooking: phase == .afterBooking)
+        var balance = dataset.balance(for: account.id, afterBooking: phase == .afterBooking)
+        if deliversFreshBookings {
+            let fresh = Self.freshBookings(for: account, at: Date()).reduce(0) { $0 + $1.amountCents }
+            balance.bookedCents += fresh
+            balance.availableCents = balance.availableCents.map { $0 + fresh }
+        }
+        return balance
     }
 
     public func transactions(for account: Account, since: Date?) async throws -> [Transaction] {
         try await gate()
         try check(account)
         let source = phase == .afterBooking ? dataset.transactionsAfterBooking : dataset.transactions
-        let all = source[account.id] ?? []
+        var all = source[account.id] ?? []
+        if deliversFreshBookings { all += Self.freshBookings(for: account, at: Date()) }
         guard let since else { return all }
         let from = BankDay(since)
         return all.filter { $0.effectiveDate >= from }
@@ -82,6 +93,34 @@ public struct MockConnector: BankConnector {
         try check(account)
         guard account.type == .depot else { return [] }
         return dataset.securities[account.id] ?? []
+    }
+
+    private static let freshMerchants: [(name: String, purpose: String, cents: Int)] = [
+        ("Bäckerei Kornfeld", "Kartenzahlung", -385),
+        ("REWE Markt", "Kartenzahlung Lebensmittel", -2_749),
+        ("Aral Tankstelle", "Kartenzahlung", -6_120),
+        ("Café Mokka", "Kartenzahlung", -560),
+        ("Drogerie Blum", "Kartenzahlung", -1_295),
+        ("Kiosk am Markt", "Kartenzahlung", -240),
+    ]
+
+    /// One or two bookings dated today for giro and card accounts, the same all day (later syncs
+    /// that day bring nothing new), so the demo ledger grows by at most one set per day.
+    static func freshBookings(for account: Account, at date: Date) -> [Transaction] {
+        guard account.type == .giro || account.type == .card else { return [] }
+        let today = BankDay(date)
+        let slot = today.year * 10_000 + today.month * 100 + today.day
+        var seed = UInt64(truncatingIfNeeded: slot) &* 0x9E37_79B9_7F4A_7C15 ^ account.id.rawValue.unicodeScalars.reduce(UInt64(0)) { $0 &* 31 &+ UInt64($1.value) }
+        seed ^= seed >> 29
+        let count = 1 + Int(seed % 2)
+        return (0..<count).map { index in
+            let pick = freshMerchants[Int((seed >> (8 * UInt64(index + 1))) % UInt64(freshMerchants.count))]
+            return Transaction(
+                accountID: account.id, bookingDate: today, valueDate: today, amountCents: pick.cents,
+                counterpartName: pick.name, purpose: pick.purpose, status: .booked,
+                externalID: "demo-fresh:\(account.id.rawValue):\(slot):\(index)"
+            )
+        }
     }
 
     // MARK: -
