@@ -22,8 +22,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://www.moneyfornothing.app/screenshots/de/overview-dark.png">
-    <img src="https://www.moneyfornothing.app/screenshots/de/overview.png" width="820" alt="MFN overview with demo data">
+    <source media="(prefers-color-scheme: dark)" srcset="https://www.moneyfornothing.app/screenshots/de/overview-dark.png?v=0.4.0">
+    <img src="https://www.moneyfornothing.app/screenshots/de/overview.png?v=0.4.0" width="820" alt="MFN overview with demo data">
   </picture>
 </p>
 
