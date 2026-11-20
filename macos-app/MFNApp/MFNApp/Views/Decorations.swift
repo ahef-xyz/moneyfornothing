@@ -157,6 +157,9 @@ struct AccentBadge: View {
             .font(.caption.weight(.semibold))
             .monospacedDigit()
             .foregroundStyle(Self.textColor)
+            // Never wrapped or squeezed: in a full chip column the neighbouring chips truncate instead.
+            .lineLimit(1)
+            .fixedSize()
             .padding(.horizontal, 6)
             .padding(.vertical, 1)
             .background(Color.accentColor, in: Capsule())

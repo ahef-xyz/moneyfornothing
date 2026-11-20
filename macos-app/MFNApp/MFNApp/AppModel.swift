@@ -2023,7 +2023,8 @@ struct SnapshotIndex {
     var forecasts: [AccountID: ForecastBasis] = [:]
     /// The user's planned items per account, by day.
     var ownItemsByAccount: [AccountID: [PlannedItem]] = [:]
-    /// Giro and Tagesgeld accounts whose balance does not cover their planned payments.
+    /// Giro and Tagesgeld accounts whose balance does not cover their known payments (announced
+    /// by the bank or planned by the user; estimated monthly ones do not warn).
     var shortfalls: [AccountID: Shortfall] = [:]
     /// Overview: the newest pending and booked transactions of all accounts, newest first. Planned
     /// (not happened yet) and cancelled ones are left out.
@@ -2033,8 +2034,10 @@ struct SnapshotIndex {
     static let overviewMonths = 12
     static let overviewDays = 31
 
-    /// The balance runs out before the planned payments (standing orders, announced debits) are
-    /// through. Start: booked balance plus pending, without overdraft (Dispo is not known).
+    /// The balance runs out before the known payments (announced by the bank, planned by the user)
+    /// are through. Start: booked balance plus pending, without overdraft (Dispo is not known).
+    /// Estimated monthly payments never warn: an account topped up as its debits come has the
+    /// debits estimated but not the money that covers them, and warned falsely.
     struct Shortfall: Equatable {
         /// First day the balance would be below zero (today if it already is).
         var day: BankDay
@@ -2042,8 +2045,6 @@ struct SnapshotIndex {
         var missingCents: Int
         /// Planned payments still to come (positive cents).
         var plannedOutCents: Int
-        /// Estimated monthly payments are part of it (not only announced and self-planned ones).
-        var estimated = false
         /// Formatted once per build (the sidebar shows it on every redraw).
         var dayText: String
         var missingText: String
@@ -2231,7 +2232,8 @@ struct SnapshotIndex {
         likelyOutflow = AppModel.likelyCategories(counts: outflowCounts, inflow: false)
         latestOverall = latestAll.map(\.transaction)
 
-        // One forecast per account for both the shortfall and the curve, so they agree.
+        // One forecast per account for the shortfall and the curve. The curve shows all of it,
+        // the shortfall warning reads the known payments only (`Shortfall`).
         ownItemsByAccount = Dictionary(grouping: snapshot.plannedItems, by: \.accountID)
         let itemsByAccount = ownItemsByAccount
         // First of next month minus one day (adding a month to the 31st would clamp first).
@@ -2266,8 +2268,10 @@ struct SnapshotIndex {
                                       ownPlannedCents: ownPlanned)
             forecasts[account.id] = basis
             let path = BalanceForecast.path(start: start, events: forecast.events, today: today, until: horizon)
-            if account.type == .giro || account.type == .tagesgeld, let shortfall = Self.shortfall(path) {
-                shortfalls[account.id] = shortfall
+            if account.type == .giro || account.type == .tagesgeld {
+                // Without estimates the curve's path is the known path already.
+                let known = forecast.events.contains(where: \.isEstimate) ? Self.knownPath(basis, today: today) : path
+                if let shortfall = Self.shortfall(known) { shortfalls[account.id] = shortfall }
             }
             balanceCurves[account.id] = Self.curve(booked: balance.bookedCents, nets: dailyBookedNet[account.id] ?? emptyDays,
                                                    path: path, horizon: horizon, today: today)
@@ -2276,13 +2280,18 @@ struct SnapshotIndex {
 
     private static let shortDay = Date.FormatStyle(locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone).day().month(.wide)
 
+    /// The balance walked through the known payments only, as the shortfall warning counts it.
+    static func knownPath(_ basis: ForecastBasis, today: BankDay) -> ForecastPath {
+        BalanceForecast.path(start: basis.startCents, events: basis.forecast.events.filter { !$0.isEstimate },
+                             today: today, until: basis.horizon)
+    }
+
     /// Only a warning about expected payments: an account already below zero with nothing outgoing
     /// expected gets none (its balance says it).
     private static func shortfall(_ path: ForecastPath) -> Shortfall? {
         let outgoing = path.steps.reduce(0) { $0 + max(0, -$1.event.cents) }
         guard let firstDay = path.firstNegativeDay, path.lowestCents < 0, outgoing > 0 else { return nil }
         return Shortfall(day: firstDay, missingCents: -path.lowestCents, plannedOutCents: outgoing,
-                         estimated: path.steps.contains { $0.event.isEstimate && $0.event.cents < 0 },
                          dayText: firstDay.startDate.formatted(shortDay), missingText: Money.format(-path.lowestCents))
     }
 

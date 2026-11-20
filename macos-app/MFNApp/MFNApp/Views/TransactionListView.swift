@@ -34,7 +34,7 @@ struct TransactionListView: View {
             // Own row like the filter bar: inside the header it pushed the header under the toolbar.
             if let account = ledger.account, let shortfall = model.shortfall(for: account.id) {
                 Divider()
-                ShortfallNotice(shortfall: shortfall)
+                ShortfallNotice(account: account, shortfall: shortfall)
             }
             if ledger.query.isFiltering {
                 Divider()
@@ -558,24 +558,48 @@ enum ShortfallFormat {
     static let symbol = "exclamationmark.circle.fill"
 
     static func text(_ shortfall: SnapshotIndex.Shortfall) -> String {
-        "Guthaben reicht nicht für \(payments(shortfall)): ab \(shortfall.dayText) fehlen bis zu \(shortfall.missingText)"
+        "Guthaben reicht nicht für geplante Zahlungen: ab \(shortfall.dayText) fehlen bis zu \(shortfall.missingText)"
     }
 
     /// Short form for the sidebar tooltip and VoiceOver.
     static func short(_ shortfall: SnapshotIndex.Shortfall) -> String {
-        "Reicht nicht für \(payments(shortfall)) ab \(shortfall.dayText), bis zu \(shortfall.missingText)"
-    }
-
-    private static func payments(_ shortfall: SnapshotIndex.Shortfall) -> String {
-        shortfall.estimated ? "geplante und regelmäßige Zahlungen" : "geplante Zahlungen"
+        "Reicht nicht für geplante Zahlungen ab \(shortfall.dayText), bis zu \(shortfall.missingText)"
     }
 }
 
-/// Alert row below the account header (symbol + text, not colour alone).
+/// Alert row below the account header (symbol + text, not colour alone). Its button opens the
+/// forecast panel with everything expected, estimates included.
 struct ShortfallNotice: View {
+    let account: Account
     let shortfall: SnapshotIndex.Shortfall
+    @Environment(AppModel.self) private var model
+    @State private var showsDetails = false
 
     var body: some View {
+        // One row while it fits; in a narrow column the buttons get a row of their own instead of
+        // pushing the row past the column.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) {
+                label
+                detailsButton
+                Spacer(minLength: 8)
+                forecastButton
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                label
+                HStack(spacing: 12) {
+                    detailsButton
+                    forecastButton
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background { Rectangle().fill(Color.orange.opacity(0.12)) }
+    }
+
+    private var label: some View {
         Label {
             Text(ShortfallFormat.text(shortfall))
                 .foregroundStyle(.primary)
@@ -585,12 +609,144 @@ struct ShortfallNotice: View {
                 .foregroundStyle(.orange)
         }
         .font(.callout.weight(.medium))
-        .padding(.horizontal, 20)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background { Rectangle().fill(Color.orange.opacity(0.12)) }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Warnung: \(ShortfallFormat.text(shortfall))")
+    }
+
+    private var detailsButton: some View {
+        Button("Details") { showsDetails = true }
+            .buttonStyle(.link)
+            .font(.callout)
+            .fixedSize()
+            .help("Zeigt, welche Zahlungen gemeint sind")
+            .accessibilityLabel("Details zur Warnung")
+            .popover(isPresented: $showsDetails, arrowEdge: .bottom) {
+                ShortfallDetails(account: account, shortfall: shortfall)
+            }
+    }
+
+    private var forecastButton: some View {
+        Button("Prognose öffnen") { model.showForecast(for: account) }
+            .controlSize(.small)
+            .fixedSize()
+            .help("Zeigt alle erwarteten Zahlungen, auch geschätzte (⌥⌘P)")
+            .accessibilityHint("Zeigt alle erwarteten Zahlungen, auch geschätzte")
+    }
+}
+
+/// What the shortfall warning counts: the starting balance and every known payment up to the
+/// lowest point, so the warning says which payment is meant. If the balance is lowest today
+/// already, all known payments up to the horizon are listed and a line says so.
+private struct ShortfallDetails: View {
+    let account: Account
+    let shortfall: SnapshotIndex.Shortfall
+    @Environment(AppModel.self) private var model
+
+    /// More rows than this scroll, so a long list does not grow the popover off the screen.
+    private static let visibleRows = 8
+
+    /// The same walk as the warning (`SnapshotIndex`), cut after the lowest balance.
+    /// `lowestIsStart`: no payment takes the balance lower than it is today.
+    private var content: (start: Int, steps: [ForecastPath.Step], lowestIsStart: Bool)? {
+        guard let basis = model.index.forecasts[account.id] else { return nil }
+        let path = SnapshotIndex.knownPath(basis, today: model.index.day)
+        let lowest = path.steps.firstIndex { $0.cents == path.lowestCents }
+        return (basis.startCents, lowest.map { Array(path.steps[...$0]) } ?? path.steps, lowest == nil)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("So kommt die Warnung zustande")
+                .font(.headline)
+            Text("MFN rechnet vom heutigen Kontostand aus die bekannten Zahlungen durch: von der Bank angekündigte und selbst geplante. Geschätzte regelmäßige Zahlungen lösen keine Warnung aus, sie stehen nur in der Prognose. Ein Dispo ist nicht eingerechnet.")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            if let content {
+                if content.steps.count > Self.visibleRows {
+                    ScrollView { grid(content) }
+                        .frame(height: 320)
+                } else {
+                    grid(content)
+                }
+                Text(content.lowestIsStart
+                    ? "Rechte Spalte: Kontostand nach der Zahlung. Der Kontostand ist schon heute am tiefsten Punkt."
+                    : "Rechte Spalte: Kontostand nach der Zahlung.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(16)
+        .frame(width: 520, alignment: .leading)
+    }
+
+    /// VoiceOver reads a row as one element, carried by its first cell: the other cells are
+    /// hidden from it (a modifier on `GridRow` would apply to every cell).
+    private func grid(_ content: (start: Int, steps: [ForecastPath.Step], lowestIsStart: Bool)) -> some View {
+        let today = model.index.day
+        return Grid(alignment: .leading, horizontalSpacing: 14, verticalSpacing: 6) {
+            GridRow {
+                Text("Heute")
+                    .accessibilityLabel("Heute, Kontostand mit vorgemerkten Umsätzen: \(spoken(content.start))")
+                Text("Kontostand mit vorgemerkten Umsätzen")
+                    .accessibilityHidden(true)
+                Text("")
+                    .accessibilityHidden(true)
+                AmountText(cents: content.start, colorsInflow: false)
+                    .gridColumnAlignment(.trailing)
+                    .accessibilityHidden(true)
+            }
+            .foregroundStyle(.secondary)
+            Divider()
+            ForEach(content.steps, id: \.event.id) { step in
+                GridRow(alignment: .firstTextBaseline) {
+                    Text(ForecastFormat.text(step.day, today: today))
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(rowLabel(step, today: today))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(step.event.title)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                            // The full name when two lines are not enough.
+                            .help(step.event.title)
+                        Label(kind(step.event, today: today), systemImage: ForecastFormat.symbol(step.event))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityHidden(true)
+                    AmountText(cents: step.event.cents, signed: true)
+                        .gridColumnAlignment(.trailing)
+                        .accessibilityHidden(true)
+                    HStack(spacing: 4) {
+                        if step.cents < 0 {
+                            Image(systemName: ShortfallFormat.symbol)
+                                .foregroundStyle(.orange)
+                        }
+                        AmountText(cents: step.cents, colorsInflow: false)
+                    }
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+                }
+            }
+        }
+        .font(.callout)
+    }
+
+    private func spoken(_ cents: Int, signed: Bool = false) -> String {
+        model.hideAmounts ? "Betrag ausgeblendet" : Money.format(cents, signed: signed)
+    }
+
+    private func rowLabel(_ step: ForecastPath.Step, today: BankDay) -> String {
+        [ForecastFormat.text(step.day, today: today), step.event.title, kind(step.event, today: today),
+         spoken(step.event.cents, signed: true),
+         "Kontostand danach \(spoken(step.cents))" + (step.cents < 0 && !model.hideAmounts ? ", unter null" : "")]
+            .joined(separator: ", ")
+    }
+
+    private func kind(_ event: ForecastEvent, today: BankDay) -> String {
+        let kind = ForecastFormat.kind(event)
+        return event.isOverdue ? "\(kind) · fällig seit \(ForecastFormat.text(event.dueDay, today: today))" : kind
     }
 }
 
@@ -603,9 +759,10 @@ private struct LedgerHeader: View {
     @State private var textIdealWidth: CGFloat = 0
     @State private var figuresWidth: CGFloat = 0
     @State private var chartWidth: CGFloat = 208
-    /// Widths of the action row with labels and icon-only (`actions`).
+    /// Width of the action row with labels (`actions`).
     @State private var actionsWidth: CGFloat = 0
-    @State private var compactActionsWidth: CGFloat = 0
+    /// Width of the activity line on one line (`activity`).
+    @State private var activityWidth: CGFloat = 0
 
     private var connection: Connection? {
         ledger.account.flatMap { account in model.snapshot.connections.first { $0.id == account.connectionID } }
@@ -622,46 +779,93 @@ private struct LedgerHeader: View {
         .padding(.vertical, 14)
     }
 
-    /// The graph fits next to the untruncated text and the figures. Measured, not `ViewThatFits`:
-    /// one row keeps the graph's identity (its popover and focus survive a resize) and the graph
-    /// is laid out once.
+    private static let spacing: CGFloat = 14
+
+    /// Badge plus its gap: where the text block starts.
+    private var textInset: CGFloat { connection == nil ? 0 : 40 + Self.spacing }
+
+    /// Text block and figures fit side by side, untruncated and with labelled buttons. If not,
+    /// the figures get a row of their own below (a taller header instead of squeezed or
+    /// truncated parts). Decided from measured widths (invisible copies), not `ViewThatFits`.
+    private var isOneRow: Bool {
+        guard rowWidth > 0 else { return true }
+        return textInset + max(textIdealWidth, actionsWidth) + Self.spacing + 12 + Self.spacing + figuresWidth <= rowWidth
+    }
+
+    /// Indent of the figures in their own row.
+    private var figuresInset: CGFloat { textInset + figuresWidth <= rowWidth ? textInset : 0 }
+
+    /// The graph fits as well: next to the figures, in whichever row they are.
     private var showsChart: Bool {
         guard rowWidth > 0 else { return true }
-        let spacing: CGFloat = 14
-        let badge: CGFloat = connection == nil ? 0 : 40 + spacing
-        // The action row can always fall back to icons, so only its compact width counts here.
-        let text = max(textIdealWidth, compactActionsWidth)
-        let needed = badge + text + spacing + 12 + spacing + chartWidth + spacing + figuresWidth
-        return needed <= rowWidth
+        let figuresRow = isOneRow
+            ? textInset + max(textIdealWidth, actionsWidth) + Self.spacing + 12 + Self.spacing + figuresWidth
+            : figuresInset + figuresWidth
+        return figuresRow + Self.spacing + chartWidth <= rowWidth
     }
 
     /// Never wider than the column: an overflowing header pushed itself up under the toolbar.
-    /// The graph goes first when space runs out, then the text block truncates; the figures
-    /// shrink last.
     private var headerRow: some View {
-        HStack(alignment: .center, spacing: 14) {
-            if let connection {
-                BankBadge(connection: connection, size: 40)
-            }
-            textBlock()
-                // Untruncated width, from an invisible copy that may grow past the row.
-                .background(alignment: .leading) {
-                    textBlock(measuring: true)
-                        .fixedSize()
-                        .hidden()
-                        .accessibilityHidden(true)
-                        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { textIdealWidth = $0 }
-                }
-            Spacer(minLength: 12)
-            if showsChart, let account = ledger.account {
-                AccountBalanceChart(account: account.id)
-                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { chartWidth = $0 }
-            }
-            figures
-                .layoutPriority(1)
-                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { figuresWidth = $0 }
+        VStack(alignment: .leading, spacing: 0) {
+            // The width the header may use. Measured on an empty view, never on the content: a
+            // row that overflowed reported its own width and so never switched to two rows.
+            Color.clear
+                .frame(height: 0)
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { rowWidth = $0 }
+            rows
         }
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { rowWidth = $0 }
+        // Untruncated widths, from invisible copies that may grow past the row. The visible parts
+        // are not measured: a squeezed part would report too little and keep the others in.
+        .background(alignment: .leading) {
+            ZStack(alignment: .leading) {
+                textBlock(measuring: true)
+                    .fixedSize()
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { textIdealWidth = $0 }
+                figures
+                    .fixedSize()
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { figuresWidth = $0 }
+            }
+            .hidden()
+            .accessibilityHidden(true)
+        }
+    }
+
+    private var rows: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: Self.spacing) {
+                if let connection {
+                    BankBadge(connection: connection, size: 40)
+                }
+                textBlock()
+                    // Before the spacer: at equal priority the row offered the text only half of
+                    // the free space and it truncated next to an empty gap.
+                    .layoutPriority(1)
+                Spacer(minLength: 12)
+                if isOneRow {
+                    chart
+                    figures.fixedSize()
+                }
+            }
+            if !isOneRow {
+                // Under the text, not under the badge, while that fits. In a very narrow column
+                // the figures start at the edge and, last of all, shrink (`Figure` scales down).
+                HStack(alignment: .center, spacing: Self.spacing) {
+                    // One gap between figures and graph, as `showsChart` counts it.
+                    figures.fixedSize(horizontal: figuresWidth <= rowWidth, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    chart
+                }
+                .padding(.leading, figuresInset)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var chart: some View {
+        if showsChart, let account = ledger.account {
+            AccountBalanceChart(account: account.id)
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { chartWidth = $0 }
+        }
     }
 
     /// `measuring`: the invisible copy that sizes the row. It leaves out the action row, which
@@ -676,9 +880,11 @@ private struct LedgerHeader: View {
             identity
                 .font(.callout)
                 .foregroundStyle(.secondary)
-            activity
+            activity(wrapped: !measuring && activityWidth > textSpace)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                // Only the invisible copy reports: it is always one line and untruncated.
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { if measuring { activityWidth = $0 } }
             if !measuring, let account = ledger.account {
                 actions(for: account)
                     .padding(.top, 4)
@@ -693,14 +899,10 @@ private struct LedgerHeader: View {
     private func actions(for account: Account) -> some View {
         actionButtons(for: account, compact: actionsWidth > textSpace, giroCode: $showsGiroCode)
             .background(alignment: .leading) {
-                ZStack(alignment: .leading) {
-                    actionButtons(for: account, compact: false, giroCode: .constant(false), measuring: true)
-                        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { actionsWidth = $0 }
-                    actionButtons(for: account, compact: true, giroCode: .constant(false), measuring: true)
-                        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { compactActionsWidth = $0 }
-                }
-                .hidden()
-                .accessibilityHidden(true)
+                actionButtons(for: account, compact: false, giroCode: .constant(false), measuring: true)
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { actionsWidth = $0 }
+                    .hidden()
+                    .accessibilityHidden(true)
             }
     }
 
@@ -750,13 +952,13 @@ private struct LedgerHeader: View {
         .fixedSize()
     }
 
-    /// Width the text block gets in the header row (same layout as `showsChart`).
+    /// Width the text block gets (same layout as `headerRow`).
     private var textSpace: CGFloat {
         guard rowWidth > 0 else { return .infinity }
-        let spacing: CGFloat = 14
-        let badge: CGFloat = connection == nil ? 0 : 40 + spacing
-        let chart: CGFloat = showsChart ? chartWidth + spacing : 0
-        return rowWidth - badge - spacing - 12 - spacing - chart - figuresWidth
+        // Text, gap, spacer (12), gap, then chart and figures: the same gaps as `isOneRow`.
+        guard isOneRow else { return rowWidth - textInset - Self.spacing - 12 }
+        let chart: CGFloat = showsChart ? chartWidth + Self.spacing : 0
+        return rowWidth - textInset - Self.spacing - 12 - Self.spacing - chart - figuresWidth
     }
 
     /// Bank · type · IBAN (copyable) · card.
@@ -786,26 +988,43 @@ private struct LedgerHeader: View {
         }
     }
 
-    /// This month's income and expenses, and the last sync.
+    /// This month's income and expenses, and the last sync. One line while it fits; in a narrow
+    /// header the sync part moves to a second line, so the amounts are not truncated to dots.
+    /// Decided from measured widths like the rest of the header: `ViewThatFits` here did not
+    /// shrink and squeezed the figures into one-letter columns.
+    private func activity(wrapped: Bool) -> some View {
+        let layout = wrapped ? AnyLayout(VStackLayout(alignment: .leading, spacing: 3)) : AnyLayout(HStackLayout(spacing: 10))
+        return layout {
+            monthSummary
+            syncInfo
+        }
+        .monospacedDigit()
+        .lineLimit(1)
+    }
+
     @ViewBuilder
-    private var activity: some View {
-        HStack(spacing: 10) {
-            if ledger.monthInCents != 0 || ledger.monthOutCents != 0 {
-                Label {
-                    HStack(spacing: 6) {
-                        Text("\(monthName):")
-                        AmountText(cents: ledger.monthInCents, signed: true)
-                        Text("Eingänge")
-                        Text("·")
-                        AmountText(cents: ledger.monthOutCents, colorsInflow: false)
-                            .foregroundStyle(.secondary)
-                        Text("Ausgaben")
-                    }
-                } icon: {
-                    Image(systemName: "calendar")
+    private var monthSummary: some View {
+        if ledger.monthInCents != 0 || ledger.monthOutCents != 0 {
+            Label {
+                HStack(spacing: 6) {
+                    Text("\(monthName):")
+                    AmountText(cents: ledger.monthInCents, signed: true)
+                    Text("Eingänge")
+                    Text("·")
+                    AmountText(cents: ledger.monthOutCents, colorsInflow: false)
+                        .foregroundStyle(.secondary)
+                    Text("Ausgaben")
                 }
+            } icon: {
+                Image(systemName: "calendar")
             }
-            if let account = ledger.account {
+        }
+    }
+
+    @ViewBuilder
+    private var syncInfo: some View {
+        if let account = ledger.account {
+            HStack(spacing: 10) {
                 if connection?.isManual == true {
                     Label("ohne Anbindung", systemImage: "tray.and.arrow.down")
                 } else if let lastSync = model.snapshot.syncStates[account.connectionID]?.lastSuccess {
@@ -821,8 +1040,6 @@ private struct LedgerHeader: View {
                 }
             }
         }
-        .monospacedDigit()
-        .lineLimit(1)
     }
 
     private var monthName: String {
