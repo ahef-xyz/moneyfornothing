@@ -8,8 +8,8 @@ import Testing
     let dataset = MockDataset.demo(today: Self.today, now: Self.today.startDate.addingTimeInterval(9 * 3600))
 
     @Test func shape() {
-        #expect(dataset.connections.count == 5)
-        #expect(dataset.accounts.count == 11)
+        #expect(dataset.connections.count == 6)
+        #expect(dataset.accounts.count == 12)
         let count = dataset.allTransactions.count
         #expect((1_300...1_700).contains(count), "\(count) transactions")
         let oldest = dataset.allTransactions.map(\.effectiveDate).min()
@@ -128,7 +128,7 @@ import Testing
         }
         await engine.syncAll(trigger: .manual)
         let snapshot = await store.snapshot()
-        #expect(snapshot.accounts.count == 11)
+        #expect(snapshot.accounts.count == 12)
         #expect(snapshot.transactions.count == dataset.allTransactions.count)
         #expect(snapshot.syncStates.values.allSatisfy { $0.phase == .idle })
         #expect(snapshot.securities.count == 6)

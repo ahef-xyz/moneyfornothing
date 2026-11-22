@@ -14,6 +14,7 @@ struct RootView: View {
                 MainView()
             }
         }
+        .modifier(BackupPresentation())
         // First application needs `NSApp`, which does not exist yet when the model is created.
         .onAppear {
             model.appearance.apply()
@@ -210,6 +211,8 @@ struct MainView: View {
                 if let item = model.selection {
                     if item == .overview {
                         OverviewView()
+                    } else if item == .subscriptions {
+                        SubscriptionsView()
                     } else if let depot = depotAccount(item) {
                         DepotView(account: depot)
                     } else {

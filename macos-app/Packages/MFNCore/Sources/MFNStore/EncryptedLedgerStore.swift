@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import MFNCore
 
@@ -30,15 +31,89 @@ public actor EncryptedLedgerStore: LedgerStore {
     /// Number of published snapshots (tests check that batches publish once).
     private(set) var publishCount = 0
 
-    private init(db: sending SQLiteConnection, url: URL, state: LedgerSnapshot) {
+    /// Derived from the database key, for what a backup carries next to the database
+    /// (`LedgerBackup.sealingKey`). Kept so writing a backup never asks the keychain.
+    private var sealingKey: SymmetricKey?
+    /// Derived from the database key as well: keys hashes the app keeps in its preferences
+    /// (`preferenceHashKey`). Both go when the store closes.
+    private var hashKey: SymmetricKey?
+
+    private init(db: sending SQLiteConnection, url: URL, state: LedgerSnapshot, sealingKey: SymmetricKey, hashKey: SymmetricKey) {
         self.db = db
         self.url = url
         self.state = state
+        self.sealingKey = sealingKey
+        self.hashKey = hashKey
+    }
+
+    /// Key for HMACs of things that must not be readable outside the database but have to be
+    /// recognised by the app's preferences (hidden fixed costs). `nil` once closed.
+    public func preferenceHashKey() -> SymmetricKey? { hashKey }
+
+    /// Encrypts `data` for a backup of this database (AES-GCM). Opened again with the database
+    /// key by `LedgerBackup.unseal`.
+    public func seal(_ data: Data) throws(StoreError) -> Data {
+        guard db.isOpen, let sealingKey else { throw .closed }
+        guard let sealed = try? AES.GCM.seal(data, using: sealingKey).combined else { throw .database("Sicherung: Verschlüsselung") }
+        return sealed
+    }
+
+    /// How long the copies MFN leaves next to the database stay (before a schema update, before
+    /// a restore). They hold the data as it was, also what the user removed since.
+    static let copyLifetimeDays = 30
+    static let preRestorePrefix = "ledger-vor-wiederherstellung-"
+
+    /// Removes those copies once they are older than `copyLifetimeDays`.
+    static func removeOutdatedCopies(in folder: URL, now: Date = Date()) {
+        let files = FileManager.default
+        let limit = now.addingTimeInterval(-Double(copyLifetimeDays) * 86_400)
+        for name in (try? files.contentsOfDirectory(atPath: folder.path)) ?? []
+        where name.hasPrefix(preMigrationPrefix) || name.hasPrefix(preRestorePrefix) {
+            let file = folder.appendingPathComponent(name)
+            guard let changed = (try? files.attributesOfItem(atPath: file.path))?[.modificationDate] as? Date, changed < limit else { continue }
+            try? files.removeItem(at: file)
+            Log.store.info("Alte Kopie der Datenbank entfernt")
+        }
+    }
+
+    /// Prefix of the copy a schema update leaves next to the database.
+    static let preMigrationPrefix = "ledger-vor-update-schema-"
+
+    /// Before a schema update changes an existing database: one copy of it as it is, next to
+    /// it (`ledger-vor-update-schema-<version>.sqlite`, same key). An older MFN can open that
+    /// copy, never the updated database. Only the newest copy is kept.
+    private static func keepCopyBeforeMigration(of url: URL, _ db: SQLiteConnection) throws {
+        let current = try db.query("PRAGMA user_version").first?.int("user_version") ?? 0
+        guard current > 0, current < Schema.migrations.count else { return }
+        let files = FileManager.default
+        let folder = url.deletingLastPathComponent()
+        let name = "\(preMigrationPrefix)\(current).sqlite"
+        let copy = folder.appendingPathComponent(name)
+        // Written under another name first: an older copy stays until the new one is complete.
+        let fresh = folder.appendingPathComponent("\(name).neu")
+        try? files.removeItem(at: fresh)
+        // Columns: busy, log, checkpointed. busy = 1: pages stayed in the WAL, the copy would miss them.
+        let result = try db.query("PRAGMA wal_checkpoint(TRUNCATE)").first
+        guard try result?.int("busy") == 0 else { throw StoreError.database("Kopie vor dem Update: WAL nicht vollständig übernommen") }
+        do {
+            try files.copyItem(at: url, to: fresh)
+            for other in (try? files.contentsOfDirectory(atPath: folder.path)) ?? [] where other.hasPrefix(preMigrationPrefix) && other != fresh.lastPathComponent {
+                try? files.removeItem(at: folder.appendingPathComponent(other))
+            }
+            try files.moveItem(at: fresh, to: copy)
+        } catch {
+            try? files.removeItem(at: fresh)
+            throw StoreError.database("Kopie vor dem Update: \(error.localizedDescription)")
+        }
+        Log.store.info("Kopie vor dem Schema-Update angelegt (Version \(current, privacy: .public))")
     }
 
     /// Opens (or creates) the database at `url` with the 256-bit `key`, migrates it and loads
     /// the snapshot. Use `LedgerVault` to obtain the key; it is not retained.
-    public static func open(at url: URL, key: Data) async throws(StoreError) -> EncryptedLedgerStore {
+    ///
+    /// `keepingCopy`: leave a copy of an older database next to it before the schema update
+    /// (`keepCopyBeforeMigration`). Off for a backup being unpacked: the backup file is that copy.
+    public static func open(at url: URL, key: Data, keepingCopy: Bool = true) async throws(StoreError) -> EncryptedLedgerStore {
         guard key.count == 32 else { throw .database("Schlüssel muss 32 Byte haben") }
         do {
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -54,11 +129,19 @@ public actor EncryptedLedgerStore: LedgerStore {
             guard let cipherVersion, !cipherVersion.isEmpty else { throw StoreError.encryptionUnavailable }
             // First real read: fails with SQLITE_NOTADB if the key is wrong.
             _ = try db.query("SELECT count(*) AS n FROM sqlite_master")
-            try db.execute("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;")
+            // WAL with synchronous = NORMAL: the database stays consistent after a crash or power
+            // loss (only the last commits may be missing, and a sync brings them back), without
+            // an fsync per commit.
+            try db.execute("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL;")
+            if keepingCopy {
+                try keepCopyBeforeMigration(of: url, db)
+                removeOutdatedCopies(in: url.deletingLastPathComponent())
+            }
             try Schema.migrate(db)
             let snapshot = try load(db)
             Log.store.info("Datenbank geöffnet (SQLCipher \(cipherVersion, privacy: .public), \(snapshot.transactions.count, privacy: .public) Buchungen)")
-            return EncryptedLedgerStore(db: db, url: url, state: snapshot)
+            return EncryptedLedgerStore(db: db, url: url, state: snapshot, sealingKey: LedgerBackup.sealingKey(for: key),
+                                        hashKey: LedgerBackup.preferenceHashKey(for: key))
         } catch {
             throw map(error)
         }
@@ -68,6 +151,9 @@ public actor EncryptedLedgerStore: LedgerStore {
     public func close() {
         guard db.isOpen else { return }
         db.close()
+        // Nothing derived from the database key outlives the lock.
+        sealingKey = nil
+        hashKey = nil
         state = LedgerSnapshot()
         broadcaster.finishAll()
         Log.store.info("Datenbank geschlossen")
@@ -156,6 +242,9 @@ public actor EncryptedLedgerStore: LedgerStore {
             for item in changes.plannedItems {
                 try db.run(PlannedItemTable.upsert, try PlannedItemTable.values(item))
             }
+            for entry in changes.recurringEntries {
+                try db.run(RecurringEntryTable.upsert, RecurringEntryTable.values(entry))
+            }
             // Re-pointed before the source accounts go (their batches would cascade otherwise).
             for batch in changes.importBatches {
                 try db.run(ImportBatchTable.upsert, ImportBatchTable.values(batch))
@@ -176,7 +265,7 @@ public actor EncryptedLedgerStore: LedgerStore {
 
     private static func deleteConnection(_ id: ConnectionID, accounts: [AccountID], in db: SQLiteConnection) throws {
         for account in accounts {
-            for table in ["ledgerTransaction", "cardStatement", "securityPosition", "balance", "accountName", "budget", "depotValue", "plannedItem", "openingBalance", "importBatch"] {
+            for table in ["ledgerTransaction", "cardStatement", "securityPosition", "balance", "accountName", "budget", "depotValue", "plannedItem", "recurringEntry", "openingBalance", "importBatch"] {
                 try db.run("DELETE FROM \(table) WHERE accountID = ?", [.text(account.rawValue)])
             }
         }
@@ -389,6 +478,22 @@ public actor EncryptedLedgerStore: LedgerStore {
         change { $0.upsertPlannedItem(item) }
     }
 
+    public func upsertRecurringEntry(_ entry: RecurringEntry) throws {
+        try write { db in
+            // One change per detected payment.
+            if let series = entry.seriesID {
+                try db.run("DELETE FROM recurringEntry WHERE seriesID = ? AND id != ?", [.text(series), .text(entry.id.uuidString)])
+            }
+            try db.run(RecurringEntryTable.upsert, RecurringEntryTable.values(entry))
+        }
+        change { $0.upsertRecurringEntry(entry) }
+    }
+
+    public func removeRecurringEntry(_ id: UUID) throws {
+        try write { try $0.run("DELETE FROM recurringEntry WHERE id = ?", [.text(id.uuidString)]) }
+        change { $0.removeRecurringEntry(id) }
+    }
+
     public func removePlannedItem(_ id: UUID) throws {
         try write { try $0.run("DELETE FROM plannedItem WHERE id = ?", [.text(id.uuidString)]) }
         change { $0.removePlannedItem(id) }
@@ -484,6 +589,7 @@ public actor EncryptedLedgerStore: LedgerStore {
             snapshot.budgets[account] = AccountBudget(accountID: account, amountCents: try row.int("amountCents"), period: period, startDay: try row.int("startDay"), anchor: anchor)
         }
         snapshot.plannedItems = try db.query("SELECT * FROM plannedItem ORDER BY day, createdAt").map(PlannedItemTable.model)
+        snapshot.recurringEntries = try db.query("SELECT * FROM recurringEntry ORDER BY createdAt, id").map(RecurringEntryTable.model)
         for row in try db.query("SELECT * FROM openingBalance") {
             let (account, opening) = try OpeningBalanceTable.model(row)
             snapshot.openingBalances[account] = opening

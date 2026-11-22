@@ -642,3 +642,66 @@ private struct ProbeConnector: BankConnector {
         await reopened.close()
     }
 }
+
+@Suite struct RecurringEntryPersistenceTests {
+    @Test func entriesPersistOneChangePerPaymentAndGoWithTheBank() async throws {
+        let url = tempURL()
+        let store = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        try await Fixture.fill(store)
+        // Whole seconds: the column is a Unix time.
+        let own = RecurringEntry(accountID: Fixture.giro.id, title: "Miete bar", amountCents: -80_000, cadence: .monthly,
+                                 anchorDay: BankDay(year: 2026, month: 12, day: 1)!, createdAt: Date(timeIntervalSince1970: 1_800_000_000))
+        try await store.upsertRecurringEntry(own)
+        let first = RecurringEntry(seriesID: "series-1", accountID: Fixture.giro.id, title: "Musik", amountCents: -999, cadence: .yearly,
+                                   createdAt: Date(timeIntervalSince1970: 1_800_000_100))
+        try await store.upsertRecurringEntry(first)
+        // A second change of the same payment replaces the first, also under a new ID.
+        let second = RecurringEntry(seriesID: "series-1", accountID: Fixture.giro.id, title: "Musik Familie", amountCents: -1_799, cadence: .monthly,
+                                    createdAt: Date(timeIntervalSince1970: 1_800_000_200))
+        try await store.upsertRecurringEntry(second)
+        #expect(await store.snapshot().recurringEntries == [own, second])
+        await store.close()
+
+        let reopened = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await reopened.snapshot().recurringEntries == [own, second])
+        try await reopened.removeRecurringEntry(second.id)
+        #expect(await reopened.snapshot().recurringEntries == [own])
+        try await reopened.removeConnection(Fixture.connection.id)
+        #expect(await reopened.snapshot().recurringEntries.isEmpty)
+        await reopened.close()
+        let third = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await third.snapshot().recurringEntries.isEmpty)
+        await third.close()
+    }
+
+    /// A schema update leaves the database as it was next to the updated one.
+    @Test func schemaUpdateKeepsACopyOfTheOldDatabase() async throws {
+        let url = tempURL()
+        let folder = url.deletingLastPathComponent()
+        let store = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        try await Fixture.fill(store)
+        await store.close()
+        func copies() -> [String] {
+            ((try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []).filter { $0.hasPrefix(EncryptedLedgerStore.preMigrationPrefix) }
+        }
+        #expect(copies().isEmpty, "a new database and an up-to-date one leave none")
+
+        // As an older MFN left it: one migration behind.
+        let old = Schema.migrations.count - 1
+        var passphrase = keyA.sqlCipherRawKey
+        defer { passphrase.wipe() }
+        let db = try SQLiteConnection(path: url.path, passphrase: passphrase)
+        try db.execute("DROP TABLE recurringEntry; PRAGMA user_version = \(old);")
+        db.close()
+
+        let updated = try await EncryptedLedgerStore.open(at: url, key: keyA)
+        #expect(await updated.snapshot().connections == [Fixture.connection])
+        await updated.close()
+        #expect(copies() == ["\(EncryptedLedgerStore.preMigrationPrefix)\(old).sqlite"])
+
+        let copy = try SQLiteConnection(path: folder.appendingPathComponent(copies()[0]).path, passphrase: passphrase)
+        #expect(try copy.query("PRAGMA user_version").first?.int("user_version") == old)
+        #expect(try copy.query("SELECT count(*) AS n FROM connection").first?.int("n") == 1)
+        copy.close()
+    }
+}

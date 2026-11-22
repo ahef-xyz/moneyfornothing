@@ -10,16 +10,22 @@ extension AppModel {
     var csvExportItem: SidebarItem? {
         guard !lock.isLocked else { return nil }
         switch selection {
-        case nil, .overview?: return .allAccounts
+        case nil, .overview?, .subscriptions?: return .allAccounts
         case let .account(id)?:
             return account(id)?.type == .depot ? nil : .account(id)
         case let item?: return item
         }
     }
 
+    /// Read by the menu bar on every publish. Where no list is on screen (overview) it must not
+    /// build the "Alle Konten" list just to count it: any transaction enables the command, and an
+    /// export that turns out empty (search, filters) beeps.
     var canExportCSV: Bool {
         guard let item = csvExportItem else { return false }
-        return ledgerContent(for: item).listedCount > 0
+        switch selection {
+        case nil, .overview?, .subscriptions?: return !snapshot.transactions.isEmpty
+        default: return ledgerContent(for: item).listedCount > 0
+        }
     }
 
     func exportCSV() {

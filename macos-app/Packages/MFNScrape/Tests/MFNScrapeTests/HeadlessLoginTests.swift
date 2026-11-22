@@ -203,6 +203,21 @@ private let credentials = BankCredentials(["username": "max@example.invalid", "p
     }
 }
 
+@Suite struct WebDataStorePayPalTests {
+    /// The cookie names of the recording (`Fixtures/PayPal/endpoints.md`): the session leaves the
+    /// web store although the login ends on a URL and most names say nothing.
+    @Test func payPalKeepsOnlyDeviceCookies() {
+        let request = WebLoginRequest(url: URL(string: "https://www.paypal.com/signin")!, completion: .urlPrefix("https://www.paypal.com/myaccount"), cookieDomains: ["paypal.com"], message: "")
+        let names = ["nsid", "x-pp-s", "id_token", "rssk", "rmuc", "l7_az", "X-PP-ADS", "AV894Kt2TSumQQrJwe", "datadome", "d_id", "fn_dt", "ts", "ts_c", "LANG", "cookie_prefs"]
+        let cookies = names.map { SessionCookie(name: $0, value: "v", domain: $0 == "nsid" ? "www.paypal.com" : ".paypal.com") }
+        let deleted = WebDataStorePolicy.cookiesToDelete(cookies, after: request).map(\.name)
+        #expect(deleted == ["nsid", "x-pp-s", "id_token", "rssk", "rmuc", "l7_az", "X-PP-ADS", "AV894Kt2TSumQQrJwe"])
+        // Another site with the same names is judged by name fragments as before.
+        #expect(!WebDataStorePolicy.isSessionCookie(named: "nsid", domain: "bank.example.invalid", completion: request.completion))
+        #expect(!WebDataStorePolicy.isSessionCookie(named: "nsid", domain: "notpaypal.com", completion: request.completion))
+    }
+}
+
 @Suite struct HeadlessLoginQRCodeTests {
     private func login() -> HeadlessLogin {
         var login = HeadlessLogin(automation: WebLoginAutomation(script: "", message: "Anmeldung …"))

@@ -22,8 +22,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://www.moneyfornothing.app/screenshots/de/overview-dark.png?v=0.4.0">
-    <img src="https://www.moneyfornothing.app/screenshots/de/overview.png?v=0.4.0" width="820" alt="MFN overview with demo data">
+    <source media="(prefers-color-scheme: dark)" srcset="https://www.moneyfornothing.app/screenshots/de/overview-dark.png?v=0.5.0">
+    <img src="https://www.moneyfornothing.app/screenshots/de/overview.png?v=0.5.0" width="820" alt="MFN overview with demo data">
   </picture>
 </p>
 
@@ -51,6 +51,10 @@ yourself, but you may not pass it on (see [License](#license)).
   select them; filter or sort by them.
 - **Forecast.** Note one-off expenses for a future date and see the projected balance. Monthly payments
   such as salary and rent are estimated from your own history. Planned entries are local notes, not orders.
+- **Fixed costs.** Recurring expenses and income are detected from your transactions and shown per month
+  and per year; add your own entries or adjust detected ones.
+- **Encrypted backup.** One file holds the whole database; its contents can only be read with the database
+  password that was set when it was written. Optionally written automatically into a folder you choose. Bank logins are never part of a backup.
 
 Swift 6, SwiftUI/AppKit. Requires **macOS 26** on **Apple Silicon**.
 
@@ -64,6 +68,7 @@ Swift 6, SwiftUI/AppKit. Requires **macOS 26** on **Apple Silicon**.
 | C24 | The bank's own web login (QR/push approval), then its web JSON endpoints |
 | easybank | The bank's own web login, then its web endpoints |
 | N26 | Headless web login with push approval |
+| PayPal | PayPal's own web login in a visible window (you sign in yourself), then its web endpoints |
 
 CSV import works for every account, including accounts without a bank connection; CSV export works for every list. Unofficial and web-banking interfaces can change at any
 time and may break MFN without notice.

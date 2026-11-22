@@ -1,4 +1,5 @@
 import AppKit
+import CryptoKit
 import Foundation
 import LocalAuthentication
 import MFNCore
@@ -27,10 +28,18 @@ final class AppModel {
     /// on read it (bank menus, Settings → Banken).
     private(set) var ledger = LedgerSnapshot() {
         didSet {
-            // Only read marks changed (a row selected, ⇧⌘U): no rebuild of index and lists.
-            if Self.differsOnlyInNew(oldValue, ledger) {
+            // Only read marks changed (a row selected, ⇧⌘U) or only sync states (a sync starting,
+            // asking for approval, failing, ending): no rebuild of index and lists.
+            switch Self.lightChange(from: oldValue, to: ledger) {
+            case .newOnly:
                 refreshNewState()
                 return
+            case let .syncStates(alsoNew):
+                if alsoNew { refreshNewState() }
+                snapshot.syncStates = ledger.syncStates
+                return
+            case nil:
+                break
             }
             ledgerRevision &+= 1
             refreshSnapshot()
@@ -67,6 +76,23 @@ final class AppModel {
             if let id = selectedAccountID, hiddenAccountIDs.contains(id) { selection = .overview }
         }
     }
+    /// Recurring payments the user said are none (Fixkosten → "Ausblenden"). A UI preference in
+    /// `UserDefaults` like `hiddenAccountIDs`, but only as hashes: the IDs carry counterpart names,
+    /// which belong into the encrypted database and nowhere else.
+    var hiddenRecurring: Set<String> = AppModel.loadHiddenRecurring() {
+        didSet {
+            guard hiddenRecurring != oldValue else { return }
+            UserDefaults.standard.set(hiddenRecurring.sorted(), forKey: Self.hiddenRecurringKey)
+        }
+    }
+    /// Keys the hashes in `hiddenRecurring`. Derived from the database key by the store, held
+    /// only while unlocked.
+    @ObservationIgnored var recurringHashKey: SymmetricKey?
+    /// What `Subscriptions.detect` found for a snapshot and day, computed off the main actor
+    /// (Subscriptions.swift). `nil` until the first run finished.
+    var recurringDetection: RecurringDetection?
+    /// `recurringDetection` with the user's entries applied, per detection and entries.
+    @ObservationIgnored var recurringCache: (version: Int, entries: [RecurringEntry], payments: [RecurringPayment])?
     /// Accounts left out of the bank sums and the overall total (still shown with their balance).
     /// A UI preference in `UserDefaults`, like `hiddenAccountIDs`.
     var excludedFromTotals: Set<AccountID> = AppModel.loadExcludedFromTotals() {
@@ -277,16 +303,57 @@ final class AppModel {
     /// Encrypted demo ledger in the sandbox container, filled by the five mock banks. The data
     /// persists across launches.
     static func demo(headlessLogin: Bool = false) -> AppModel {
-        let url = (try? databaseURL()) ?? FileManager.default.temporaryDirectory.appendingPathComponent(EncryptedLedgerStore.fileName)
-        return AppModel(databaseURL: url, isDemo: true, profile: .demo, machineStages: [MockCategorizationStage()], presetStages: [RuleStage()]) { engine, store, presenter in
+        var directory = "MFN"
+        var keyAccount = KeychainDatabaseKey.defaultAccount
+        var seedsAlways = false
+        #if DEBUG
+        // Website screenshots never show the demo ledger of this Mac (it may hold whatever was
+        // tried in it, also a restored backup): they get a ledger of their own, new on every run.
+        if ScreenshotMode.isActive {
+            directory = "MFN-Screenshots"
+            keyAccount = "ledger-key-screenshots-v1"
+            seedsAlways = true
+            if let old = try? databaseURL(directory: directory).deletingLastPathComponent() { try? FileManager.default.removeItem(at: old) }
+            // The key of the ledger just deleted goes with it.
+            SecItemDelete([
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: KeychainDatabaseKey.defaultService,
+                kSecAttrAccount as String: keyAccount,
+                kSecUseDataProtectionKeychain as String: true,
+            ] as CFDictionary)
+        }
+        #endif
+        let url = (try? databaseURL(directory: directory)) ?? FileManager.default.temporaryDirectory.appendingPathComponent(EncryptedLedgerStore.fileName)
+        // The "once" marks belong to the persistent demo ledger; a new one is always filled.
+        let fresh = seedsAlways
+        let wasDone: @Sendable (String) -> Bool = { key in !fresh && UserDefaults.standard.bool(forKey: key) }
+        let markDone: @Sendable (String) -> Void = { key in if !fresh { UserDefaults.standard.set(true, forKey: key) } }
+        return AppModel(databaseURL: url, keyAccount: keyAccount, isDemo: true, profile: .demo, machineStages: [MockCategorizationStage()], presetStages: [RuleStage()]) { engine, store, presenter in
             if await store.snapshot().categoryRules.isEmpty {
                 for rule in MockCategorizationStage.demoRules { try await store.upsertRule(rule) }
             }
+            #if DEBUG
+            // Website screenshots start from a new ledger: fill it with the demo data as it was a
+            // few days ago first (the same history, without its newest days), so the sync that
+            // follows brings transactions that are marked "Neu", and the example budgets, planned
+            // payments and depot history below find their accounts.
+            if await ScreenshotMode.isActive, await store.snapshot().connections.isEmpty {
+                let current = MockDataset.demo()
+                let seeding = SyncEngine(store: store)
+                for connection in current.connections {
+                    let connector = ScreenshotMode.EarlierConnector(
+                        base: MockConnector(connection: connection.id, dataset: current, latency: .milliseconds(0)),
+                        until: BankDay.today.adding(days: -ScreenshotMode.newDays))
+                    try await seeding.register(connection, connector: connector)
+                }
+                await seeding.syncAll(trigger: .manual)
+            }
+            #endif
             // Once: automatic categories of earlier demo versions go (model guesses, known
             // merchants, transfers; not user rules or manual ones), so an existing demo ledger is
             // as open as a new one and the assistant is offered again.
             let resetKey = "demoMachineCategoriesReset.v3"
-            if !UserDefaults.standard.bool(forKey: resetKey) {
+            if !wasDone(resetKey) {
                 let automatic = await store.snapshot().transactions.filter { transaction in
                     switch transaction.categorySource {
                     case .knn, .llm: true
@@ -295,36 +362,43 @@ final class AppModel {
                     }
                 }
                 try await store.clearCategories(Set(automatic.map(\.id)))
-                UserDefaults.standard.set(true, forKey: resetKey)
-                UserDefaults.standard.removeObject(forKey: "categorySetupOffered.demo")
+                markDone(resetKey)
+                // The persistent demo's own setting: a screenshot run leaves it alone.
+                if !fresh { UserDefaults.standard.removeObject(forKey: "categorySetupOffered.demo") }
             }
             // Once: example budgets (deleting them later sticks).
             let budgetsKey = "demoBudgets.v1"
-            if !UserDefaults.standard.bool(forKey: budgetsKey) {
-                let existing = await store.snapshot().budgets
-                for budget in MockDataset.demoBudgets where existing[budget.accountID] == nil {
-                    try await store.setBudget(budget)
+            if !wasDone(budgetsKey) {
+                let snapshot = await store.snapshot()
+                let known = Set(snapshot.accounts.map(\.id))
+                // A budget needs its account, and a demo bank that was never approved has none.
+                // Each budget is added once on its own, so one missing bank does not bring back
+                // budgets the user deleted on the others.
+                for budget in MockDataset.demoBudgets where known.contains(budget.accountID) {
+                    let key = "\(budgetsKey).\(budget.accountID.rawValue)"
+                    guard !wasDone(key) else { continue }
+                    if snapshot.budgets[budget.accountID] == nil { try await store.setBudget(budget) }
+                    markDone(key)
                 }
-                UserDefaults.standard.set(true, forKey: budgetsKey)
             }
             // Once: example planned payments on the salary account (deleting them later sticks).
             let plannedKey = "demoPlannedItems.v1"
-            if !UserDefaults.standard.bool(forKey: plannedKey),
+            if !wasDone(plannedKey),
                await store.snapshot().accounts.contains(where: { $0.id == MockAccounts.ingGiro }) {
                 for item in MockDataset.demoPlannedItems() {
                     try await store.upsertPlannedItem(item)
                 }
-                UserDefaults.standard.set(true, forKey: plannedKey)
+                markDone(plannedKey)
             }
             let dataset = MockDataset.demo()
             // Once: depot history up to yesterday (the banks deliver none; syncs add today).
             let depotKey = "demoDepotHistory.v1"
             // The depot accounts must exist (first sync of a new demo ledger), else next launch.
-            if !UserDefaults.standard.bool(forKey: depotKey) {
+            if !wasDone(depotKey) {
                 let known = Set(await store.snapshot().accounts.map(\.id))
                 if dataset.accounts.filter({ $0.type == .depot }).allSatisfy({ known.contains($0.id) }) {
                     try await store.recordDepotValues(dataset.demoDepotHistory())
-                    UserDefaults.standard.set(true, forKey: depotKey)
+                    markDone(depotKey)
                 }
             }
             var pairs = headlessLogin ? dataset.demoConnectorsWithHeadlessLogin(presenter: nil) : dataset.demoConnectors(presenter: nil)
@@ -393,6 +467,11 @@ final class AppModel {
                 await finishOpening(try await vault.open(), session: session)
             case .needsSetup:
                 vaultPrompt = .setup
+                #if DEBUG
+                // The screenshot ledger is thrown away with the next run: nobody has to think of
+                // a password for it.
+                if ScreenshotMode.isActive { await submitPassword(UUID().uuidString + UUID().uuidString) }
+                #endif
             case .needsPassword:
                 vaultPrompt = .password
             }
@@ -469,6 +548,7 @@ final class AppModel {
         }
         self.store = store
         self.engine = engine
+        recurringHashKey = await store.preferenceHashKey()
         // Deterministic stages first (user rules, own transfers, well-known merchants), then the
         // learning ones. Works without Apple Intelligence: the first three need no model.
         categorization = CategorizationService(
@@ -478,7 +558,8 @@ final class AppModel {
         let defaults = UserDefaults.standard
         hideAmounts = defaults.bool(forKey: Preferences.hideAmountsOnUnlock)
         showCancelled = defaults.bool(forKey: Preferences.showCancelledByDefault)
-        if defaults.bool(forKey: Preferences.syncOnUnlock) {
+        let syncsNow = defaults.bool(forKey: Preferences.syncOnUnlock)
+        if syncsNow {
             // The user is at the Mac: logins may ask for approval (unlike the timer).
             startSync { await engine.syncAll(trigger: .unlock) }
         }
@@ -488,6 +569,9 @@ final class AppModel {
         if selection == nil { selection = .overview }
         loadBankIcons()
         scheduleAutoSync()
+        // With a sync starting now the backup waits for its end (`syncSucceeded`): copying the
+        // database while it is being written and categorized makes both slower.
+        if !syncsNow { runAutoBackupIfDue() }
         // Secrets of removed connections whose deletion did not finish (failure, crash). A
         // connection that exists again (same ID) is left alone.
         let pending = PendingCleanup.all.filter { stale in !ledger.connections.contains { $0.id == stale.id } }
@@ -548,6 +632,11 @@ final class AppModel {
         // Ends the save sheet; its completion sees the lock and writes nothing.
         csvExportPanel?.cancel(nil)
         csvExportPanel = nil
+        backupPanel?.cancel(nil)
+        backupPanel = nil
+        restoreRequest = nil
+        recurringHashKey = nil
+        recurringDetection = nil
         // Alerts and reports over decrypted rows (counts, account names, transactions).
         importRemoval = nil
         importRemovalFailure = nil
@@ -572,6 +661,8 @@ final class AppModel {
         syncTasks[id] = Task { [weak self] in
             await operation()
             self?.syncTasks[id] = nil
+            // Also when every bank failed (no `syncSucceeded`): a due backup is not skipped.
+            self?.runAutoBackupIfDue()
         }
     }
 
@@ -1029,6 +1120,23 @@ final class AppModel {
 
     var canChangePassword: Bool { !lock.isLocked && vaultPrompt == nil }
 
+    // MARK: - Backup (Backup.swift)
+
+    /// The vault of this unlock: also while the password prompt is up, before any database is open.
+    var backupVault: LedgerVault? { vault }
+    var backupStore: EncryptedLedgerStore? { store }
+    /// Automatic backup into a folder the user chose (Settings → Sicherung).
+    @ObservationIgnored private(set) lazy var autoBackup = AutoBackup(profile: profile)
+
+    /// After a restore on the setup screen: the database from the backup is in place, open it
+    /// the way a copied database is opened (key into the keychain, connectors, first view).
+    func openRestoredDatabase(password: String) async {
+        guard vault != nil, store == nil, !lock.isLocked else { return }
+        vaultPrompt = .password
+        vaultError = nil
+        await submitPassword(password)
+    }
+
     var databaseURLForDisplay: URL { databaseURL }
 
     static func message(forPasswordChange error: VaultError) -> String {
@@ -1073,6 +1181,7 @@ final class AppModel {
     private func syncSucceeded() {
         setupOfferPending = true
         categorizeInBackground()
+        runAutoBackupIfDue()
     }
 
     // MARK: - Category setup assistant
@@ -1407,7 +1516,8 @@ final class AppModel {
         guard let budget = ledger.budgets[account] else { return nil }
         let connection = ledger.accounts.first { $0.id == account }?.connectionID
         let lastSync = connection.flatMap { ledger.syncStates[$0]?.lastSuccess }.map(BankDay.init)
-        return BudgetForecast.status(for: budget, transactions: ledger.transactions, today: today, dataAsOf: lastSync)
+        // Only this account's rows count (spending, anchor deposits): not a pass over the whole ledger.
+        return BudgetForecast.status(for: budget, transactions: ledger.transactions(of: account), today: today, dataAsOf: lastSync)
     }
 
     func showBudgetEditor(for account: Account) {
@@ -1446,6 +1556,14 @@ final class AppModel {
     var isOpeningCSV = false
     /// The open "Umsätze als CSV exportieren" panel; cancelled when locking.
     @ObservationIgnored var csvExportPanel: NSSavePanel?
+    /// Open save or open panel of the backup commands; cancelled when locking.
+    @ObservationIgnored var backupPanel: NSSavePanel?
+    /// A backup file the user picked to restore from (sheet over the main window).
+    var restoreRequest: RestoreRequest?
+    /// Result of a backup or restore, shown as an alert (also over the lock screen).
+    var backupNotice: BackupNotice?
+    /// A backup is being written or restored.
+    var isBackingUp = false
     /// "Importierte Umsätze entfernen" waiting for confirmation (alert with the count).
     var importRemoval: ImportRemovalRequest?
     /// Why a removal failed (alert); `nil` when there is nothing to say.
@@ -1607,9 +1725,14 @@ final class AppModel {
     // Per profile (`LaunchProfile.scoped`): the test profile may hold the same real accounts
     // (same IDs) as the live ledger, and its settings must not change the live ones.
     static var hiddenAccountsKey: String { LaunchProfile.launched.scoped("hiddenAccounts") }
+    static var hiddenRecurringKey: String { LaunchProfile.launched.scoped("hiddenRecurring") }
+
+    private static func loadHiddenRecurring() -> Set<String> {
+        Set(UserDefaults.standard.stringArray(forKey: hiddenRecurringKey) ?? [])
+    }
     static var excludedFromTotalsKey: String { LaunchProfile.launched.scoped("excludedFromTotals") }
     /// Base names of all per-profile UI settings (removed when the test profile is emptied).
-    nonisolated static let profileScopedKeys = ["hiddenAccounts", "excludedFromTotals", "sidebarOrder", "collapsedBanks", "categorySetupOffered", "pendingSecretCleanup"]
+    nonisolated static let profileScopedKeys = ["hiddenAccounts", "excludedFromTotals", "sidebarOrder", "collapsedBanks", "hiddenRecurring", "categorySetupOffered", "pendingSecretCleanup"]
 
     private static func loadExcludedFromTotals() -> Set<AccountID> {
         Set((UserDefaults.standard.stringArray(forKey: excludedFromTotalsKey) ?? []).map(AccountID.init(rawValue:)))
@@ -1639,16 +1762,37 @@ final class AppModel {
         sharedAccounts.contains(transaction.accountID) ? initiators[transaction.id] : nil
     }
 
+    /// Extraction result per transaction, with the size of the raw data it was read from: a
+    /// publish only reads rows that are new or whose raw data changed, not every blob again.
+    /// (Same size, other content: the person behind a transaction does not change.)
+    @ObservationIgnored private var initiatorCache: [TransactionID: (size: Int, initiator: TransactionInitiator?)] = [:]
+
     private func refreshInitiators() {
+        // Most publishes change no raw data (a category, a balance, a read mark): nothing to
+        // extract and nothing to rebuild then.
+        if initiatorCache.count == ledger.transactions.count,
+           ledger.transactions.allSatisfy({ initiatorCache[$0.id]?.size == $0.rawJSON.count }) { return }
         var found: [TransactionID: TransactionInitiator] = [:]
         var people: [AccountID: Set<String>] = [:]
+        var cache: [TransactionID: (size: Int, initiator: TransactionInitiator?)] = [:]
+        cache.reserveCapacity(ledger.transactions.count)
         for transaction in ledger.transactions {
-            guard let initiator = TransactionInitiator.extract(from: transaction.rawJSON) else { continue }
+            let size = transaction.rawJSON.count
+            let initiator: TransactionInitiator?
+            if let known = initiatorCache[transaction.id], known.size == size {
+                initiator = known.initiator
+            } else {
+                initiator = TransactionInitiator.extract(from: transaction.rawJSON)
+            }
+            cache[transaction.id] = (size, initiator)
+            guard let initiator else { continue }
             found[transaction.id] = initiator
             people[transaction.accountID, default: []].insert(initiator.key)
         }
-        initiators = found
-        sharedAccounts = Set(people.filter { $0.value.count > 1 }.keys)
+        initiatorCache = cache
+        if initiators != found { initiators = found }
+        let shared = Set(people.filter { $0.value.count > 1 }.keys)
+        if sharedAccounts != shared { sharedAccounts = shared }
     }
 
     /// The UI's view: hidden accounts out, the user's account names in place of the bank's.
@@ -1686,12 +1830,33 @@ final class AppModel {
     /// Set while the app itself moves the selection (`selectNextReview`): that does not read.
     @ObservationIgnored private var selectsWithoutReading = false
 
-    /// Everything but the read marks is the same (also when nothing changed, e.g. the store
-    /// confirming an optimistic `markRead`). Unchanged arrays compare by storage first: cheap.
-    private static func differsOnlyInNew(_ old: LedgerSnapshot, _ new: LedgerSnapshot) -> Bool {
-        var old = old
-        old.newTransactionIDs = new.newTransactionIDs
-        return old == new
+    enum LightChange: Equatable {
+        /// Only the read marks differ, or nothing at all (e.g. the store confirming an optimistic
+        /// `markRead`).
+        case newOnly
+        /// Only the sync states differ (and the read marks, if `alsoNew`).
+        case syncStates(alsoNew: Bool)
+    }
+
+    /// A change that needs no new index and no new lists; `nil` for everything else.
+    /// Unchanged arrays compare by storage first: cheap.
+    ///
+    /// Sync states only count as light while every connection's last successful sync stays on
+    /// the same day: budgets forecast from that day (`computeBudgetStatus`), so a new day goes
+    /// the full way.
+    static func lightChange(from old: LedgerSnapshot, to new: LedgerSnapshot) -> LightChange? {
+        var probe = old
+        probe.newTransactionIDs = new.newTransactionIDs
+        probe.syncStates = new.syncStates
+        guard probe == new else { return nil }
+        guard old.syncStates != new.syncStates else { return .newOnly }
+        let connections = Set(old.syncStates.keys).union(new.syncStates.keys)
+        for id in connections {
+            let before = old.syncStates[id]?.lastSuccess.map { BankDay($0) }
+            let after = new.syncStates[id]?.lastSuccess.map { BankDay($0) }
+            guard before == after else { return nil }
+        }
+        return .syncStates(alsoNew: old.newTransactionIDs != new.newTransactionIDs)
     }
 
     /// Read marks into `snapshot` and the counts, without rebuilding anything else.
@@ -1775,7 +1940,7 @@ final class AppModel {
     func toggleNewFilter() {
         guard !lock.isLocked else { return }
         let isDepot = if case let .account(id)? = selection { account(id)?.type == .depot } else { false }
-        if !ledgerQuery.onlyNew, selection == .overview || selection == nil || isDepot {
+        if !ledgerQuery.onlyNew, selection == .overview || selection == .subscriptions || selection == nil || isDepot {
             selection = .allAccounts
             AccessibilityNotification.Announcement("Alle Konten, nur neue Umsätze").post()
         }
@@ -1964,6 +2129,13 @@ final class AppModel {
         index.accountsByID[id]
     }
 
+    /// Whether today's balance walked back through the bookings gives the balance of each day.
+    /// Not at PayPal: a payment PayPal collects from the bank account is in the list, the money
+    /// coming in for it is not, so the sum of the rows is not what the balance moved by.
+    func hasRunningBalance(_ account: Account) -> Bool {
+        ledger.connections.first { $0.id == account.connectionID }?.connectorID != .paypal
+    }
+
     func connectionName(_ id: ConnectionID) -> String {
         snapshot.connections.first { $0.id == id }?.displayName ?? id.rawValue
     }
@@ -1980,6 +2152,7 @@ extension LedgerSnapshot {
         result.cardStatements.removeAll { hidden.contains($0.accountID) }
         result.securities.removeAll { hidden.contains($0.accountID) }
         result.plannedItems.removeAll { hidden.contains($0.accountID) }
+        result.recurringEntries.removeAll { hidden.contains($0.accountID) }
         result.importBatches.removeAll { hidden.contains($0.accountID) }
         // "Neu" counts, ⇧⌘U and the new filter only see visible accounts.
         if !result.newTransactionIDs.isEmpty {

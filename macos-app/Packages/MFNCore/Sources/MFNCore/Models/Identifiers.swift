@@ -13,6 +13,8 @@ public enum ConnectorID: String, Codable, Sendable, CaseIterable, Hashable {
     /// v10: account without a bank connection ("Ohne Anbindung"). No connector, no sync:
     /// transactions come from the CSV import only, the balance is computed (`ManualAccount`).
     case manual
+    /// v11: PayPal over its website (visible web login, package `MFNPayPal`).
+    case paypal
 
     public var displayName: String {
         switch self {
@@ -24,6 +26,7 @@ public enum ConnectorID: String, Codable, Sendable, CaseIterable, Hashable {
         case .n26: "N26"
         case .mock: "Demo"
         case .manual: "Ohne Anbindung"
+        case .paypal: "PayPal"
         }
     }
 }

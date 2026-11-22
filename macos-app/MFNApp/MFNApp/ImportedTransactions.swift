@@ -142,7 +142,7 @@ extension AppModel {
     func toggleImportedFilter() {
         guard !lock.isLocked else { return }
         let isDepot = if case let .account(id)? = selection { account(id)?.type == .depot } else { false }
-        if !ledgerQuery.onlyImported, selection == .overview || selection == nil || isDepot {
+        if !ledgerQuery.onlyImported, selection == .overview || selection == .subscriptions || selection == nil || isDepot {
             selection = .allAccounts
         }
         ledgerQuery.onlyImported.toggle()

@@ -3,6 +3,7 @@ import MFNCore
 import MFNDKB
 import MFNEasybank
 import MFNN26
+import MFNPayPal
 import MFNTradeRepublic
 
 /// `ConnectorID` → connector of this build. The only place the app names connector packages.
@@ -20,6 +21,8 @@ enum ConnectorFactory {
         case .tradeRepublic: TradeRepublicConnector(connectionID: connection.id, presenter: presenter)
         case .n26: N26Connector(connectionID: connection.id, presenter: presenter)
         case .dkb: DKBConnector(connectionID: connection.id, presenter: presenter)
+        // v11: visible web login, no stored credentials.
+        case .paypal: PayPalConnector(connectionID: connection.id, presenter: presenter)
         // FinTS only (`fints-` connections above). An old web banking ING has no connector any
         // more: it keeps its data until it is merged or removed.
         case .ing: nil

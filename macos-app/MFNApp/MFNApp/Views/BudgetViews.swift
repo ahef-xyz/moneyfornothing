@@ -213,7 +213,7 @@ struct BudgetSheet: View {
     private var depositSources: [String] {
         var months: [String: Set<Int>] = [:]
         var names: [String: String] = [:]
-        for t in model.ledger.transactions where t.accountID == account.id && t.amountCents > 0 && t.status == .booked {
+        for t in model.ledger.transactions(of: account.id) where t.amountCents > 0 && t.status == .booked {
             let key = t.counterpartName.lowercased()
             guard !key.isEmpty else { continue }
             months[key, default: []].insert(t.effectiveDate.year * 12 + t.effectiveDate.month)
@@ -261,7 +261,7 @@ struct BudgetSheet: View {
             // Fixed two-line slot: the preview must not make the sheet jump while typing.
             Group {
                 if let draft {
-                    let status = BudgetForecast.status(for: draft, transactions: model.ledger.transactions)
+                    let status = BudgetForecast.status(for: draft, transactions: model.ledger.transactions(of: account.id))
                     Text("Aktueller Zeitraum: \(BudgetFormat.periodTitle(status)) · bisher \(Money.format(status.spentCents)) · \(BudgetFormat.stateText(status, hide: model.hideAmounts))")
                 } else {
                     Text("Betrag eingeben, um den aktuellen Zeitraum und die Prognose zu sehen.")

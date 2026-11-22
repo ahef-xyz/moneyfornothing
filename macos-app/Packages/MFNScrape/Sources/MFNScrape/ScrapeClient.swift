@@ -101,7 +101,14 @@ public actor ScrapeClient {
             do {
                 let (data, response) = try await transport.send(request)
                 storeCookies(from: response, url: url)
-                Self.log.info("\(method, privacy: .public) \(url.host() ?? "?", privacy: .public) → \(response.statusCode, privacy: .public)")
+// Successes at info (kept in memory only); anything else at notice, so it is still in the
+                // log when someone looks. The path is a template without IDs.
+                let line = "\(method) \(url.host() ?? "?")\(Self.pathTemplate(url)) → \(response.statusCode)"
+                if (200..<300).contains(response.statusCode) {
+                    Self.log.info("\(line, privacy: .public)")
+                } else {
+                    Self.log.notice("\(line, privacy: .public)")
+                }
                 switch response.statusCode {
                 case 200..<300:
                     consecutiveFailures = 0
@@ -124,6 +131,9 @@ public actor ScrapeClient {
             } catch let error as URLError where error.code == .cancelled {
                 throw .cancelled
             } catch {
+                // Why nothing came back (timeout, connection lost, too many redirects): the code only.
+                let code = (error as? URLError).map { "URLError \($0.code.rawValue)" } ?? String(describing: type(of: error))
+                Self.log.error("\(method, privacy: .public) \(url.host() ?? "?", privacy: .public)\(Self.pathTemplate(url), privacy: .public) ohne Antwort: \(code, privacy: .public)")
                 lastError = .bankUnavailable
             }
         }

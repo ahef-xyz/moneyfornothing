@@ -62,6 +62,7 @@ public enum MockAccounts {
     public static let c24Pocket: AccountID = "mock-c24-pocket"
     public static let easyVisa: AccountID = "mock-easybank-visa"
     public static let easyTagesgeld: AccountID = "mock-easybank-tagesgeld"
+    public static let paypal: AccountID = "mock-paypal-eur"
 }
 
 public enum MockConnections {
@@ -70,6 +71,7 @@ public enum MockConnections {
     public static let tradeRepublic: ConnectionID = "mock-tr"
     public static let c24: ConnectionID = "mock-c24"
     public static let easybank: ConnectionID = "mock-easybank"
+    public static let paypal: ConnectionID = "mock-paypal"
 }
 
 extension MockDataset {

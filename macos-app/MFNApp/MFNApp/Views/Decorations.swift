@@ -218,6 +218,7 @@ enum Monogram {
         case .c24: "C"
         case .easybank: "E"
         case .n26: "N"
+        case .paypal: "P"
         case .mock, .manual: String(connection.displayName.prefix(1)).uppercased()
         }
     }
@@ -231,6 +232,7 @@ enum Monogram {
         // Lime green of the easybank brand (favicon), not the old Barclays/placeholder purple.
         case .easybank: Color(red: 0.45, green: 0.75, blue: 0.27)
         case .n26: Color(red: 0.21, green: 0.63, blue: 0.62)
+        case .paypal: Color(red: 0.0, green: 0.19, blue: 0.53)
         case .mock: color(for: connection.displayName)
         case .manual: .gray
         }

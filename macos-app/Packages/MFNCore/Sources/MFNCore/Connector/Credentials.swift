@@ -89,6 +89,10 @@ extension ConnectorID {
         case .n26:
             [CredentialField(key: "username", label: "E-Mail", kind: .email),
              CredentialField(key: "password", label: "Passwort", kind: .secret)]
+        case .paypal:
+            // v11: the user logs in on PayPal's own page in a visible web view; MFN stores
+            // no PayPal password.
+            []
         case .mock, .manual:
             []
         }
@@ -98,7 +102,7 @@ extension ConnectorID {
     /// v8: ING over FinTS.
     public var supportsSetup: Bool {
         switch self {
-        case .tradeRepublic, .c24, .easybank, .n26, .dkb, .ing: true
+        case .tradeRepublic, .c24, .easybank, .n26, .dkb, .ing, .paypal: true
         // v10: `.manual` is created by its own sheet ("Konto ohne Anbindung anlegen"), not the wizard.
         case .mock, .manual: false
         }

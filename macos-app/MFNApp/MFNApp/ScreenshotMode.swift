@@ -1,6 +1,8 @@
 #if DEBUG
 import AppKit
 import MFNCore
+import MFNMock
+import MFNStore
 
 /// Reproducible website screenshots from the demo dataset (debug builds only, never in release).
 /// Driven by `scripts/website-screenshots`: launch once with
@@ -20,6 +22,24 @@ enum ScreenshotMode {
     private static let environment = ProcessInfo.processInfo.environment
     private static var started = false
 
+    /// Days of the demo history that arrive with the sync of the run, marked "Neu".
+    static let newDays = 4
+
+    /// A demo bank as it was `newDays` ago: the same data without the transactions since.
+    struct EarlierConnector: BankConnector {
+        let base: MockConnector
+        let until: BankDay
+
+        var id: ConnectorID { base.id }
+        func accounts() async throws -> [Account] { try await base.accounts() }
+        func balance(for account: Account) async throws -> Balance { try await base.balance(for: account) }
+        func transactions(for account: Account, since: Date?) async throws -> [MFNCore.Transaction] {
+            try await base.transactions(for: account, since: since).filter { $0.effectiveDate <= until }
+        }
+        func cardStatements(for account: Account) async throws -> [CardStatement] { try await base.cardStatements(for: account) }
+        func securities(for account: Account) async throws -> [SecurityPosition] { try await base.securities(for: account) }
+    }
+
     static var isActive: Bool {
         guard let demo = environment["MFN_DEMO"]?.lowercased(), !["", "0", "false", "no"].contains(demo) else { return false }
         return environment["MFN_SHOT"] == "1"
@@ -36,6 +56,12 @@ enum ScreenshotMode {
                 window.center()
             }
         }
+        // Every bank open, whatever was collapsed in the demo on this Mac. Only for this run: the
+        // demo profile's own setting is put back.
+        let collapsedKey = AppModel.collapsedBanksKey
+        let saved = UserDefaults.standard.stringArray(forKey: collapsedKey)
+        model.collapsedConnections = []
+        if let saved { UserDefaults.standard.set(saved, forKey: collapsedKey) } else { UserDefaults.standard.removeObject(forKey: collapsedKey) }
         model.syncAll()
         // Tells the script the app is unlocked (it cannot look into the sandbox container).
         DistributedNotificationCenter.default().postNotificationName(ready, object: nil, userInfo: nil, deliverImmediately: true)
@@ -66,6 +92,7 @@ enum ScreenshotMode {
         case "all": .allAccounts
         case "review": .review
         case "pending": .pending
+        case "subscriptions": .subscriptions
         default: .account(AccountID(rawValue: String(parts[0])))
         }
         mainWindow?.makeKeyAndOrderFront(nil)

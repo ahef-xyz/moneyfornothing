@@ -8,6 +8,8 @@ enum SidebarItem: Hashable {
     case allAccounts
     case review
     case pending
+    /// Recurring payments read from the bookings (`SubscriptionsView`).
+    case subscriptions
     case account(AccountID)
 }
 
@@ -51,6 +53,10 @@ struct SidebarView: View {
                     AmountText(cents: model.pendingTotalCents, colorsInflow: false)
                 }
                 .selectable(.pending)
+                SidebarRow(title: "Fixkosten", symbol: "repeat") {
+                    EmptyView()
+                }
+                .selectable(.subscriptions)
             }
 
             let connections = model.orderedConnections
@@ -393,7 +399,7 @@ extension SidebarView {
     /// Every item in sidebar order, also the accounts of collapsed banks (the selection can stay on
     /// one after ← collapsed its bank; the arrows continue from its place).
     private var allItems: [(item: SidebarItem, visible: Bool)] {
-        var items: [(item: SidebarItem, visible: Bool)] = [(.overview, true), (.allAccounts, true), (.review, true), (.pending, true)]
+        var items: [(item: SidebarItem, visible: Bool)] = [(.overview, true), (.allAccounts, true), (.review, true), (.pending, true), (.subscriptions, true)]
         for connection in model.orderedConnections {
             let visible = !model.isCollapsed(connection.id)
             items += model.orderedAccounts(of: connection.id).map { (.account($0.id), visible) }

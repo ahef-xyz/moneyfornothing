@@ -7,6 +7,7 @@ Anonymized and altered bank responses (real structure, invented content). **Only
 - `TradeRepublic/`: login responses, timeline pages (with cursor), timelineDetailV2, compactPortfolio, cash
 - `C24/`: `endpoints.md`, JSON examples for accounts/transactions/pockets
 - `Easybank/`: `endpoints.md`, card list, transactions pending/booked, statements, CSV export
+- `PayPal/`: `endpoints.md`, summary page (balances), activity page (token), activity list
 - `N26/`: GraphQL queries, feed/timeline responses
 
 ## Policy: nothing real stays

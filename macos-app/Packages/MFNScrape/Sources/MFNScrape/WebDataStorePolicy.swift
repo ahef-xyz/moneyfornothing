@@ -12,6 +12,14 @@ public enum WebDataStorePolicy {
     /// Name fragments (case-insensitive) that mark a cookie as part of the session.
     public static let sessionFragments = ["session", "token", "refresh", "auth"]
 
+    /// Sites whose session cookies cannot be told by name (PayPal: `nsid`, `x-pp-s` and several
+    /// with random names): there everything goes after a login except the cookies listed here,
+    /// which only say "this browser was here before" (bot and device recognition, language,
+    /// cookie banner). Keyed by cookie domain, matched with its subdomains.
+    public static let keptCookies: [String: Set<String>] = [
+        "paypal.com": ["datadome", "d_id", "fn_dt", "ddi", "ddfp", "ddgp", "ts", "ts_c", "tsrce", "cookie_prefs", "cookie_check", "enforce_policy", "LANG"],
+    ]
+
     /// Stable data store identifier of a connection: name-based UUID (version 5 layout) from
     /// SHA-256 of the connection ID, so it needs no bookkeeping and survives reinstalls.
     public static func identifier(for connection: ConnectionID) -> UUID {
@@ -30,8 +38,18 @@ public enum WebDataStorePolicy {
         return sessionFragments.contains { lowered.contains($0) }
     }
 
+    /// The same for a cookie of `domain`: on a site of `keptCookies` every cookie that is not
+    /// listed there is part of the session.
+    public static func isSessionCookie(named name: String, domain: String, completion: WebLoginRequest.Completion) -> Bool {
+        let host = domain.lowercased().drop { $0 == "." }
+        if let kept = keptCookies.first(where: { host == $0.key || host.hasSuffix("." + $0.key) })?.value {
+            return !kept.contains(name)
+        }
+        return isSessionCookie(named: name, completion: completion)
+    }
+
     /// The cookies of `cookies` to delete after a successful login.
     public static func cookiesToDelete(_ cookies: [SessionCookie], after request: WebLoginRequest) -> [SessionCookie] {
-        cookies.filter { isSessionCookie(named: $0.name, completion: request.completion) }
+        cookies.filter { isSessionCookie(named: $0.name, domain: $0.domain, completion: request.completion) }
     }
 }

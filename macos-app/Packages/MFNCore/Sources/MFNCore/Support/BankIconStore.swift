@@ -46,6 +46,7 @@ public actor BankIconStore {
         case .c24: URL(string: "https://www.c24.de/")
         case .easybank: URL(string: "https://www.easybank.de/")
         case .n26: URL(string: "https://n26.com/")
+        case .paypal: URL(string: "https://www.paypal.com/")
         case .mock, .manual: nil
         }
     }

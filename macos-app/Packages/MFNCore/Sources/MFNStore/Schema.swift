@@ -160,6 +160,21 @@ enum Schema {
             id TEXT PRIMARY KEY NOT NULL REFERENCES ledgerTransaction(id) ON DELETE CASCADE
         );
         """,
+        // 12 – fixed costs the user entered (`seriesID` NULL) or changed (`seriesID` = the
+        // detected payment's ID); `cadenceMonths` = `RecurringPayment.Cadence`
+        """
+        CREATE TABLE recurringEntry (
+            id TEXT PRIMARY KEY NOT NULL,
+            seriesID TEXT,
+            accountID TEXT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            amountCents INTEGER NOT NULL,
+            cadenceMonths INTEGER NOT NULL,
+            anchorDay TEXT,
+            createdAt REAL NOT NULL
+        );
+        CREATE INDEX recurringEntry_account ON recurringEntry(accountID);
+        """,
     ]
 
     /// 10 – CSV imports (protocol v10): `importBatch` plus `ledgerTransaction.importID` (NULL = bank
@@ -421,6 +436,28 @@ enum DepotValueTable {
         DepotValuePoint(accountID: AccountID(try row.string("accountID")), day: try day(row, "day"),
                         valueCents: try row.int("valueCents"), purchaseCents: try row.optionalInt("purchaseCents"),
                         currency: try row.string("currency"))
+    }
+}
+
+enum RecurringEntryTable {
+    static let columns = ["id", "seriesID", "accountID", "title", "amountCents", "cadenceMonths", "anchorDay", "createdAt"]
+    static let upsert = upsertSQL(table: "recurringEntry", columns: columns, conflict: ["id"])
+
+    static func values(_ entry: RecurringEntry) -> [SQLValue] {
+        [.text(entry.id.uuidString), entry.seriesID.map { .text($0) } ?? .null, .text(entry.accountID.rawValue), .text(entry.title),
+         SQLValue(entry.amountCents), SQLValue(entry.cadence.rawValue), entry.anchorDay.map { .text($0.iso) } ?? .null,
+         .real(entry.createdAt.timeIntervalSince1970)]
+    }
+
+    static func model(_ row: SQLRow) throws -> RecurringEntry {
+        guard let id = UUID(uuidString: try row.string("id")),
+              let cadence = RecurringPayment.Cadence(rawValue: try row.int("cadenceMonths")) else {
+            throw StoreError.corruptRow("recurringEntry")
+        }
+        return RecurringEntry(id: id, seriesID: try row.optionalString("seriesID"), accountID: AccountID(try row.string("accountID")),
+                              title: try row.string("title"), amountCents: try row.int("amountCents"), cadence: cadence,
+                              anchorDay: try optionalDay(row, "anchorDay"),
+                              createdAt: Date(timeIntervalSince1970: try row.double("createdAt")))
     }
 }
 

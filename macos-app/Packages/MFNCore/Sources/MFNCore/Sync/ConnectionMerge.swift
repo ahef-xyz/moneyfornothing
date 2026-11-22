@@ -285,6 +285,7 @@ extension ConnectionMerge {
         public var depotValues: [DepotValuePoint] = []
         /// The source's planned items, now for the target account.
         public var plannedItems: [PlannedItem] = []
+        public var recurringEntries: [RecurringEntry] = []
         /// The source's CSV imports, now for the target account (moved rows keep their `importID`).
         public var importBatches: [ImportBatch] = []
         /// Target rows that take over the "Neu" mark of their source twin (which goes away).
@@ -326,6 +327,20 @@ extension ConnectionMerge {
                 item.ignoredMatches = Set(item.ignoredMatches.map { twins[$0] ?? $0 })
                 changes.plannedItems.append(item)
             }
+            // Fixed costs move along. A change of a detected payment names its account at the
+            // start of its series ID: it follows the bookings to the target account, unless the
+            // target already has a change of its own for that payment.
+            let sourcePrefix = "\(account.pair.source.id.rawValue)|"
+            for var entry in snapshot.recurringEntries where entry.accountID == account.pair.source.id {
+                if let series = entry.seriesID {
+                    guard series.hasPrefix(sourcePrefix) else { continue }
+                    let moved = "\(target.rawValue)|" + series.dropFirst(sourcePrefix.count)
+                    guard !snapshot.recurringEntries.contains(where: { $0.seriesID == moved }) else { continue }
+                    entry.seriesID = moved
+                }
+                entry.accountID = target
+                changes.recurringEntries.append(entry)
+            }
             changes.importBatches += snapshot.importBatches
                 .filter { $0.accountID == account.pair.source.id }
                 .map { $0.moved(to: target) }
@@ -349,6 +364,7 @@ extension LedgerSnapshot {
         for budget in changes.budgets { budgets[budget.accountID] = budget }
         record(changes.depotValues)
         for item in changes.plannedItems { upsertPlannedItem(item) }
+        for entry in changes.recurringEntries { upsertRecurringEntry(entry) }
         removeConnection(changes.source)
         // After the removal, which drops the source accounts' batches.
         for batch in changes.importBatches { upsert(importBatch: batch) }

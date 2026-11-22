@@ -32,7 +32,7 @@ import Testing
         #expect(!BankCredentials(["phoneNumber": "+49170", "pin": "12345"]).isComplete(for: .tradeRepublic))
         #expect(BankCredentials(["phoneNumber": "+49170", "pin": "1234"]).isComplete(for: .tradeRepublic))
         // v5: C24 logs in by QR code only and needs no stored credentials.
-        #expect(ConnectorID.allCases.filter(\.supportsSetup).filter { $0 != .c24 }.allSatisfy { !$0.credentialFields.isEmpty })
+        #expect(ConnectorID.allCases.filter(\.supportsSetup).filter { $0 != .c24 && $0 != .paypal }.allSatisfy { !$0.credentialFields.isEmpty })
         #expect(ConnectorID.c24.credentialFields.isEmpty)
         #expect(BankCredentials().isComplete(for: .c24))
     }

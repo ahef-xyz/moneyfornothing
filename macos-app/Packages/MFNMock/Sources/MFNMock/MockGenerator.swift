@@ -27,6 +27,7 @@ struct MockGenerator {
         Connection(id: MockConnections.tradeRepublic, connectorID: .tradeRepublic, displayName: "Trade Republic"),
         Connection(id: MockConnections.c24, connectorID: .c24, displayName: "C24"),
         Connection(id: MockConnections.easybank, connectorID: .easybank, displayName: "easybank"),
+        Connection(id: MockConnections.paypal, connectorID: .paypal, displayName: "PayPal"),
     ]
 
     private static let accounts: [Account] = [
@@ -41,6 +42,7 @@ struct MockGenerator {
         Account(id: MockAccounts.c24Pocket, connectionID: MockConnections.c24, type: .tagesgeld, name: "Pocket Urlaub"),
         Account(id: MockAccounts.easyVisa, connectionID: MockConnections.easybank, type: .card, name: "Visa Card", cardLast4: "7302", creditLimitCents: 300_000),
         Account(id: MockAccounts.easyTagesgeld, connectionID: MockConnections.easybank, iban: "DE00 2002 0000 0000 0000 06", type: .tagesgeld, name: "Tagesgeld"),
+        Account(id: MockAccounts.paypal, connectionID: MockConnections.paypal, type: .giro, name: "PayPal"),
     ]
 
     private static let openingBalances: [AccountID: Int] = [
@@ -53,6 +55,7 @@ struct MockGenerator {
         MockAccounts.c24Pocket: 30_000,
         MockAccounts.easyVisa: 0,
         MockAccounts.easyTagesgeld: 1_500_000,
+        MockAccounts.paypal: 8_500,
     ]
 
     private static let overdrafts: [AccountID: Int] = [
@@ -115,6 +118,7 @@ struct MockGenerator {
         generateTradeRepublic()
         generateC24()
         generateEasybank()
+        generatePayPal()
         let dkbStatements = settleCard(MockAccounts.dkbVisa, closingDay: 22, dueAfterDays: 5, payer: MockAccounts.dkbGiro, payerName: "DKB AG", creditorID: nil)
         let easyStatements = settleCard(MockAccounts.easyVisa, closingDay: 7, dueAfterDays: 13, payer: MockAccounts.ingGiro, payerName: "easybank AG", creditorID: "DE00ZZZ00000000001")
 
@@ -237,6 +241,16 @@ struct MockGenerator {
         }
         randomSpending(giro, perMonth: 6, merchants: Self.groceries + Self.everyday, purposePrefix: "Mastercard")
         recentPending(giro, count: 1, merchants: Self.groceries, purposePrefix: "Mastercard")
+    }
+
+    /// A small PayPal balance: money from a friend now and then, a few purchases paid from it.
+    private mutating func generatePayPal() {
+        monthly(day: 9) { me, day in
+            me.add(MockAccounts.paypal, day, 2_500, "Lena Beispiel", "Geld erhalten", iban: nil)
+        }
+        monthly(day: 14) { me, day in
+            me.add(MockAccounts.paypal, day, -me.vary(1_800, by: 600), "Buchhandlung Lesezeichen", "Zahlung", iban: nil)
+        }
     }
 
     private mutating func generateEasybank() {

@@ -33,7 +33,7 @@ struct WebLoginView: View {
                     Color.clear
                 }
             }
-            .frame(minWidth: 720, idealWidth: 920, minHeight: 480, idealHeight: 680)
+            .frame(minWidth: 720, idealWidth: 920, maxWidth: .infinity, minHeight: 480, idealHeight: 680, maxHeight: .infinity)
             Divider()
             HStack(spacing: 8) {
                 // The host is always visible so the user can see where they are typing.
@@ -376,7 +376,7 @@ final class WebLoginController: NSObject, WKNavigationDelegate, WKUIDelegate {
     /// The session goes to the keychain only: drop session-like cookies from the persistent web
     /// store; device and fingerprint cookies (and `localStorage`) stay for the next login.
     private static func removeSessionCookies(from store: WKHTTPCookieStore, completion: WebLoginRequest.Completion) async {
-        for cookie in await store.allCookies() where WebDataStorePolicy.isSessionCookie(named: cookie.name, completion: completion) {
+        for cookie in await store.allCookies() where WebDataStorePolicy.isSessionCookie(named: cookie.name, domain: cookie.domain, completion: completion) {
             await store.deleteCookie(cookie)
         }
     }

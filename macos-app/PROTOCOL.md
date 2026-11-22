@@ -1,6 +1,6 @@
 # PROTOCOL – BankConnector v6
 
-Version: 10
+Version: 11
 Eingefroren am: 2026-11-10
 
 Dieses Dokument ist der einzige Freeze-Marker. Keine Git-Tags.
@@ -55,7 +55,7 @@ public struct CredentialField { key, label, kind (.text/.email/.phone/.secret), 
 public struct BankCredentials { values: [String: String] }   // v4, description redacted, nur Keychain
 extension ConnectorID { var credentialFields: [CredentialField]; var supportsSetup: Bool }  // v4
 public struct CredentialStore { credentials(for:), set(_:for:), delete(for:) }  // v4, Keychain "credentials.<connectionID>"
-// ConnectorID: .ing, .dkb, .tradeRepublic, .c24, .easybank, .n26 (v4), .mock, .manual (v10)
+// ConnectorID: .ing, .dkb, .tradeRepublic, .c24, .easybank, .n26 (v4), .mock, .manual (v10), .paypal (v11)
 public struct StorageKey: Hashable, Codable, Sendable {   // v2, deklariert als WebLoginRequest.StorageKey + Typealias
     var key: String                     // Storage-Key bzw. bei .javaScript der Übergabename
     var source: Source                  // .sessionStorage | .localStorage | .javaScript (v3)
@@ -156,6 +156,7 @@ Fett = Ergänzung gegenüber der Kurzfassung in CLAUDE.md §4 (Zuordnung, Mehrw�
 ## Änderungshistorie
 | Version | Datum | Änderung | Freigabe |
 | --- | --- | --- | --- |
+| 11 | 2026-11-22 | `ConnectorID.paypal` (`displayName` „PayPal“, `credentialFields = []`, `supportsSetup = true`): PayPal über die Website, sichtbarer Web-Login ohne `automation` (Package `MFNPayPal`). Additiv, v10-Daten bleiben dekodierbar. Keine Signaturänderung. Der zuerst gebaute Weg über die offizielle REST-API wurde am selben Tag wieder entfernt: PayPal gibt Privatkonten keine Live-Zugangsdaten | Mensch, 2026-11-22 (Chat: „yes, let go with 2“, „remove the other“, „copy, anony. and go for it“) |
 | 10 | 2026-11-16 | Teil „Konten ohne Anbindung“ (Branch `manual-accounts`): `ConnectorID.manual` (keine Zugangsdaten, kein Assistent, kein Connector, kein Abgleich), `ConnectorID.hasConnector`. Additiv, v9-Daten bleiben dekodierbar. Store-Migration „openingBalance“ (Startsaldo, `LedgerStore` ist nicht eingefroren). Weitere v10-Änderungen anderer Branches stehen in eigenen Zeilen | Mensch, 2026-11-16 (Freigabe Bump v9 → v10 für `PROPOSALS.md` „Konten ohne Anbindung“) |
 | 1 | 2026-11-09 | Initiales Einfrieren nach M2 (inkl. `WebLoginRequest`, `BankDay`, `accountID` an `CardStatement`/`SecurityPosition`) | Mensch, 2026-11-09 |
 | 10 | 2026-11-16 | `Transaction.importID: ImportBatchID?` (Default `nil`, Codable-tolerant) und Modell `ImportBatch` (Tabelle `importBatch`, Spalte `ledgerTransaction.importID` mit Index); Migration ergänzt für frühere Importe (`rawJSON.source == "csv"`) je Konto einen synthetischen Import `backfill:<accountID>`. Connectoren unberührt. Zusammen mit `ConnectorID.manual` (Agent `manual-accounts`) | Mensch, 2026-11-16 (Auftrag an Agent `csv-imported`) |

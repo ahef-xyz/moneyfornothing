@@ -127,7 +127,7 @@ public struct LedgerVault: Sendable {
     /// Saves the key in the keychain. A keychain that refuses it is not fatal: the password in
     /// `ledger.key` still opens the database, so the refusal is returned and the caller goes on
     /// with the key in memory. Without this, setup could never finish on such a Mac.
-    private func saveKey(_ key: Data) throws(VaultError) -> DatabaseKeyError? {
+    func saveKey(_ key: Data) throws(VaultError) -> DatabaseKeyError? {
         do {
             try keyStore.save(key)
             return nil
@@ -160,7 +160,7 @@ public struct LedgerVault: Sendable {
         }
     }
 
-    private func readEnvelope() throws(VaultError) -> KeyEnvelope {
+    func readEnvelope() throws(VaultError) -> KeyEnvelope {
         do {
             let data = try Data(contentsOf: envelopeURL)
             return try JSONDecoder().decode(KeyEnvelope.self, from: data)
@@ -169,7 +169,7 @@ public struct LedgerVault: Sendable {
         }
     }
 
-    private func writeEnvelope(_ envelope: KeyEnvelope) throws(VaultError) {
+    func writeEnvelope(_ envelope: KeyEnvelope) throws(VaultError) {
         do {
             try FileManager.default.createDirectory(at: envelopeURL.deletingLastPathComponent(), withIntermediateDirectories: true)
             let encoder = JSONEncoder()

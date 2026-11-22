@@ -1,3 +1,4 @@
+import AppKit
 import MFNCore
 import SwiftUI
 
@@ -19,9 +20,24 @@ struct BankSetupView: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 14)
         }
-        .frame(width: 540)
-        .frame(minHeight: 440)
+        .frame(width: showsWebPage ? 780 : 540)
+        .frame(minHeight: showsWebPage ? Self.webPageHeight : 440)
         .interactiveDismissDisabled()
+    }
+
+    /// Room for a login page, but never taller than the screen takes (a 13-inch display at the
+    /// default scaling leaves about 800 points).
+    private static var webPageHeight: CGFloat {
+        let available = (NSScreen.main?.visibleFrame.height ?? 800) - 120
+        return min(720, max(520, available))
+    }
+
+    /// A bank's own login page is shown inside the assistant (visible web login, e.g. PayPal):
+    /// it needs the room of a browser window, or the page is cut off at the sides.
+    private var showsWebPage: Bool {
+        guard let connection = setup.connection, let request = model.presenter.request(for: connection.id),
+              case let .webLogin(webLogin) = request.challenge else { return false }
+        return webLogin.automation == nil
     }
 
     // MARK: Header

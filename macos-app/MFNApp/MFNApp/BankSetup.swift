@@ -79,6 +79,7 @@ final class BankSetup: Identifiable {
         }
         switch access.connector {
         case .dkb: return "Web-Banking · FinTS folgt"
+        case .paypal: return "Anmeldung im PayPal-Fenster"
         default: return nil
         }
     }
@@ -96,6 +97,8 @@ final class BankSetup: Identifiable {
             return "Test des FinTS-Zugangs (HBCI): \(name) erscheint als eigene Bank mit eigenen Konten, getrennt von einer Verbindung über das Web-Banking.\(approval) Ohne registrierte Produkt-ID lehnt die Bank jeden Zugriff ab."
         }
         switch access.connector {
+        case .paypal:
+            return "PayPal schützt seine Anmeldung gegen Automatisierung. Du meldest dich deshalb in einem Fenster direkt bei PayPal an, mit deinem zweiten Faktor; MFN speichert kein PayPal-Passwort und übernimmt nur die Sitzung. Läuft sie ab, fragt MFN beim nächsten Abgleich von Hand wieder nach der Anmeldung. Zahlungen in einer Währung ohne eigenes Guthaben fehlen noch."
         case .dkb:
             return "MFN liest \(name) vorläufig über das Web-Banking: Jede Anmeldung muss in der \(name)-App freigegeben werden. Der Zugang über FinTS (HBCI) folgt in einer späteren Version."
         default: return nil

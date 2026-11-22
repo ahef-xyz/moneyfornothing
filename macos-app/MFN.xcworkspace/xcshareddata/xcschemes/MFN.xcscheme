@@ -143,6 +143,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MFNPayPalTests"
+               BuildableName = "MFNPayPalTests"
+               BlueprintName = "MFNPayPalTests"
+               ReferencedContainer = "container:Packages/MFNPayPal">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "MFNDKBTests"
                BuildableName = "MFNDKBTests"
                BlueprintName = "MFNDKBTests"

@@ -13,6 +13,7 @@ struct SettingsView: View {
             Tab("Banken", systemImage: "building.columns") { BankSettings() }
             Tab("Kategorien", systemImage: "tag") { CategorySettings() }
             Tab("Sicherheit", systemImage: "lock") { SecuritySettings() }
+            Tab("Sicherung", systemImage: "externaldrive") { BackupSettings() }
             if DeveloperMode.isAvailable {
                 Tab("Entwickler", systemImage: "hammer") { DeveloperSettings() }
             }

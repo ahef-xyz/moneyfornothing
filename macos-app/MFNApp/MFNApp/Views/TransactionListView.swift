@@ -219,7 +219,7 @@ struct TransactionListView: View {
             return query.isFiltering ? [] : model.plannedItems(for: id)
         case .allAccounts, .pending:
             return model.ledgerQuery.isFiltering ? [] : model.snapshot.plannedItems
-        case .overview, .review:
+        case .overview, .review, .subscriptions:
             return []
         }
     }
@@ -278,8 +278,8 @@ struct LedgerBase {
         let snapshot = model.snapshot
         let source: [MFNCore.Transaction]
         switch item {
-        // `.overview` has its own view (`OverviewView`); as a list it is "Alle Konten".
-        case .overview, .allAccounts:
+        // `.overview` and `.subscriptions` have their own views; as a list they are "Alle Konten".
+        case .overview, .subscriptions, .allAccounts:
             account = nil
             title = "Alle Konten"
             subtitle = "\(snapshot.accounts.count) Konten"
@@ -313,7 +313,7 @@ struct LedgerBase {
         monthOutCents = monthBooked.filter { $0.amountCents < 0 }.sumCents
         // From the cached per-snapshot index where the list is a whole account or all accounts.
         switch item {
-        case .overview, .allAccounts: importedCount = model.importIndex.count
+        case .overview, .subscriptions, .allAccounts: importedCount = model.importIndex.count
         case let .account(id): importedCount = model.importedCount(of: id)
         case .review, .pending: importedCount = source.count { $0.importID != nil }
         }
@@ -335,7 +335,7 @@ struct LedgerBase {
 
         // Snapshot transactions are newest first: walk back from today's balance.
         var running: [TransactionID: Int] = [:]
-        if let balance, account != nil {
+        if let balance, let account, model.hasRunningBalance(account) {
             var current = balance.bookedCents
             for transaction in allBooked {
                 running[transaction.id] = current
@@ -514,7 +514,7 @@ struct LedgerContent {
         switch item {
         case .review: "Nichts zu prüfen"
         case .pending: "Keine vorgemerkten Umsätze"
-        case .overview, .allAccounts, .account: "Keine Umsätze"
+        case .overview, .subscriptions, .allAccounts, .account: "Keine Umsätze"
         }
     }
 

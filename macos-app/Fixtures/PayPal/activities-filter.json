@@ -1,0 +1,1360 @@
+{
+ "data": {
+  "data": {
+   "activity": {
+    "hasTransactionsPending": false,
+    "hasTransactionsCompleted": true,
+    "noOfTransactions": 22,
+    "currencyCodes": [
+     "EUR",
+     "USD"
+    ],
+    "selectedCurrency": "ALL",
+    "transactions": [
+     {
+      "id": "1CD1BL488R0W2T7VY",
+      "primitiveTxnId": "1CD1BL488R0W2T7VY",
+      "legId": "1CD1BL488R0W2T7VY",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "PAYMENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-09-09T08:32:15.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "09",
+       "year": "2026",
+       "formattedDate": "9. Sept.",
+       "displayDate": "9. Sept."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;188,67 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Versandhaus KG"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "9. Sept. . Zahlung"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/1CD1BL488R0W2T7VY"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Zahlung",
+       "counterparty": "Versandhaus KG",
+       "id": "1CD1BL488R0W2T7VY",
+       "displayAmount": "188,67 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "04RUR8P2TDG5Z6MMW",
+      "primitiveTxnId": "04RUR8P2TDG5Z6MMW",
+      "legId": "04RUR8P2TDG5Z6MMW",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "SEND_MONEY_SENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-09-04T16:48:33.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "04",
+       "year": "2026",
+       "formattedDate": "4. Sept.",
+       "displayDate": "4. Sept."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;130,17 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Pizzeria Forno"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "4. Sept. . Geld gesendet"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/04RUR8P2TDG5Z6MMW"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Geld gesendet",
+       "counterparty": "Pizzeria Forno",
+       "id": "04RUR8P2TDG5Z6MMW",
+       "displayAmount": "130,17 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "J4P5FYX3J6003B2P4",
+      "primitiveTxnId": "J4P5FYX3J6003B2P4",
+      "legId": "J4P5FYX3J6003B2P4",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "CONTRIBUTION_SENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-07-28T08:16:11.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "28",
+       "year": "2026",
+       "formattedDate": "28. Juli",
+       "displayDate": "28. Juli"
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;131,01 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Streamingdienst SE"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "28. Juli . Gesendeter Beitrag"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/J4P5FYX3J6003B2P4"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Gesendeter Beitrag",
+       "counterparty": "Streamingdienst SE",
+       "id": "J4P5FYX3J6003B2P4",
+       "displayAmount": "131,01 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "3GVH1M8VP6SL2KMJ7",
+      "primitiveTxnId": "3GVH1M8VP6SL2KMJ7",
+      "legId": "3GVH1M8VP6SL2KMJ7",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "INSTANT_TRANSFER_TO_BANK",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-07-14T20:08:17.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "14",
+       "year": "2026",
+       "formattedDate": "14. Juli",
+       "displayDate": "14. Juli"
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;55,03 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Blumen Wiese"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "14. Juli . Sofortzahlung auf Bankkonto"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/3GVH1M8VP6SL2KMJ7"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Sofortzahlung auf Bankkonto",
+       "counterparty": "Blumen Wiese",
+       "id": "3GVH1M8VP6SL2KMJ7",
+       "displayAmount": "55,03 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "4UERVFH1SP6PZL3DR",
+      "primitiveTxnId": "4UERVFH1SP6PZL3DR",
+      "legId": "4UERVFH1SP6PZL3DR",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "SEND_MONEY_RECEIVED",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-07-14T20:05:07.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "14",
+       "year": "2026",
+       "formattedDate": "14. Juli",
+       "displayDate": "14. Juli"
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "+107,08 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "isCredit txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Example Store Inc"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "14. Juli . Geld erhalten"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/4UERVFH1SP6PZL3DR"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Geld erhalten",
+       "counterparty": "Example Store Inc",
+       "id": "4UERVFH1SP6PZL3DR",
+       "displayAmount": "107,08 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "E44UB7SYS6BP3S2C1",
+      "primitiveTxnId": "E44UB7SYS6BP3S2C1",
+      "legId": "E44UB7SYS6BP3S2C1",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "PAYMENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-07-07T21:58:42.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "07",
+       "year": "2026",
+       "formattedDate": "7. Juli",
+       "displayDate": "7. Juli"
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;104,72 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Kaffeerösterei Bohne"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "7. Juli . Zahlung"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/E44UB7SYS6BP3S2C1"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Zahlung",
+       "counterparty": "Kaffeerösterei Bohne",
+       "id": "E44UB7SYS6BP3S2C1",
+       "displayAmount": "104,72 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "BBWDD3GDNVAXU77PA",
+      "primitiveTxnId": "BBWDD3GDNVAXU77PA",
+      "legId": "BBWDD3GDNVAXU77PA",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "PAYMENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-06-17T06:36:08.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "17",
+       "year": "2026",
+       "formattedDate": "17. Juni",
+       "displayDate": "17. Juni"
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;173,21 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Pizzeria Forno"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "17. Juni . Zahlung"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/BBWDD3GDNVAXU77PA"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Zahlung",
+       "counterparty": "Pizzeria Forno",
+       "id": "BBWDD3GDNVAXU77PA",
+       "displayAmount": "173,21 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "ZA611D06V7LC7R7R1",
+      "primitiveTxnId": "ZA611D06V7LC7R7R1",
+      "legId": "ZA611D06V7LC7R7R1",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "SEND_MONEY_SENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-04-18T18:33:29.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "18",
+       "year": "2026",
+       "formattedDate": "18. Apr.",
+       "displayDate": "18. Apr."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;65,95 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Kaffeerösterei Bohne"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "18. Apr. . Geld gesendet"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/ZA611D06V7LC7R7R1"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Geld gesendet",
+       "counterparty": "Kaffeerösterei Bohne",
+       "id": "ZA611D06V7LC7R7R1",
+       "displayAmount": "65,95 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "YPGCPGVXX5VWX2X9U",
+      "primitiveTxnId": "YPGCPGVXX5VWX2X9U",
+      "legId": "YPGCPGVXX5VWX2X9U",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "SEND_MONEY_SENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-03-18T21:58:31.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "18",
+       "year": "2026",
+       "formattedDate": "18. März",
+       "displayDate": "18. März"
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;3,03 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Ticketshop Bühne"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "18. März . Geld gesendet"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/YPGCPGVXX5VWX2X9U"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Geld gesendet",
+       "counterparty": "Ticketshop Bühne",
+       "id": "YPGCPGVXX5VWX2X9U",
+       "displayAmount": "3,03 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "HAY4RREFK93PR59TB",
+      "primitiveTxnId": "HAY4RREFK93PR59TB",
+      "legId": "HAY4RREFK93PR59TB",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "SEND_MONEY_RECEIVED",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-03-03T15:07:23.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "03",
+       "year": "2026",
+       "formattedDate": "3. März",
+       "displayDate": "3. März"
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "+160,72 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "isCredit txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Streamingdienst SE"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "3. März . Geld erhalten"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/HAY4RREFK93PR59TB"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Geld erhalten",
+       "counterparty": "Streamingdienst SE",
+       "id": "HAY4RREFK93PR59TB",
+       "displayAmount": "160,72 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "CBHHHSZDNPX7T5KVM",
+      "primitiveTxnId": "CBHHHSZDNPX7T5KVM",
+      "legId": "CBHHHSZDNPX7T5KVM",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "INSTANT_TRANSFER_TO_BANK",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-02-23T20:56:29.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "23",
+       "year": "2026",
+       "formattedDate": "23. Feb.",
+       "displayDate": "23. Feb."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;40,15 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Softwarehaus Byte"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "23. Feb. . Sofortzahlung auf Bankkonto"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/CBHHHSZDNPX7T5KVM"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Sofortzahlung auf Bankkonto",
+       "counterparty": "Softwarehaus Byte",
+       "id": "CBHHHSZDNPX7T5KVM",
+       "displayAmount": "40,15 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "2EZ6B9RA3JJ91W2UB",
+      "primitiveTxnId": "2EZ6B9RA3JJ91W2UB",
+      "legId": "2EZ6B9RA3JJ91W2UB",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "SEND_MONEY_RECEIVED",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2026-02-23T20:01:49.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "23",
+       "year": "2026",
+       "formattedDate": "23. Feb.",
+       "displayDate": "23. Feb."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "+68,53 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "isCredit txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Example Store Inc"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "23. Feb. . Geld erhalten"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/2EZ6B9RA3JJ91W2UB"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Geld erhalten",
+       "counterparty": "Example Store Inc",
+       "id": "2EZ6B9RA3JJ91W2UB",
+       "displayAmount": "68,53 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "H65XUMP86SDYAUZWV",
+      "primitiveTxnId": "H65XUMP86SDYAUZWV",
+      "legId": "H65XUMP86SDYAUZWV",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "PRE_APPROVED_PAYMENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-11-29T01:11:15.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "29",
+       "year": "2025",
+       "formattedDate": "29. Nov.",
+       "displayDate": "29. Nov."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;17,10 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Versandhaus KG"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "29. Nov. . Zahlung im Einzugsverfahren"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/H65XUMP86SDYAUZWV"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Zahlung im Einzugsverfahren",
+       "counterparty": "Versandhaus KG",
+       "id": "H65XUMP86SDYAUZWV",
+       "displayAmount": "17,10 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "PKR46T9V5UAN9Z2MF",
+      "primitiveTxnId": "PKR46T9V5UAN9Z2MF",
+      "legId": "PKR46T9V5UAN9Z2MF",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "PRE_APPROVED_PAYMENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-11-14T04:57:08.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "14",
+       "year": "2025",
+       "formattedDate": "14. Nov.",
+       "displayDate": "14. Nov."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;56,70 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Max Mustermann"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "14. Nov. . Zahlung im Einzugsverfahren"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/PKR46T9V5UAN9Z2MF"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Zahlung im Einzugsverfahren",
+       "counterparty": "Max Mustermann",
+       "id": "PKR46T9V5UAN9Z2MF",
+       "displayAmount": "56,70 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "8V843REFJ5M6Z4ELZ",
+      "primitiveTxnId": "8V843REFJ5M6Z4ELZ",
+      "legId": "8V843REFJ5M6Z4ELZ",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "PRE_APPROVED_PAYMENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-11-01T01:39:04.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "01",
+       "year": "2025",
+       "formattedDate": "1. Nov.",
+       "displayDate": "1. Nov."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;47,98 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Erika Beispiel"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "1. Nov. . Zahlung im Einzugsverfahren"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/8V843REFJ5M6Z4ELZ"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Zahlung im Einzugsverfahren",
+       "counterparty": "Erika Beispiel",
+       "id": "8V843REFJ5M6Z4ELZ",
+       "displayAmount": "47,98 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "2970E4WURTRGAG6BA",
+      "primitiveTxnId": "2970E4WURTRGAG6BA",
+      "legId": "2970E4WURTRGAG6BA",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "REFUND",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-10-22T07:10:53.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "22",
+       "year": "2025",
+       "formattedDate": "22. Okt.",
+       "displayDate": "22. Okt."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "+116,41 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "isCredit txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Example Store Inc"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "22. Okt. . Rückzahlung"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/2970E4WURTRGAG6BA"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Rückzahlung",
+       "counterparty": "Example Store Inc",
+       "id": "2970E4WURTRGAG6BA",
+       "displayAmount": "116,41 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "FC6YK88BS75C5HH70",
+      "primitiveTxnId": "FC6YK88BS75C5HH70",
+      "legId": "FC6YK88BS75C5HH70",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "TRANSFER_TO_BANK",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-05-19T13:49:22.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "19",
+       "year": "2025",
+       "formattedDate": "19. Mai",
+       "displayDate": "19. Mai"
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;35,29 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Spielwaren Bauklotz"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "19. Mai . Abbuchung"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/FC6YK88BS75C5HH70"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Abbuchung",
+       "counterparty": "Spielwaren Bauklotz",
+       "id": "FC6YK88BS75C5HH70",
+       "displayAmount": "35,29 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "FWCAVYN20EK7HMAFB",
+      "primitiveTxnId": "FWCAVYN20EK7HMAFB",
+      "legId": "FWCAVYN20EK7HMAFB",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "CONTRIBUTION_SENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-04-23T09:15:34.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "23",
+       "year": "2025",
+       "formattedDate": "23. Apr.",
+       "displayDate": "23. Apr."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;178,61 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Blumen Wiese"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "23. Apr. . Gesendeter Beitrag"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/FWCAVYN20EK7HMAFB"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Gesendeter Beitrag",
+       "counterparty": "Blumen Wiese",
+       "id": "FWCAVYN20EK7HMAFB",
+       "displayAmount": "178,61 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "NCRKMJHEPL2MTU7PD",
+      "primitiveTxnId": "NCRKMJHEPL2MTU7PD",
+      "legId": "NCRKMJHEPL2MTU7PD",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "PRE_APPROVED_PAYMENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-03-23T06:28:50.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "23",
+       "year": "2025",
+       "formattedDate": "23. März",
+       "displayDate": "23. März"
+      },
+      "amounts": {
+       "currencyCode": "USD"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;101,25 $ USD",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Blumen Wiese"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "23. März . Zahlung im Einzugsverfahren"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/NCRKMJHEPL2MTU7PD"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Zahlung im Einzugsverfahren",
+       "counterparty": "Blumen Wiese",
+       "id": "NCRKMJHEPL2MTU7PD",
+       "displayAmount": "101,25 $ USD",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "NBXP9M4KU6JEEV2VK",
+      "primitiveTxnId": "NBXP9M4KU6JEEV2VK",
+      "legId": "NBXP9M4KU6JEEV2VK",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "DONATION_SENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-02-24T14:28:40.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "24",
+       "year": "2025",
+       "formattedDate": "24. Feb.",
+       "displayDate": "24. Feb."
+      },
+      "amounts": {
+       "currencyCode": "EUR"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;24,63 €",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Max Mustermann"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "24. Feb. . Spende"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/NBXP9M4KU6JEEV2VK"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Spende",
+       "counterparty": "Max Mustermann",
+       "id": "NBXP9M4KU6JEEV2VK",
+       "displayAmount": "24,63 €",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "CZ0XGD8VTL57JBFWM",
+      "primitiveTxnId": "CZ0XGD8VTL57JBFWM",
+      "legId": "CZ0XGD8VTL57JBFWM",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "PRE_APPROVED_PAYMENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-02-21T06:05:01.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "21",
+       "year": "2025",
+       "formattedDate": "21. Feb.",
+       "displayDate": "21. Feb."
+      },
+      "amounts": {
+       "currencyCode": "USD"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;20,99 $ USD",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Fahrradteile Kette"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "21. Feb. . Zahlung im Einzugsverfahren"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/CZ0XGD8VTL57JBFWM"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Zahlung im Einzugsverfahren",
+       "counterparty": "Fahrradteile Kette",
+       "id": "CZ0XGD8VTL57JBFWM",
+       "displayAmount": "20,99 $ USD",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     },
+     {
+      "id": "YZVT7B3HJA0TL9SV9",
+      "primitiveTxnId": "YZVT7B3HJA0TL9SV9",
+      "legId": "YZVT7B3HJA0TL9SV9",
+      "primitiveTxnType": "PAYMENT",
+      "primitiveTimeCreated": "",
+      "type": "PRE_APPROVED_PAYMENT",
+      "status": "COMPLETED",
+      "isOnHold": false,
+      "shouldShow": true,
+      "date": {
+       "rawDate": {
+        "date": "2025-01-21T06:38:31.000Z",
+        "timeZone": "Europe/Berlin"
+       },
+       "day": "21",
+       "year": "2025",
+       "formattedDate": "21. Jan.",
+       "displayDate": "21. Jan."
+      },
+      "amounts": {
+       "currencyCode": "USD"
+      },
+      "amountInfo": {
+       "contents": {
+        "amountText": "&minus;181,51 $ USD",
+        "installmentAmountMsg": null
+       },
+       "classNames": {
+        "transactionAmountClassName": "txn_amt_font"
+       }
+      },
+      "counterpartyInfo": {
+       "classNames": "counterparty_name",
+       "counterpartyName": "Erika Beispiel"
+      },
+      "descriptionInfo": {
+       "content": {
+        "transactionDescriptionText": "21. Jan. . Zahlung im Einzugsverfahren"
+       }
+      },
+      "notesInfo": {
+       "notes": "",
+       "visibility": {
+        "isShowNotes": "hide"
+       }
+      },
+      "linksInfo": {
+       "detailsLink": "/myaccount/activities/details/YZVT7B3HJA0TL9SV9"
+      },
+      "ftsSearchInfo": {
+       "displayType": "Zahlung im Einzugsverfahren",
+       "counterparty": "Erika Beispiel",
+       "id": "YZVT7B3HJA0TL9SV9",
+       "displayAmount": "181,51 $ USD",
+       "notes": null,
+       "memo": null,
+       "email": "kontakt@example.org",
+       "invoiceId": null
+      }
+     }
+    ]
+   }
+  }
+ }
+}

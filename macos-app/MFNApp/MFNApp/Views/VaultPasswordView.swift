@@ -81,6 +81,12 @@ struct VaultPasswordView: View {
                     if model.isWorking {
                         ProgressView().controlSize(.small)
                     }
+                    if isSetup {
+                        // A new Mac, or starting over: the data comes from a backup file.
+                        Button("Aus Sicherung wiederherstellen …") { model.chooseBackupToRestore() }
+                            .buttonStyle(.link)
+                            .disabled(!model.canRestoreBackup)
+                    }
                     Spacer()
                     Button("Abbrechen", role: .cancel) { model.cancelPasswordPrompt() }
                         .keyboardShortcut(.cancelAction)

@@ -16,6 +16,7 @@ public enum Fixtures {
         case tradeRepublic = "TradeRepublic"
         case c24 = "C24"
         case easybank = "Easybank"
+        case paypal = "PayPal"
     }
 
     public struct Missing: Error, CustomStringConvertible {

@@ -15,6 +15,7 @@
 		A00000000000000000000D06 /* MFNC24 in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B06 /* MFNC24 */; };
 		A00000000000000000000D07 /* MFNTradeRepublic in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B07 /* MFNTradeRepublic */; };
 		A00000000000000000000D08 /* MFNN26 in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B08 /* MFNN26 */; };
+		A00000000000000000000D2A /* MFNPayPal in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B2A /* MFNPayPal */; };
 		A00000000000000000000D09 /* MFNIntelligence in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B09 /* MFNIntelligence */; };
 		A00000000000000000000D0A /* MFNDKB in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0A /* MFNDKB */; };
 		A00000000000000000000D0C /* MFNFinTS in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0C /* MFNFinTS */; };
@@ -64,6 +65,7 @@
 				A00000000000000000000D05 /* MFNEasybank in Frameworks */,
 				A00000000000000000000D06 /* MFNC24 in Frameworks */,
 				A00000000000000000000D08 /* MFNN26 in Frameworks */,
+				A00000000000000000000D2A /* MFNPayPal in Frameworks */,
 				A00000000000000000000D0A /* MFNDKB in Frameworks */,
 				A00000000000000000000D0C /* MFNFinTS in Frameworks */,
 				A00000000000000000000D09 /* MFNIntelligence in Frameworks */,
@@ -138,6 +140,7 @@
 				A00000000000000000000B05 /* MFNEasybank */,
 				A00000000000000000000B06 /* MFNC24 */,
 				A00000000000000000000B08 /* MFNN26 */,
+				A00000000000000000000B2A /* MFNPayPal */,
 				A00000000000000000000B0A /* MFNDKB */,
 				A00000000000000000000B0C /* MFNFinTS */,
 				A00000000000000000000B0D /* Sparkle */,
@@ -206,6 +209,7 @@
 				A00000000000000000000F04 /* XCLocalSwiftPackageReference "../Packages/MFNEasybank" */,
 				A00000000000000000000F05 /* XCLocalSwiftPackageReference "../Packages/MFNC24" */,
 				A00000000000000000000F07 /* XCLocalSwiftPackageReference "../Packages/MFNN26" */,
+				A00000000000000000000F2A /* XCLocalSwiftPackageReference "../Packages/MFNPayPal" */,
 				A00000000000000000000F09 /* XCLocalSwiftPackageReference "../Packages/MFNDKB" */,
 				A00000000000000000000F0B /* XCLocalSwiftPackageReference "../Packages/MFNFinTS" */,
 				A00000000000000000000F08 /* XCLocalSwiftPackageReference "../Packages/MFNIntelligence" */,
@@ -318,7 +322,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -331,7 +335,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.1;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -350,7 +354,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -363,7 +367,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.1;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -380,9 +384,9 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.4.1;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -399,9 +403,9 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.4.1;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -471,6 +475,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../Packages/MFNN26;
 		};
+		A00000000000000000000F2A /* XCLocalSwiftPackageReference "../Packages/MFNPayPal" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNPayPal;
+		};
 		A00000000000000000000F08 /* XCLocalSwiftPackageReference "../Packages/MFNIntelligence" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../Packages/MFNIntelligence;
@@ -536,6 +544,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A00000000000000000000F07 /* XCLocalSwiftPackageReference "../Packages/MFNN26" */;
 			productName = MFNN26;
+		};
+		A00000000000000000000B2A /* MFNPayPal */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F2A /* XCLocalSwiftPackageReference "../Packages/MFNPayPal" */;
+			productName = MFNPayPal;
 		};
 		A00000000000000000000B09 /* MFNIntelligence */ = {
 			isa = XCSwiftPackageProductDependency;

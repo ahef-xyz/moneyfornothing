@@ -27,6 +27,8 @@ public struct LedgerSnapshot: Sendable, Equatable {
     public var depotHistory: [AccountID: [DepotValuePoint]] = [:]
     /// One-off payments the user expects (`PlannedItem`), by day.
     public var plannedItems: [PlannedItem] = []
+    /// Fixed costs the user entered or changed (`RecurringEntry`), oldest first.
+    public var recurringEntries: [RecurringEntry] = []
     /// Opening balances of accounts without a bank connection (`ConnectorID.manual`); their
     /// balance is computed from it (`ManualAccount.balance`).
     public var openingBalances: [AccountID: OpeningBalance] = [:]
@@ -142,6 +144,7 @@ public struct LedgerSnapshot: Sendable, Equatable {
         for account in accountIDs { budgets[account] = nil }
         for account in accountIDs { depotHistory[account] = nil }
         plannedItems.removeAll { accountIDs.contains($0.accountID) }
+        recurringEntries.removeAll { accountIDs.contains($0.accountID) }
         for account in accountIDs { openingBalances[account] = nil }
         importBatches.removeAll { accountIDs.contains($0.accountID) }
     }
@@ -232,6 +235,17 @@ public struct LedgerSnapshot: Sendable, Equatable {
 
     public mutating func removePlannedItem(_ id: UUID) {
         plannedItems.removeAll { $0.id == id }
+    }
+
+    /// One entry per ID, and one change per detected payment.
+    public mutating func upsertRecurringEntry(_ entry: RecurringEntry) {
+        recurringEntries.removeAll { $0.id == entry.id || (entry.seriesID != nil && $0.seriesID == entry.seriesID) }
+        recurringEntries.append(entry)
+        recurringEntries.sort { ($0.createdAt, $0.id.uuidString) < ($1.createdAt, $1.id.uuidString) }
+    }
+
+    public mutating func removeRecurringEntry(_ id: UUID) {
+        recurringEntries.removeAll { $0.id == id }
     }
 
     public mutating func upsertRule(_ rule: CategoryRule) {
@@ -575,6 +589,9 @@ public protocol LedgerStore: Actor {
     /// Adds or changes a planned item (by ID).
     func upsertPlannedItem(_ item: PlannedItem) async throws
     func removePlannedItem(_ id: UUID) async throws
+    /// Adds or changes a fixed cost entry (by ID; one change per detected payment).
+    func upsertRecurringEntry(_ entry: RecurringEntry) async throws
+    func removeRecurringEntry(_ id: UUID) async throws
     /// Removes machine categories in one write; manual categories stay untouched.
     func clearCategories(_ ids: Set<TransactionID>) async throws
     /// One category for many transactions in one write (manual correction of a selection).
@@ -767,6 +784,15 @@ public actor InMemoryLedgerStore: LedgerStore {
 
     public func removePlannedItem(_ id: UUID) {
         change { $0.removePlannedItem(id) }
+    }
+
+    public func upsertRecurringEntry(_ entry: RecurringEntry) throws {
+        guard state.accounts.contains(where: { $0.id == entry.accountID }) else { throw PlannedItemError.unknownAccount(entry.accountID) }
+        change { $0.upsertRecurringEntry(entry) }
+    }
+
+    public func removeRecurringEntry(_ id: UUID) {
+        change { $0.removeRecurringEntry(id) }
     }
 
     public func recordImport(_ batch: ImportBatch, merge: TransactionMerger.Result) throws {

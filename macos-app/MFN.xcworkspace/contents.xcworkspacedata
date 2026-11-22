@@ -32,6 +32,9 @@
       location = "group:Packages/MFNN26">
    </FileRef>
    <FileRef
+      location = "group:Packages/MFNPayPal">
+   </FileRef>
+   <FileRef
       location = "group:Packages/MFNDKB">
    </FileRef>
    <FileRef

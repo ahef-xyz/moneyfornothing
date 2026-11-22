@@ -115,7 +115,9 @@ private func tx(
         let booked = tx(.booked, booking: "2026-05-02", value: "2026-05-02", amount: -350, merchant: "Café")
         let pending = tx(.pending, booking: nil, value: "2026-05-03", amount: -350, merchant: "Café")
         let result = TransactionMerger.merge(stored: [booked], incoming: [booked, pending], since: nil)
-        #expect(Set(result.upserts.map(\.id)) == [booked.id, pending.id])
+        // The stored booking comes back unchanged and is not written again.
+        #expect(result.upserts.map(\.id) == [pending.id])
+        #expect(result.deletions.isEmpty)
     }
 
     @Test func oneBookingResolvesOnlyOnePending() {
@@ -138,8 +140,17 @@ private func tx(
         stored.categorySource = .rule
         let incoming = tx(.booked, booking: "2026-05-04", value: "2026-05-04", amount: -100, merchant: "X")
         let result = TransactionMerger.merge(stored: [stored], incoming: [incoming], since: nil)
-        #expect(result.upserts.first?.categoryID == "sonstiges")
-        #expect(result.deletions.isEmpty)
+        // Equal to the stored row once the category is inherited: nothing to write.
+        #expect(result.isEmpty)
+
+        // A row that differs from the stored one is written.
+        var changed = incoming
+        changed.categoryID = "lebensmittel"
+        changed.categorySource = .manual
+        let second = TransactionMerger.merge(stored: [stored], incoming: [changed], since: nil)
+        #expect(second.upserts.map(\.id) == [stored.id])
+        #expect(second.upserts.first?.categoryID == "lebensmittel")
+        #expect(second.deletions.isEmpty)
     }
 }
 

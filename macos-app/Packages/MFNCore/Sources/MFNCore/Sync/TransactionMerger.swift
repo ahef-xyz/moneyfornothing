@@ -3,7 +3,8 @@ import Foundation
 /// Merges a fresh connector result for one account into the stored transactions.
 ///
 /// Rules (CLAUDE.md §4):
-/// - Same `id` → incoming replaces stored; categorisation of the stored row is kept.
+/// - Same `id` → incoming replaces stored; categorisation of the stored row is kept. A row that
+///   is then equal to the stored one is left out of the result.
 /// - A stored pending/planned transaction that the bank no longer reports is either
 ///   - replaced by the matching booked transaction (same merchant, same amount – ± 2 % for
 ///     foreign currency – and date ± 3 days):
@@ -68,7 +69,9 @@ public enum TransactionMerger {
             if storedByID[pending.id] != nil { result.deletions.insert(pending.id) }
             dropped.insert(pendingIndex)
         }
-        result.upserts = upserts.indices.filter { !dropped.contains($0) }.map { upserts[$0] }
+        // Rows the bank reports again unchanged (every sync refetches an overlap window) are not
+        // written again: a sync without news leaves the stored transactions untouched.
+        result.upserts = upserts.indices.filter { !dropped.contains($0) && storedByID[upserts[$0].id] != upserts[$0] }.map { upserts[$0] }
 
         // Remaining vanished rows: delete if the fetch covered their date.
         for transaction in vanished where since.map({ transaction.effectiveDate >= $0 }) ?? true {

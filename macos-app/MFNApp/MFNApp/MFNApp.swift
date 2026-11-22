@@ -46,6 +46,12 @@ struct MFNApp: App {
                 Button("Umsätze als CSV exportieren …") { model.exportCSV() }
                     .keyboardShortcut("e", modifiers: [.command, .shift])
                     .disabled(!model.canExportCSV)
+                Divider()
+                Button("Sicherung erstellen …") { model.createBackup() }
+                    .keyboardShortcut("b", modifiers: [.command, .option])
+                    .disabled(!model.canBackUp)
+                Button("Aus Sicherung wiederherstellen …") { model.chooseBackupToRestore() }
+                    .disabled(!model.canRestoreBackup)
             }
             CommandMenu("Konten") {
                 Button("Bank hinzufügen …") { model.showBankSetup() }
@@ -91,11 +97,15 @@ struct MFNApp: App {
                 Button("Vorgemerkte anzeigen") { model.selection = .pending }
                     .keyboardShortcut("2", modifiers: .command)
                     .disabled(model.lock.isLocked)
+                Button("Fixkosten anzeigen") { model.selection = .subscriptions }
+                    .keyboardShortcut("3", modifiers: .command)
+                    .disabled(model.lock.isLocked)
                 Button(model.showCancelled ? "Stornos ausblenden" : "Stornos einblenden") { model.showCancelled.toggle() }
                     .keyboardShortcut("s", modifiers: [.command, .option])
                 Divider()
                 Button("Umsätze durchsuchen") {
                     // The overview and depots have no search field: search all transactions instead.
+                    // Fixkosten has its own and keeps the request.
                     let isDepot = if case let .account(id)? = model.selection { model.account(id)?.type == .depot } else { false }
                     if model.selection == .overview || model.selection == nil || isDepot { model.selection = .allAccounts }
                     model.searchFocusRequested = true
