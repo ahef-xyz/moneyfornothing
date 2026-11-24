@@ -58,8 +58,14 @@ extension AppModel {
         return HMAC<SHA256>.authenticationCode(for: Data(id.utf8), using: key).prefix(12).map { String(format: "%02x", $0) }.joined()
     }
 
+    /// `recurringHash` as a function that can leave the main actor (MCP `find_recurring`).
+    func recurringHasher() -> @Sendable (String) -> String {
+        guard let key = recurringHashKey else { return { Self.legacyRecurringHash($0) } }
+        return { id in HMAC<SHA256>.authenticationCode(for: Data(id.utf8), using: key).prefix(12).map { String(format: "%02x", $0) }.joined() }
+    }
+
     /// The unkeyed hash of the first builds of 0.5.0, only read to carry old entries over.
-    static func legacyRecurringHash(_ id: String) -> String {
+    nonisolated static func legacyRecurringHash(_ id: String) -> String {
         SHA256.hash(data: Data(id.utf8)).prefix(12).map { String(format: "%02x", $0) }.joined()
     }
 

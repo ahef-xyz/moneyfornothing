@@ -39,26 +39,59 @@ public struct CategorizationReport: Hashable, Sendable {
 /// - Incremental: `categorizeUncategorized()` only looks at transactions without a category.
 /// - Rule changes (`apply(rule:)`, `removeRule(_:)`) and corrections (`setManual`) re-evaluate
 ///   exactly the non-manual transactions they can affect.
-/// - One operation at a time: operations queue behind each other, so a slow LLM batch never
-///   races a rule change. Calls to `categorizeUncategorized()` while one is queued or running
-///   share it; if they arrive mid-run, the run makes one more pass for what came in meanwhile.
+/// - User actions never wait for the background run (on a slow Mac its language model stage
+///   takes minutes). They queue behind each other only. The background run works on the
+///   snapshot it started from, so every write is a compare and set
+///   (`LedgerStore.setCategories(_:expecting:)`): a row the user or a rule changed meanwhile is
+///   left alone.
+/// - The background run saves after the fast stages and after every chunk of the slow stage,
+///   so results appear as they come and a stop (`cancel()`, lock, quit) keeps what is done.
+///   Calls to `categorizeUncategorized()` while it runs share it; if they arrive mid-run, the run
+///   makes one more pass for what came in meanwhile.
 public actor CategorizationService {
     private let store: any LedgerStore
     private let categorizer: Categorizer
+    private let slowChunkSize: Int
+    /// Background results are collected and written at most this often (the first step at
+    /// once): every write publishes a new snapshot, and the app rebuilds its lists for each.
+    private let saveInterval: Duration
+    /// Per `categorize` call: results not written yet, and when it last wrote.
+    private var pendingWrites: [UUID: [TransactionID: CategorySuggestion]] = [:]
+    private var lastWrite: [UUID: ContinuousClock.Instant] = [:]
+    private let onProgress: (@Sendable (CategorizationProgress?) -> Void)?
     private let clock = ContinuousClock()
 
-    /// End of the operation queue.
+    /// End of the queue of user actions.
     private var tail: Task<Void, Never>?
     private var uncategorizedRun: Task<CategorizationReport, any Error>?
+    /// Identifies the current background run; a cancelled run that finishes late must not
+    /// reset the state of a newer one.
+    private var runGeneration = 0
     private var uncategorizedStarted = false
     private var uncategorizedAgain = false
+    /// Per `categorize` call: the category state each row has in the store as far as this call
+    /// knows (what it saw, then what it wrote).
+    private var expected: [UUID: [TransactionID: CategoryStamp]] = [:]
+    /// First write error of a `categorize` call, rethrown when it ends.
+    private var writeErrors: [UUID: any Error] = [:]
+    /// `categorize` calls of user actions: they write without the compare.
+    private var unchecked: Set<UUID> = []
 
-    public init(store: any LedgerStore, categorizer: Categorizer) {
+    /// `onProgress`: the background run's progress after every step, `nil` when it ends.
+    public init(
+        store: any LedgerStore,
+        categorizer: Categorizer,
+        slowChunkSize: Int = Categorizer.defaultSlowChunkSize,
+        saveInterval: Duration = .seconds(5),
+        onProgress: (@Sendable (CategorizationProgress?) -> Void)? = nil
+    ) {
         self.store = store
         self.categorizer = categorizer
+        self.slowChunkSize = slowChunkSize
+        self.saveInterval = saveInterval
+        self.onProgress = onProgress
     }
 
-    /// The rule the rule sheet (⇧⌘K) starts with for this transaction.
     /// For `setupPlan` (other file): the current ledger.
     func storeSnapshot() async -> LedgerSnapshot {
         await store.snapshot()
@@ -69,9 +102,13 @@ public actor CategorizationService {
         await categorizer.categorize(transactions, context: CategorizationContext(snapshot: snapshot))
     }
 
+    /// The rule the rule sheet (⇧⌘K) starts with for this transaction.
     public nonisolated func suggestedRule(for transaction: Transaction) -> CategoryRule.Match? {
         CategoryRule.Match.suggested(for: transaction)
     }
+
+    /// Whether a background run is going on.
+    public var isRunning: Bool { uncategorizedRun != nil }
 
     /// Categorizes every transaction without a category (new ones after a sync).
     @discardableResult
@@ -80,9 +117,21 @@ public actor CategorizationService {
             if uncategorizedStarted { uncategorizedAgain = true }
             return try await run.value
         }
-        let run = enqueue { try await self.uncategorizedPasses() }
+        runGeneration &+= 1
+        let generation = runGeneration
+        let run = Task { try await self.uncategorizedPasses(generation) }
         uncategorizedRun = run
         return try await run.value
+    }
+
+    /// Stops the background run before its next step (lock, quit). What it saved stays.
+    public func cancel() {
+        uncategorizedRun?.cancel()
+        uncategorizedRun = nil
+        uncategorizedStarted = false
+        uncategorizedAgain = false
+        runGeneration &+= 1
+        onProgress?(nil)
     }
 
     /// Stores the rule (new or edited) and re-evaluates every non-manual transaction it matches,
@@ -120,20 +169,23 @@ public actor CategorizationService {
 
     // MARK: - Operations
 
-    private func uncategorizedPasses() async throws -> CategorizationReport {
+    private func uncategorizedPasses(_ generation: Int) async throws -> CategorizationReport {
         uncategorizedStarted = true
         defer {
-            uncategorizedRun = nil
-            uncategorizedStarted = false
-            uncategorizedAgain = false
+            if runGeneration == generation {
+                uncategorizedRun = nil
+                uncategorizedStarted = false
+                uncategorizedAgain = false
+                onProgress?(nil)
+            }
         }
         var total = CategorizationReport()
         repeat {
             uncategorizedAgain = false
             let snapshot = await store.snapshot()
             let open = snapshot.transactions.filter { $0.categoryID == nil && $0.status != .cancelled }
-            total.add(try await categorize(open, snapshot: snapshot, reevaluating: false))
-        } while uncategorizedAgain
+            total.add(try await categorize(open, snapshot: snapshot, reevaluating: false, reportsProgress: true))
+        } while uncategorizedAgain && !Task.isCancelled
         return total
     }
 
@@ -184,10 +236,10 @@ public actor CategorizationService {
     @discardableResult
     private func reevaluate(_ ids: Set<TransactionID>, in snapshot: LedgerSnapshot) async throws -> CategorizationReport {
         let targets = snapshot.transactions.filter { ids.contains($0.id) && $0.categorySource != .manual && $0.status != .cancelled }
-        return try await categorize(targets, snapshot: snapshot, reevaluating: true)
+        return try await categorize(targets, snapshot: snapshot, reevaluating: true, reportsProgress: false)
     }
 
-    private func categorize(_ transactions: [Transaction], snapshot: LedgerSnapshot, reevaluating: Bool) async throws -> CategorizationReport {
+    private func categorize(_ transactions: [Transaction], snapshot: LedgerSnapshot, reevaluating: Bool, reportsProgress: Bool) async throws -> CategorizationReport {
         guard !transactions.isEmpty else { return CategorizationReport() }
         let start = clock.now
         var context = CategorizationContext(snapshot: snapshot)
@@ -195,17 +247,34 @@ public actor CategorizationService {
         let targetIDs = Set(transactions.map(\.id))
         context.labeled.removeAll { targetIDs.contains($0.id) }
 
-        let suggestions = await categorizer.categorize(transactions, context: context)
-        let byID = Dictionary(transactions.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-        let changed = suggestions.filter { id, suggestion in
-            guard let current = byID[id] else { return false }
-            return current.categoryID != suggestion.categoryID || current.categorySource != suggestion.source || current.confidence != suggestion.confidence
+        let call = UUID()
+        let seen = Dictionary(transactions.map { ($0.id, CategoryStamp($0)) }, uniquingKeysWith: { a, _ in a })
+        expected[call] = seen
+        // User actions (re-evaluations) are serialized among themselves and win over the
+        // background run: they write without the compare, and never wait for the model.
+        if reevaluating { unchecked.insert(call) }
+        defer {
+            expected[call] = nil
+            writeErrors[call] = nil
+            unchecked.remove(call)
+            pendingWrites[call] = nil
+            lastWrite[call] = nil
         }
-        let cleared = reevaluating
+        let progress = reportsProgress ? onProgress : nil
+        let suggestions = await categorizer.categorize(transactions, context: context, slowChunkSize: slowChunkSize, skipsSlowStages: reevaluating) { improved, step in
+            await self.collect(improved, call: call, flushNow: reevaluating)
+            progress?(step)
+        }
+        // Also after a stop (lock, quit): what was finished is written.
+        await flush(call)
+        if let error = writeErrors[call] { throw error }
+        // A run stopped midway clears nothing: missing suggestions may just not be computed yet.
+        let cleared = reevaluating && !Task.isCancelled
             ? Set(transactions.filter { $0.categorySource == .rule && suggestions[$0.id] == nil }.map(\.id))
             : []
-        try await store.clearCategories(cleared)
-        try await store.setCategories(changed)
+        if !cleared.isEmpty {
+            try await store.clearCategories(cleared)
+        }
 
         var report = CategorizationReport(reevaluated: reevaluating ? transactions.count : 0, cleared: cleared.count)
         for suggestion in suggestions.values {
@@ -215,5 +284,47 @@ public actor CategorizationService {
         }
         report.duration = clock.now - start
         return report
+    }
+
+    /// Writes one step's suggestions, only where they change something and only to rows still in
+    /// the state this call expects.
+    /// Keeps a step's results; writes when the interval has passed (user actions: at once).
+    private func collect(_ improved: [TransactionID: CategorySuggestion], call: UUID, flushNow: Bool) async {
+        pendingWrites[call, default: [:]].merge(improved) { _, newer in newer }
+        let due = lastWrite[call].map { clock.now - $0 >= saveInterval } ?? true
+        if flushNow || due { await flush(call) }
+    }
+
+    private func flush(_ call: UUID) async {
+        lastWrite[call] = clock.now
+        guard let pending = pendingWrites.removeValue(forKey: call), !pending.isEmpty else { return }
+        await persist(pending, call: call)
+    }
+
+    private func persist(_ improved: [TransactionID: CategorySuggestion], call: UUID) async {
+        guard writeErrors[call] == nil, var known = expected[call] else { return }
+        var changed: [TransactionID: CategorySuggestion] = [:]
+        var checks: [TransactionID: CategoryStamp] = [:]
+        for (id, suggestion) in improved {
+            guard let current = known[id] else { continue }
+            let next = CategoryStamp(categoryID: suggestion.categoryID, source: suggestion.source, confidence: suggestion.confidence)
+            guard current != next else { continue }
+            changed[id] = suggestion
+            checks[id] = current
+        }
+        guard !changed.isEmpty else { return }
+        do {
+            if unchecked.contains(call) {
+                try await store.setCategories(changed)
+            } else {
+                try await store.setCategories(changed, expecting: checks)
+            }
+            for (id, suggestion) in changed {
+                known[id] = CategoryStamp(categoryID: suggestion.categoryID, source: suggestion.source, confidence: suggestion.confidence)
+            }
+            expected[call] = known
+        } catch {
+            writeErrors[call] = error
+        }
     }
 }

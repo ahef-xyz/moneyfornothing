@@ -234,6 +234,12 @@ struct MainView: View {
             }
         }
         .toolbar {
+            if model.assistantAccess.isEnabled, !model.assistantAccess.connectedClients.isEmpty {
+                // Visible while an assistant is connected (not by color alone: icon and label).
+                ToolbarItem {
+                    AssistantToolbarButton()
+                }
+            }
             ToolbarItemGroup {
                 Button("Alle abgleichen", systemImage: "arrow.clockwise") { model.syncAll() }
                     .help("Alle Konten abgleichen (⌘R)")
@@ -290,6 +296,13 @@ struct MainView: View {
             Text(model.keychainNotice ?? "")
         }
         .modifier(ImportRemovalAlerts())
+        .alert("Kategorie nicht gespeichert", isPresented: Binding(
+            get: { model.categoryFailure != nil }, set: { if !$0 { model.categoryFailure = nil } }
+        )) {
+            Button("OK") { model.categoryFailure = nil }
+        } message: {
+            Text(model.categoryFailure ?? "")
+        }
     }
 
     /// Depot accounts get the positions view instead of the transaction list.

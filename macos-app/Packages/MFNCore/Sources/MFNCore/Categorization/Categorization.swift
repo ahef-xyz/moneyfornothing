@@ -75,7 +75,33 @@ public struct CategorizationContext: Sendable {
 /// - kNN learns from the user's labels, the LLM handles the rest.
 public protocol CategorizationStage: Sendable {
     var source: CategorySource { get }
+    /// A stage that takes seconds per handful of bookings (the language model). The categorizer
+    /// gives it the open bookings in chunks and reports after each one, so results land as they
+    /// come and a stop (lock, quit) keeps what is done.
+    var isSlow: Bool { get }
     func suggest(_ transactions: [Transaction], context: CategorizationContext) async -> [TransactionID: CategorySuggestion]
+    /// Like `suggest`, plus whether the stage gave up for the rest of the run (the model is busy
+    /// or hung): bookings it did not answer are then not final. Default: never gives up.
+    func suggestOrStop(_ transactions: [Transaction], context: CategorizationContext) async -> (suggestions: [TransactionID: CategorySuggestion], stopped: Bool)
+}
+
+extension CategorizationStage {
+    public var isSlow: Bool { false }
+
+    public func suggestOrStop(_ transactions: [Transaction], context: CategorizationContext) async -> (suggestions: [TransactionID: CategorySuggestion], stopped: Bool) {
+        (await suggest(transactions, context: context), false)
+    }
+}
+
+/// How far a categorization run is: `done` of `total` bookings went through the cascade.
+public struct CategorizationProgress: Hashable, Sendable {
+    public var done: Int
+    public var total: Int
+
+    public init(done: Int, total: Int) {
+        self.done = done
+        self.total = total
+    }
 }
 
 /// Runs the stages in order. A transaction leaves the cascade once a stage is at least
@@ -93,14 +119,85 @@ public struct Categorizer: Sendable {
     }
 
     public func categorize(_ transactions: [Transaction], context: CategorizationContext) async -> [TransactionID: CategorySuggestion] {
+        await categorize(transactions, context: context, slowChunkSize: .max, onStep: nil)
+    }
+
+    /// Bookings per chunk for slow stages (three to four model batches).
+    public static let defaultSlowChunkSize = 40
+
+    /// Like `categorize(_:context:)`, but reports as it goes: once after the fast stages (with
+    /// what they settled, at least `acceptThreshold`), then after every chunk of a slow stage
+    /// (with the best suggestion for each booking of that chunk). A booking is reported only
+    /// once the cascade is through with it, so a run stopped midway (cancelled task) leaves the
+    /// rest without a category, and the next run gives them the full cascade.
+    /// `skipsSlowStages`: only the fast stages (user actions must not wait for the model).
+    public func categorize(
+        _ transactions: [Transaction],
+        context: CategorizationContext,
+        slowChunkSize: Int,
+        skipsSlowStages: Bool = false,
+        onStep: (@Sendable (_ improved: [TransactionID: CategorySuggestion], _ progress: CategorizationProgress) async -> Void)?
+    ) async -> [TransactionID: CategorySuggestion] {
         var best: [TransactionID: CategorySuggestion] = [:]
-        var open = transactions.filter { $0.status != .cancelled }
-        for stage in stages where !open.isEmpty {
-            let suggestions = await stage.suggest(open, context: context)
+        let all = transactions.filter { $0.status != .cancelled }
+        var open = all
+        var reportedFast = false
+        let chunkSize = max(slowChunkSize, 1)
+
+        func improve(with suggestions: [TransactionID: CategorySuggestion]) -> [TransactionID: CategorySuggestion] {
+            var improved: [TransactionID: CategorySuggestion] = [:]
             for (id, suggestion) in suggestions where suggestion.confidence > (best[id]?.confidence ?? -1) {
                 best[id] = suggestion
+                improved[id] = suggestion
+            }
+            return improved
+        }
+
+        var gaveUp = false
+        for stage in stages where !open.isEmpty && !(skipsSlowStages && stage.isSlow) && !gaveUp {
+            if Task.isCancelled { break }
+            guard stage.isSlow, let onStep else {
+                _ = improve(with: await stage.suggest(open, context: context))
+                open.removeAll { (best[$0.id]?.confidence ?? 0) >= acceptThreshold }
+                continue
+            }
+            if !reportedFast {
+                reportedFast = true
+                await onStep(best.filter { $0.value.confidence >= acceptThreshold },
+                             CategorizationProgress(done: all.count - open.count, total: all.count))
+            }
+            var done = all.count - open.count
+            var start = 0
+            let queue = open
+            while start < queue.count, !Task.isCancelled {
+                let chunk = Array(queue[start ..< min(start + chunkSize, queue.count)])
+                start += chunk.count
+                let (suggestions, stopped) = await stage.suggestOrStop(chunk, context: context)
+                // A chunk the stage could not finish (cancelled) is not reported: its bookings
+                // stay open for the next run instead of keeping a weak fast guess for good.
+                guard !Task.isCancelled else { break }
+                _ = improve(with: suggestions)
+                if stopped {
+                    // The model gave up: only what it answered is final. The rest of this
+                    // chunk and of the run stays open for the next run.
+                    let answered = Dictionary(uniqueKeysWithValues: chunk.compactMap { t in
+                        suggestions[t.id] == nil ? nil : best[t.id].map { (t.id, $0) }
+                    })
+                    await onStep(answered, CategorizationProgress(done: min(done + answered.count, all.count), total: all.count))
+                    gaveUp = true
+                    break
+                }
+                done += chunk.count
+                let finished = Dictionary(uniqueKeysWithValues: chunk.compactMap { t in best[t.id].map { (t.id, $0) } })
+                await onStep(finished, CategorizationProgress(done: min(done, all.count), total: all.count))
             }
             open.removeAll { (best[$0.id]?.confidence ?? 0) >= acceptThreshold }
+        }
+        if !reportedFast, let onStep {
+            // Stopped before a slow stage ran: only what is settled counts, weak guesses wait
+            // for the next run's full cascade.
+            let settled = Task.isCancelled ? best.filter { $0.value.confidence >= acceptThreshold } : best
+            await onStep(settled, CategorizationProgress(done: all.count, total: all.count))
         }
         return best
     }

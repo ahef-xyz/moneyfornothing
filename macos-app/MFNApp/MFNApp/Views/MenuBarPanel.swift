@@ -27,6 +27,13 @@ struct MenuBarPanel: View {
                 Divider()
                 lists
             }
+            if model.assistantAccess.isEnabled, !model.assistantAccess.connectedClients.isEmpty {
+                Divider()
+                AssistantIndicator()
+                    .font(.callout)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+            }
             Divider()
             actions
         }

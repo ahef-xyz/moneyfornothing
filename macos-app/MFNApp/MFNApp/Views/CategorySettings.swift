@@ -8,6 +8,7 @@ struct CategorySettings: View {
     @State private var editing: RuleDraft?
     @State private var error: String?
     @Environment(\.openWindow) private var openWindow
+    @AppStorage(Preferences.useCategoryModel) private var useModel = true
 
     var body: some View {
         Form {
@@ -49,7 +50,7 @@ struct CategorySettings: View {
                         .disabled(!model.canShowCategorySetup)
                     }
                 }
-                Section("Automatik") {
+                Section {
                     LabeledContent("Ohne Kategorie") { Text("\(model.uncategorizedCount)").monospacedDigit() }
                     LabeledContent("Zu prüfen") { Text("\(model.reviewCount)").monospacedDigit() }
                     HStack {
@@ -57,9 +58,22 @@ struct CategorySettings: View {
                             .disabled(!model.canCategorize || model.isCategorizing)
                         if model.isCategorizing {
                             ProgressView().controlSize(.small)
+                                .accessibilityLabel("Kategorisierung läuft")
+                            if let status = model.categorizationStatus {
+                                Text(status).monospacedDigit().foregroundStyle(.secondary)
+                            }
                         }
                     }
+                } header: {
+                    Text("Automatik")
                 }
+            }
+            Section {
+                Toggle(isOn: $useModel) {
+                    Text("Apple Intelligence für Kategorien verwenden")
+                    Text("Ordnet ein, was Regeln und ähnliche Umsätze offenlassen. Auf älteren oder kleinen Macs kann das lange dauern. Aus: Diese Umsätze behalten nur einen unsicheren Vorschlag (dann unter „Zu prüfen“) oder bleiben ohne Kategorie, für den Assistenten oder ⌘K.")
+                }
+                .onChange(of: useModel) { _, on in model.categoryModelSwitched(on: on) }
             }
         }
         .formStyle(.grouped)

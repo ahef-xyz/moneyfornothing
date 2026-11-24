@@ -40,13 +40,23 @@ The source code is public so that anyone can check what the app does with their 
 yourself, but you may not pass it on (see [License](#license)).
 
 - **Read-only.** MFN never initiates transfers, orders or any other action that moves money.
-- **Local.** Everything stays on your Mac. No account, no server, no telemetry.
+- **Local.** Everything stays on your Mac. No account, no server, no telemetry. The one exception is an AI
+  assistant you connect yourself (off by default, see below).
 - **Encrypted.** The ledger is a SQLCipher database. Its key is protected by the Keychain
   (biometrics or device passcode) and, optionally, by your own password.
 - **Locked.** The app locks with Touch ID / device password at start, after screen lock and after inactivity.
   Credentials and sessions live only in the Keychain.
 - **On-device categorisation.** Rules, then nearest-neighbour matching on your own history, then
-  Apple Foundation Models. Nothing leaves the machine.
+  Apple Foundation Models. Nothing leaves the machine. On a slow Mac you can switch the model off
+  (Settings, Kategorien): rules and similar transactions still sort, the rest waits in "Zu prüfen".
+  Your own choices never wait for the background run.
+- **AI assistants (MCP), off by default.** Switch it on in Settings, MCP, and an MCP client
+  (Claude Desktop, Claude Code, a client for a local model) can read the accounts you share and answer
+  questions about them: balances, sums by category, cash flow, fixed costs, budgets, forecast, portfolio,
+  transactions. Read-only (no sync, no changes, no transfers), only while MFN is unlocked, MFN asks before
+  a new program gets access and logs every call. IBANs, references and bank IDs never leave; MFN does the
+  sums. **With a cloud model this data goes to the model's provider**; with a local model it stays on
+  your Mac. MFN cannot tell which one is connected.
 - **New since the last sync.** New transactions are counted per account and marked in the list until you
   select them; filter or sort by them.
 - **Forecast.** Note one-off expenses for a future date and see the projected balance. Monthly payments
@@ -91,7 +101,8 @@ time and may break MFN without notice.
 FinTS banks (ING, DKB) only accept clients with a registered **FinTS product ID**, issued free of
 charge by the Deutsche Kreditwirtschaft (DK). The terms ask that the ID is not published.
 
-- Official release builds carry the maintainer's registered product ID.
+- Official release builds carry the maintainer's registered product ID. If you use the downloaded
+  app, you do not need to register anywhere.
 - Builds from source (for your own personal use, see [License](#license)) need **your own** registration. Apply with the DK (search for "FinTS
   Produktregistrierung"), then copy `macos-app/MFNApp/Config/FinTS.local.xcconfig.example` to
   `macos-app/MFNApp/Config/FinTS.local.xcconfig` (gitignored) and set `MFN_FINTS_PRODUCT_ID`.

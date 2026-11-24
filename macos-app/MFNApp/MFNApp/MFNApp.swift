@@ -172,6 +172,10 @@ struct MFNApp: App {
                 Button(model.hideAmounts ? "Beträge einblenden" : "Beträge ausblenden") { model.hideAmounts.toggle() }
                     .keyboardShortcut("h", modifiers: [.command, .shift])
             }
+            CommandGroup(before: .windowList) {
+                AssistantLogCommand()
+                Divider()
+            }
             CommandGroup(after: .appSettings) {
                 // "Bank hinzufügen …" (⇧⌘N) lives in the "Konten" menu only: one shortcut, one item.
                 Button("Sperren") { model.lock.lock() }
@@ -184,6 +188,12 @@ struct MFNApp: App {
             SettingsView()
                 .environment(model)
         }
+
+        Window("MCP-Zugriffe", id: AssistantLogView.windowID) {
+            AssistantLogView()
+                .environment(model)
+        }
+        .restorationBehavior(.disabled)
 
         Window("Über MoneyForNothing", id: AboutView.windowID) {
             AboutView()

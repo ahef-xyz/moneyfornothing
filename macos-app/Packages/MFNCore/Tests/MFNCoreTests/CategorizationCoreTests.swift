@@ -367,3 +367,203 @@ private struct OneAccountConnector: BankConnector {
         #expect(result.reachedLLM == 0)
     }
 }
+
+// MARK: - Slow model (docs/v0.6.0.md section 10)
+
+/// A slow stage like the language model on an 8 GB Mac: answers after `delay`, or never.
+private struct SlowStage: CategorizationStage {
+    let answers: [String: (CategoryID, Double)]
+    var delay: Duration
+    var hangs = false
+    var log: CallLog = CallLog()
+    var source: CategorySource { .llm }
+    var isSlow: Bool { true }
+
+    func suggest(_ transactions: [Transaction], context: CategorizationContext) async -> [TransactionID: CategorySuggestion] {
+        await log.record(transactions.map(\.counterpartName))
+        if hangs {
+            // Ignores cancellation, like a stuck model call.
+            while true { try? await Task.sleep(for: .seconds(3600)) }
+        }
+        try? await Task.sleep(for: delay)
+        var result: [TransactionID: CategorySuggestion] = [:]
+        for t in transactions {
+            if let (id, c) = answers[t.counterpartName] { result[t.id] = CategorySuggestion(categoryID: id, source: .llm, confidence: c) }
+        }
+        return result
+    }
+}
+
+private final class ProgressLog: Sendable {
+    private let entries = Mutex<[CategorizationProgress?]>([])
+    func record(_ entry: CategorizationProgress?) { entries.withLock { $0.append(entry) } }
+    var all: [CategorizationProgress?] { entries.withLock { $0 } }
+}
+
+import Synchronization
+
+@Suite struct SlowModelTests {
+    @Test func manualCategoryLandsWhileTheModelHangs() async throws {
+        let open = tx("Bäcker"), other = tx("Kiosk", day: 4)
+        let store = try await makeStore([open, other])
+        let service = CategorizationService(store: store, categorizer: Categorizer(stages: [SlowStage(answers: [:], delay: .zero, hangs: true)]))
+        let run = Task { try await service.categorizeUncategorized() }
+        try await Task.sleep(for: .milliseconds(50))
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask { try await service.setManual("lebensmittel", for: [open.id]) }
+            group.addTask {
+                try await Task.sleep(for: .seconds(2))
+                Issue.record("setManual waited for the background run")
+            }
+            try await group.next()
+            group.cancelAll()
+        }
+        #expect(await category(store, open.id) == ("lebensmittel", .manual))
+        await service.cancel()
+        run.cancel()
+    }
+
+    @Test func lateModelAnswerDoesNotOverwriteARuleSavedMeanwhile() async throws {
+        let open = tx("Tankstelle Nord")
+        let store = try await makeStore([open])
+        let slow = SlowStage(answers: ["Tankstelle Nord": ("restaurant", 0.8)], delay: .milliseconds(300))
+        let service = CategorizationService(store: store, categorizer: Categorizer(stages: [RuleStage(), slow]))
+        let run = Task { try await service.categorizeUncategorized() }
+        try await Task.sleep(for: .milliseconds(80))
+        try await service.apply(rule: CategoryRule(match: .counterpart("tankstelle"), categoryID: "tanken"))
+        #expect(await category(store, open.id) == ("tanken", .rule))
+        _ = try await run.value
+        #expect(await category(store, open.id) == ("tanken", .rule), "the run's stale answer is dropped")
+    }
+
+    @Test func storeRefusesAStaleMachineWrite() async throws {
+        let row = tx("Shop")
+        let store = try await makeStore([row])
+        let seen = CategoryStamp(row)
+        try await store.setCategory("kleidung", source: .rule, confidence: 1, for: [row.id] as Set)
+        try await store.setCategories([row.id: CategorySuggestion(categoryID: "abos", source: .llm, confidence: 0.9)], expecting: [row.id: seen])
+        #expect(await category(store, row.id) == ("kleidung", .rule))
+        try await store.clearCategories([row.id], expecting: [row.id: seen])
+        #expect(await category(store, row.id) == ("kleidung", .rule))
+    }
+
+    @Test func savesAfterEveryChunkAndReportsProgress() async throws {
+        let names = (1 ... 5).map { "Händler \($0)" }
+        let rows = names.enumerated().map { tx($1, day: $0 + 1) }
+        let store = try await makeStore(rows)
+        let answers = Dictionary(uniqueKeysWithValues: names.map { ($0, (CategoryID("freizeit"), 0.8)) })
+        let slow = SlowStage(answers: answers, delay: .milliseconds(150))
+        let progress = ProgressLog()
+        let service = CategorizationService(store: store, categorizer: Categorizer(stages: [slow]), slowChunkSize: 2, saveInterval: .zero) { progress.record($0) }
+        let run = Task { try await service.categorizeUncategorized() }
+        // Some rows are saved before the last chunk is done.
+        try await waitUntil { await store.snapshot().transactions.count { $0.categoryID != nil } >= 1 }
+        let early = await store.snapshot().transactions.count { $0.categoryID != nil }
+        #expect(early >= 1 && early < 5)
+        _ = try await run.value
+        #expect(await store.snapshot().transactions.allSatisfy { $0.categoryID == "freizeit" })
+        let steps = progress.all.compactMap { $0 }
+        #expect(steps.first == CategorizationProgress(done: 0, total: 5))
+        #expect(steps.last == CategorizationProgress(done: 5, total: 5))
+        #expect(steps.map(\.done) == [0, 2, 4, 5])
+        #expect(progress.all.last == .some(nil), "ends with nil")
+    }
+
+    @Test func aStoppedRunLeavesUnreachedBookingsOpen() async throws {
+        let names = (1 ... 6).map { "Laden \($0)" }
+        let rows = names.enumerated().map { tx($1, day: $0 + 1) }
+        let store = try await makeStore(rows)
+        // A weak fast guess for all, the model only gets so far.
+        let weak = TableStage(source: .knn, answers: Dictionary(uniqueKeysWithValues: names.map { ($0, (CategoryID("sonstiges"), 0.5)) }))
+        let slow = SlowStage(answers: Dictionary(uniqueKeysWithValues: names.map { ($0, (CategoryID("haushalt"), 0.8)) }), delay: .milliseconds(150))
+        let service = CategorizationService(store: store, categorizer: Categorizer(stages: [weak, slow]), slowChunkSize: 2, saveInterval: .zero)
+        let run = Task { try await service.categorizeUncategorized() }
+        try await Task.sleep(for: .milliseconds(220))
+        await service.cancel()
+        _ = try? await run.value
+        try await Task.sleep(for: .milliseconds(300))
+        let snapshot = await store.snapshot()
+        let done = snapshot.transactions.filter { $0.categoryID != nil }
+        #expect(done.allSatisfy { $0.categoryID == "haushalt" }, "no weak guess frozen in place")
+        #expect(snapshot.transactions.count { $0.categoryID == nil } >= 2, "the rest waits for the next run")
+    }
+
+    @Test func cancelKeepsWhatIsSavedAndStopsBeforeTheNextChunk() async throws {
+        let names = (1 ... 6).map { "Laden \($0)" }
+        let rows = names.enumerated().map { tx($1, day: $0 + 1) }
+        let store = try await makeStore(rows)
+        let answers = Dictionary(uniqueKeysWithValues: names.map { ($0, (CategoryID("haushalt"), 0.8)) })
+        let slow = SlowStage(answers: answers, delay: .milliseconds(150))
+        let service = CategorizationService(store: store, categorizer: Categorizer(stages: [slow]), slowChunkSize: 2, saveInterval: .zero)
+        let run = Task { try await service.categorizeUncategorized() }
+        // Cancel as soon as the first chunk is saved (not after a fixed time: CI is slower).
+        try await waitUntil { await store.snapshot().transactions.count { $0.categoryID != nil } >= 2 }
+        await service.cancel()
+        _ = try? await run.value
+        try await Task.sleep(for: .milliseconds(400))
+        let saved = await store.snapshot().transactions.count { $0.categoryID != nil }
+        #expect(saved >= 2 && saved < 6)
+        #expect(await slow.log.calls.count <= 2)
+        #expect(await service.isRunning == false)
+    }
+}
+
+/// A slow stage whose model gives up after its first chunk (busy or hung).
+private struct GivingUpStage: CategorizationStage {
+    let answers: [String: (CategoryID, Double)]
+    let calls = CallLog()
+    var source: CategorySource { .llm }
+    var isSlow: Bool { true }
+
+    func suggest(_ transactions: [Transaction], context: CategorizationContext) async -> [TransactionID: CategorySuggestion] {
+        await suggestOrStop(transactions, context: context).suggestions
+    }
+
+    func suggestOrStop(_ transactions: [Transaction], context: CategorizationContext) async -> (suggestions: [TransactionID: CategorySuggestion], stopped: Bool) {
+        await calls.record(transactions.map(\.counterpartName))
+        // Answers the first booking of the first chunk, then gives up.
+        guard await calls.calls.count == 1, let first = transactions.first, let (id, c) = answers[first.counterpartName] else { return ([:], true) }
+        return ([first.id: CategorySuggestion(categoryID: id, source: .llm, confidence: c)], true)
+    }
+}
+
+@Suite struct SlowModelSavingTests {
+    @Test func aModelThatGivesUpLeavesTheRestOpen() async throws {
+        let names = (1 ... 6).map { "Shop \($0)" }
+        let rows = names.enumerated().map { tx($1, day: $0 + 1) }
+        let store = try await makeStore(rows)
+        let weak = TableStage(source: .knn, answers: Dictionary(uniqueKeysWithValues: names.map { ($0, (CategoryID("sonstiges"), 0.5)) }))
+        let model = GivingUpStage(answers: Dictionary(uniqueKeysWithValues: names.map { ($0, (CategoryID("haushalt"), 0.8)) }))
+        let service = CategorizationService(store: store, categorizer: Categorizer(stages: [weak, model]), slowChunkSize: 2, saveInterval: .zero)
+        try await service.categorizeUncategorized()
+        let snapshot = await store.snapshot()
+        #expect(snapshot.transactions.count { $0.categoryID == "haushalt" } == 1, "what the model answered is kept")
+        #expect(snapshot.transactions.count { $0.categoryID == nil } == 5, "no weak guess saved for the rest")
+        #expect(await model.calls.calls.count == 1, "no further chunks after giving up")
+    }
+
+    @Test func backgroundResultsAreWrittenTogether() async throws {
+        let names = (1 ... 8).map { "Markt \($0)" }
+        let rows = names.enumerated().map { tx($1, day: $0 + 1) }
+        let store = try await makeStore(rows)
+        let slow = SlowStage(answers: Dictionary(uniqueKeysWithValues: names.map { ($0, (CategoryID("lebensmittel"), 0.8)) }), delay: .milliseconds(30))
+        let service = CategorizationService(store: store, categorizer: Categorizer(stages: [slow]), slowChunkSize: 2, saveInterval: .seconds(30))
+        let before = await store.publishCount
+        try await service.categorizeUncategorized()
+        #expect(await store.snapshot().transactions.allSatisfy { $0.categoryID == "lebensmittel" })
+        // Four chunks, but one write at the first step and one at the end.
+        #expect(await store.publishCount - before <= 2)
+    }
+}
+
+/// Polls `condition` every 10 ms for up to `timeout`; fails the test if it never holds.
+private func waitUntil(timeout: Duration = .seconds(5), _ condition: () async -> Bool) async throws {
+    let end = ContinuousClock.now + timeout
+    while !(await condition()) {
+        guard ContinuousClock.now < end else {
+            Issue.record("condition not met within \(timeout)")
+            return
+        }
+        try await Task.sleep(for: .milliseconds(10))
+    }
+}

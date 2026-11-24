@@ -42,3 +42,6 @@ ledger.key
 *.mobileprovision
 *.fints
 .env*
+
+# Coverage output of test runs
+*.profraw

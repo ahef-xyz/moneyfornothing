@@ -14,13 +14,15 @@ struct SettingsView: View {
             Tab("Kategorien", systemImage: "tag") { CategorySettings() }
             Tab("Sicherheit", systemImage: "lock") { SecuritySettings() }
             Tab("Sicherung", systemImage: "externaldrive") { BackupSettings() }
+            Tab("MCP", systemImage: "point.3.connected.trianglepath.dotted") { AssistantSettings() }
             if DeveloperMode.isAvailable {
                 Tab("Entwickler", systemImage: "hammer") { DeveloperSettings() }
             }
             Tab("Über", systemImage: "info.circle") { AboutView().frame(maxWidth: .infinity) }
         }
-        .frame(width: 520)
-        .frame(minHeight: 360)
+        // Wide enough for every tab (up to nine with "Entwickler") without the overflow menu.
+        .frame(width: 720)
+        .frame(minHeight: 460, idealHeight: 560)
     }
 }
 

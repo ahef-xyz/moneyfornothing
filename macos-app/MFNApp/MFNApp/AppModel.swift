@@ -209,6 +209,12 @@ final class AppModel {
     @ObservationIgnored private let presetStages: [any CategorizationStage]
     /// A categorization run is going on (after a sync or a rule change).
     private(set) var isCategorizing = false
+    /// How far the background run is (`nil` before its first step and after it ends).
+    private(set) var categorizationProgress: CategorizationProgress?
+    /// A category the user chose could not be saved (alert over the main window).
+    var categoryFailure: String?
+    /// Settings → MCP.
+    @ObservationIgnored private(set) lazy var assistantAccess = AssistantAccess(model: self)
     /// ⌘K: transactions whose category the picker sheet sets.
     var categoryPicker: CategoryPickerRequest?
     /// ⇧⌘K: the rule being created or edited in the sheet over the main window.
@@ -282,6 +288,7 @@ final class AppModel {
         }
         lock.onLock = { [weak self] in self?.close() }
         lock.onUnlock = { [weak self] context in await self?.unlocked(context) }
+        assistantAccess.resume()
         lock.start()
     }
 
@@ -433,7 +440,9 @@ final class AppModel {
         // Cascade after the rules: kNN over the user's own bookings, then the on-device language
         // model (CLAUDE.md §8). One shared embedding, so few-shots and neighbours reuse its cache.
         let embedding = HybridEmbedding()
-        let language = LLMStage(embedding: embedding)
+        // Settings → Kategorien: the user can leave the model out (slow Macs). Read before every
+        // model batch, so switching takes effect in a running run.
+        let language = LLMStage(embedding: embedding, isEnabled: { UserDefaults.standard.bool(forKey: Preferences.useCategoryModel) })
         language.prewarm()
         return AppModel(databaseURL: url, keyAccount: profile.keyAccount, isDemo: false, profile: profile, machineStages: [KNNStage(embedding: embedding), language]) { engine, store, presenter in
             for connection in await store.snapshot().connections {
@@ -514,6 +523,9 @@ final class AppModel {
         lock.lock()
     }
 
+    /// The database is open (unlocked and set up): MCP may read `ledger`.
+    var isLedgerOpen: Bool { store != nil }
+
     /// The current unlock; read before an `await`, checked with `isStale` after it.
     var lockSession: Int { session }
 
@@ -549,11 +561,18 @@ final class AppModel {
         self.store = store
         self.engine = engine
         recurringHashKey = await store.preferenceHashKey()
+        assistantAccess.verifySettings(accounts: await store.snapshot().accounts.map(\.id))
         // Deterministic stages first (user rules, own transfers, well-known merchants), then the
         // learning ones. Works without Apple Intelligence: the first three need no model.
         categorization = CategorizationService(
             store: store,
-            categorizer: Categorizer(stages: presetStages + machineStages)
+            categorizer: Categorizer(stages: presetStages + machineStages),
+            onProgress: { [weak self] progress in
+                Task { @MainActor in
+                    guard let self, !self.isStale(session) else { return }
+                    self.categorizationProgress = progress
+                }
+            }
         )
         let defaults = UserDefaults.standard
         hideAmounts = defaults.bool(forKey: Preferences.hideAmountsOnUnlock)
@@ -590,6 +609,7 @@ final class AppModel {
     /// Lock: stop observing, drop everything decrypted, close the database, invalidate the key access.
     private func close() {
         session &+= 1
+        assistantAccess.locked()
         bankSetup?.abandon()
         bankSetup = nil
         presenter.cancelAll()
@@ -601,8 +621,12 @@ final class AppModel {
         categorizeTask = nil
         categorizeAgain = false
         isCategorizing = false
+        categorizationProgress = nil
+        categoryFailure = nil
         for task in syncTasks.values { task.cancel() }
         syncTasks = [:]
+        // The run stops before its next model batch; what it saved stays.
+        if let categorization { Task { await categorization.cancel() } }
         categorization = nil
         categoryPicker = nil
         ruleDraft = nil
@@ -1172,6 +1196,10 @@ final class AppModel {
             } while self?.categorizeAgain == true && !Task.isCancelled
             // A lock cancelled this run and may have started a new one after unlocking.
             guard !Task.isCancelled else { return }
+            // A run long enough to show progress says when it is done (VoiceOver).
+            if self?.categorizationProgress != nil {
+                AccessibilityNotification.Announcement("Kategorisierung abgeschlossen").post()
+            }
             self?.categorizeTask = nil
             self?.isCategorizing = false
             await self?.offerCategorySetupIfNeeded()
@@ -1310,6 +1338,23 @@ final class AppModel {
         )
     }
 
+    /// Settings → Kategorien switched the model on or off. On: load it now (it was not
+    /// prewarmed). A running run sees the switch at its next batch either way.
+    func categoryModelSwitched(on: Bool) {
+        guard on else { return }
+        for case let stage as LLMStage in machineStages { stage.prewarm() }
+        categorizeInBackground()
+    }
+
+    /// Whether this ledger uses the language model at all (live, not the demo's mock stage).
+    var hasCategoryModel: Bool { machineStages.contains { $0 is LLMStage } }
+
+    /// Quiet status of the background run ("412 von 1.500 Umsätzen eingeordnet").
+    var categorizationStatus: String? {
+        guard isCategorizing, let progress = categorizationProgress, progress.total > 0 else { return nil }
+        return "\(progress.done.formatted()) von \(progress.total.formatted()) Umsätzen eingeordnet"
+    }
+
     /// The user's category (`nil` = none) for `ids`; source becomes `manual`, so they leave "Zu prüfen".
     func setCategory(_ category: CategoryID?, for ids: [TransactionID]) {
         guard let service = categorization, !ids.isEmpty else { return }
@@ -1319,6 +1364,7 @@ final class AppModel {
                 try await service.setManual(category, for: ids)
             } catch {
                 Log.logger("categorize").error("Kategorie nicht gespeichert: \(String(describing: type(of: error)), privacy: .public)")
+                if !lock.isLocked { categoryFailure = "Die Kategorie konnte nicht gespeichert werden. Bitte versuche es noch einmal." }
             }
         }
     }
@@ -1350,6 +1396,7 @@ final class AppModel {
                 }
             } catch {
                 Log.logger("categorize").error("Vorschlag nicht übernommen: \(String(describing: type(of: error)), privacy: .public)")
+                if !lock.isLocked { categoryFailure = "Der Vorschlag konnte nicht übernommen werden. Bitte versuche es noch einmal." }
             }
         }
     }
@@ -2293,16 +2340,10 @@ struct SnapshotIndex {
     }
 
     /// Own transfers and card settlements: money moving between the user's accounts.
-    static let transferCategories: Set<CategoryID> = [TransferStage.category, TransferStage.cardSettlementCategory]
+    static let transferCategories: Set<CategoryID> = TransferRules.categories
 
-    /// "kredit" holds card settlements and loan repayments. Only a card settlement moves money
-    /// between own accounts, and only if the card is in MFN (else it is the only trace of that
-    /// spending). Loan repayments are real spending.
     static func isCardSettlement(_ transaction: MFNCore.Transaction, account: Account?, hasCardAccount: Bool) -> Bool {
-        guard hasCardAccount, transaction.categoryID == "kredit" else { return false }
-        if account?.type == .card { return true }
-        let text = (transaction.counterpartName + " " + transaction.purpose).lowercased()
-        return ["kreditkart", "kartenabrechnung", "visa", "mastercard", "american express"].contains { text.contains($0) }
+        TransferRules.isCardSettlement(transaction, account: account, hasCardAccount: hasCardAccount)
     }
 
     init() {}

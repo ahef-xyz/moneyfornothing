@@ -436,6 +436,14 @@ public actor EncryptedLedgerStore: LedgerStore {
         try writeChangedRows(state.clearedCategoryChanges(ids))
     }
 
+    public func setCategories(_ suggestions: [TransactionID: CategorySuggestion], expecting: [TransactionID: CategoryStamp]) throws {
+        try writeChangedRows(state.categoryChanges(suggestions, expecting: expecting))
+    }
+
+    public func clearCategories(_ ids: Set<TransactionID>, expecting: [TransactionID: CategoryStamp]) throws {
+        try writeChangedRows(state.clearedCategoryChanges(ids, expecting: expecting))
+    }
+
     /// Persists rows from the snapshot's `…Changes` methods, then puts them in place in the state.
     private func writeChangedRows(_ changed: [Transaction]) throws {
         guard !changed.isEmpty else { return }

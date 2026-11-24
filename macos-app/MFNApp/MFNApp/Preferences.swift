@@ -19,6 +19,10 @@ enum Preferences {
     static let negativeRedMenuBar = "negativeRedMenuBar"
     static let autoSync = "autoSync"
     static let autoSyncMinutes = "autoSyncMinutes"
+    /// Settings → Kategorien: ask Apple Intelligence for bookings rules and kNN cannot settle.
+    /// Off: those keep a weak guess ("Zu prüfen") or stay without a category (for slow Macs,
+    /// docs/v0.6.0.md section 10).
+    static let useCategoryModel = "useAppleIntelligenceForCategories"
 
     /// Choices for the automatic sync interval. Never below the engine's minimum
     /// (CLAUDE.md §1: Abruf-Intervall ≥ 15 min).
@@ -45,6 +49,7 @@ enum Preferences {
             negativeRedMenuBar: false,
             autoSync: true,
             autoSyncMinutes: 30,
+            useCategoryModel: true,
             AppearanceMode.storageKey: AppearanceMode.system.rawValue,
             AppIconChoice.storageKey: AppIconChoice.dark.rawValue,
         ])

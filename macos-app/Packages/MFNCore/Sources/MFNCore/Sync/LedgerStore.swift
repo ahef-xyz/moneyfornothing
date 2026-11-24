@@ -260,16 +260,26 @@ public struct LedgerSnapshot: Sendable, Equatable {
     /// Machine suggestions in one go. Never overwrites a manual category; unknown IDs are skipped.
     /// Returns the changed transactions (for persisting).
     @discardableResult
-    public mutating func setCategories(_ suggestions: [TransactionID: CategorySuggestion]) -> [Transaction] {
-        let changed = categoryChanges(suggestions)
+    public mutating func setCategories(_ suggestions: [TransactionID: CategorySuggestion], expecting: [TransactionID: CategoryStamp]? = nil) -> [Transaction] {
+        let changed = categoryChanges(suggestions, expecting: expecting)
         replaceCategorized(changed)
         return changed
     }
 
     /// What `setCategories` would change, without changing the snapshot.
-    public func categoryChanges(_ suggestions: [TransactionID: CategorySuggestion]) -> [Transaction] {
+    ///
+    /// `expecting`: the category state each row had when the suggestion was computed. A row whose
+    /// state differs now (the user or a rule changed it meanwhile) is left alone, so a slow
+    /// background run never overwrites a newer decision. Rows missing from `expecting` are not
+    /// checked; `nil` checks nothing.
+    public func categoryChanges(_ suggestions: [TransactionID: CategorySuggestion], expecting: [TransactionID: CategoryStamp]? = nil) -> [Transaction] {
         guard !suggestions.isEmpty else { return [] }
-        let targets = indices(of: suggestions.keys).filter { transactions[$0].categorySource != .manual }
+        let targets = indices(of: suggestions.keys).filter { position in
+            let row = transactions[position]
+            guard row.categorySource != .manual else { return false }
+            guard let expected = expecting?[row.id] else { return true }
+            return CategoryStamp(row) == expected
+        }
         return categoryChanges(at: targets) { transaction in
             guard let suggestion = suggestions[transaction.id] else { return }
             transaction.categoryID = suggestion.categoryID
@@ -281,16 +291,22 @@ public struct LedgerSnapshot: Sendable, Equatable {
     /// Removes machine categories (everything but manual) in one go, e.g. after the rule that
     /// set them was removed. Returns the changed transactions (for persisting).
     @discardableResult
-    public mutating func clearCategories(_ ids: Set<TransactionID>) -> [Transaction] {
-        let changed = clearedCategoryChanges(ids)
+    public mutating func clearCategories(_ ids: Set<TransactionID>, expecting: [TransactionID: CategoryStamp]? = nil) -> [Transaction] {
+        let changed = clearedCategoryChanges(ids, expecting: expecting)
         replaceCategorized(changed)
         return changed
     }
 
-    /// What `clearCategories` would change, without changing the snapshot.
-    public func clearedCategoryChanges(_ ids: Set<TransactionID>) -> [Transaction] {
+    /// What `clearCategories` would change, without changing the snapshot. `expecting` as in
+    /// `categoryChanges(_:expecting:)`.
+    public func clearedCategoryChanges(_ ids: Set<TransactionID>, expecting: [TransactionID: CategoryStamp]? = nil) -> [Transaction] {
         guard !ids.isEmpty else { return [] }
-        let targets = indices(of: ids).filter { transactions[$0].categorySource != .manual && transactions[$0].categoryID != nil }
+        let targets = indices(of: ids).filter { position in
+            let row = transactions[position]
+            guard row.categorySource != .manual, row.categoryID != nil else { return false }
+            guard let expected = expecting?[row.id] else { return true }
+            return CategoryStamp(row) == expected
+        }
         return categoryChanges(at: targets) { transaction in
             transaction.categoryID = nil
             transaction.categorySource = nil
@@ -582,6 +598,11 @@ public protocol LedgerStore: Actor {
     func setCustomName(_ name: String?, for account: AccountID) async throws
     /// Categorization results in one write; manual categories stay untouched.
     func setCategories(_ suggestions: [TransactionID: CategorySuggestion]) async throws
+    /// Like `setCategories(_:)`, but only for rows whose category state still equals `expecting`
+    /// (compare and set in one step, see `LedgerSnapshot.categoryChanges(_:expecting:)`).
+    func setCategories(_ suggestions: [TransactionID: CategorySuggestion], expecting: [TransactionID: CategoryStamp]) async throws
+    /// Like `clearCategories(_:)`, with the same check as `setCategories(_:expecting:)`.
+    func clearCategories(_ ids: Set<TransactionID>, expecting: [TransactionID: CategoryStamp]) async throws
     func upsertRule(_ rule: CategoryRule) async throws
     func removeRule(_ id: UUID) async throws
     func setBudget(_ budget: AccountBudget) async throws
@@ -813,8 +834,36 @@ public actor InMemoryLedgerStore: LedgerStore {
         change { $0.clearCategories(ids) }
     }
 
+    public func setCategories(_ suggestions: [TransactionID: CategorySuggestion], expecting: [TransactionID: CategoryStamp]) {
+        guard !state.categoryChanges(suggestions, expecting: expecting).isEmpty else { return }
+        change { $0.setCategories(suggestions, expecting: expecting) }
+    }
+
+    public func clearCategories(_ ids: Set<TransactionID>, expecting: [TransactionID: CategoryStamp]) {
+        guard !state.clearedCategoryChanges(ids, expecting: expecting).isEmpty else { return }
+        change { $0.clearCategories(ids, expecting: expecting) }
+    }
+
     public func setCategory(_ category: CategoryID?, source: CategorySource, confidence: Double?, for transactions: Set<TransactionID>) {
         guard !transactions.isEmpty else { return }
         change { $0.setCategory(category, source: source, confidence: confidence, for: transactions) }
+    }
+}
+
+/// The category state of one transaction: what a categorization run saw before it computed a
+/// suggestion, checked again when it writes (`LedgerStore.setCategories(_:expecting:)`).
+public struct CategoryStamp: Hashable, Sendable {
+    public var categoryID: CategoryID?
+    public var source: CategorySource?
+    public var confidence: Double?
+
+    public init(categoryID: CategoryID?, source: CategorySource?, confidence: Double?) {
+        self.categoryID = categoryID
+        self.source = source
+        self.confidence = confidence
+    }
+
+    public init(_ transaction: Transaction) {
+        self.init(categoryID: transaction.categoryID, source: transaction.categorySource, confidence: transaction.confidence)
     }
 }

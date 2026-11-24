@@ -1148,6 +1148,19 @@ private struct LedgerFooter: View {
                     .help(model.showCancelled ? "Stornos ausblenden (⌥⌘S)" : "Stornos einblenden (⌥⌘S)")
             }
             Spacer()
+            if let status = model.categorizationStatus, selection.isEmpty {
+                // The background run on a slow Mac takes a while: say how far it is.
+                Text(status)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .help("Kategorien werden im Hintergrund vergeben. Was fertig ist, ist schon gespeichert.")
+                    .accessibilityLabel("Kategorisierung im Hintergrund: \(status)")
+                    .accessibilityHint("Was fertig ist, ist schon gespeichert.")
+                Divider()
+                    .frame(height: 12)
+                    .padding(.horizontal, 4)
+            }
             if model.showsSetupHint, selection.isEmpty {
                 // Quiet hint instead of a banner: how much is categorized, one click to the assistant.
                 Text("\(Int((model.categorizationCoverage * 100).rounded())) % kategorisiert")

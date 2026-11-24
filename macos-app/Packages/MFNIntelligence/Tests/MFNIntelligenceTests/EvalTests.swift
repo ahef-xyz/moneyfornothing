@@ -72,12 +72,13 @@ import Testing
 
     /// Full cascade (rules → kNN → LLM), 10 folds of 30: each fold is categorized with the other
     /// 270 as labeled history. Then 100 bookings in one go against the other 200, timed.
-    /// LLM parts only run when the on-device model is available.
-    @Test func cascadeTenFolds() async throws {
+    /// LLM parts only run when the on-device model is available. `withModel: false` is the
+    /// cascade with the Settings switch "Apple Intelligence für Kategorien verwenden" off.
+    @Test(arguments: [true, false]) func cascadeTenFolds(withModel: Bool) async throws {
         let set = try EvalSet.load()
         let embedding = HybridEmbedding()
-        let llm = LLMStage(embedding: embedding)
-        let llmAvailable = llm.isAvailable
+        let llm = LLMStage(embedding: embedding, isEnabled: { withModel })
+        let llmAvailable = withModel && llm.isAvailable
         if llmAvailable { llm.prewarm() }
         let early: [any CategorizationStage] = [RuleStage(), KNNStage(embedding: embedding)]
         let categorizer = Categorizer(stages: llmAvailable ? early + [llm] : early)
@@ -109,7 +110,7 @@ import Testing
         _ = await categorizer.categorize(Array(transactions[hundred]), context: context(excluding: hundred))
         let seconds = Date().timeIntervalSince(started)
 
-        let mode = llmAvailable ? "rules+kNN+LLM" : "rules+kNN, LLM unavailable"
+        let mode = llmAvailable ? "rules+kNN+LLM" : withModel ? "rules+kNN, LLM unavailable" : "rules+kNN, LLM switched off"
         print("EVAL cascade (\(mode)): \(score); to LLM \(String(format: "%.1f", llmShare * 100)) %; 100 bookings in \(String(format: "%.1f", seconds)) s")
 
         #expect(llmShare <= 0.2)

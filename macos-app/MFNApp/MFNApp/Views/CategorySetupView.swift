@@ -57,7 +57,16 @@ struct CategorySetupView: View {
                     .foregroundStyle(.red)
                     .lineLimit(2)
             } else if setup.isWorking {
+                // This assistant saving a decision; not the background run below.
                 ProgressView().controlSize(.small)
+                    .accessibilityHidden(true)
+                Text("Wird gespeichert …")
+                    .foregroundStyle(.secondary)
+            } else if let status = model.categorizationStatus {
+                Text("Im Hintergrund: \(status)")
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+                    .help("Die automatische Kategorisierung läuft weiter. Deine Entscheidungen hier warten nicht auf sie.")
             }
             Spacer()
             if setup.step != .overview {
