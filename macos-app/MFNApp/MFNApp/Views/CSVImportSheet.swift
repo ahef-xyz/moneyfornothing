@@ -92,24 +92,24 @@ struct CSVImportSheet: View {
 
     private var formatText: String {
         if let preset = document.preset { return preset.displayName }
-        if document.headerRow == nil { return "Unbekannt, ohne Kopfzeile: Spalten bitte zuordnen" }
-        return "Allgemein (Spalten nach Kopfzeile erkannt)"
+        if document.headerRow == nil { return String(localized: "Unbekannt, ohne Kopfzeile: Spalten bitte zuordnen") }
+        return String(localized: "Allgemein (Spalten nach Kopfzeile erkannt)")
     }
 
     private var fileText: String {
         var parts = [document.table.encoding.displayName]
         if let header = document.headerRow {
-            parts.append("Kopfzeile in Zeile \(document.table.lines[header])")
+            parts.append(String(localized: "Kopfzeile in Zeile \(String(document.table.lines[header]))"))
         }
-        parts.append("\(document.dataRows.count) Datenzeilen")
+        parts.append(String(localized: "\(document.dataRows.count) Datenzeilen"))
         return parts.joined(separator: " · ")
     }
 
     private var importTitle: String {
         switch session.importCount {
-        case 0: "Importieren"
-        case 1: "1 Umsatz importieren"
-        default: "\(session.importCount) Umsätze importieren"
+        case 0: String(localized: "Importieren")
+        case 1: String(localized: "1 Umsatz importieren")
+        default: String(localized: "\(session.importCount) Umsätze importieren")
         }
     }
 
@@ -137,7 +137,7 @@ struct CSVImportSheet: View {
     private func columnLabel(_ name: String, sample: String) -> String {
         guard !sample.isEmpty, !model.hideAmounts else { return name }
         let short = sample.count > 24 ? String(sample.prefix(24)) + "…" : sample
-        return "\(name) (z. B. \(short))"
+        return String(localized: "\(name) (z. B. \(short))")
     }
 
     @ViewBuilder
@@ -185,10 +185,10 @@ struct CSVImportSheet: View {
         let skipped = session.result.skipped
         let problems = session.problems
         let filtered = skipped.count - problems.count
-        var parts = ["\(plan.new.count) neu", "\(plan.duplicates.count) bereits vorhanden"]
-        if !plan.likelyDuplicates.isEmpty { parts.append("\(plan.likelyDuplicates.count) wahrscheinlich vorhanden") }
-        if filtered > 0 { parts.append("\(filtered) nicht gebucht oder anderes Konto") }
-        if !problems.isEmpty { parts.append("\(problems.count) nicht lesbar") }
+        var parts = [String(localized: "\(plan.new.count) neu"), String(localized: "\(plan.duplicates.count) bereits vorhanden")]
+        if !plan.likelyDuplicates.isEmpty { parts.append(String(localized: "\(plan.likelyDuplicates.count) wahrscheinlich vorhanden")) }
+        if filtered > 0 { parts.append(String(localized: "\(filtered) nicht gebucht oder anderes Konto")) }
+        if !problems.isEmpty { parts.append(String(localized: "\(problems.count) nicht lesbar")) }
         return VStack(alignment: .leading, spacing: 6) {
             Text(parts.joined(separator: " · ")).monospacedDigit()
             if !plan.likelyDuplicates.isEmpty {
@@ -196,9 +196,11 @@ struct CSVImportSheet: View {
                     .help("Gleicher Tag, Betrag und Händler wie ein gespeicherter Umsatz, aber anderer Verwendungszweck.")
             }
             if !problems.isEmpty {
-                let shown = problems.prefix(4).map { "Zeile \($0.line): \($0.reason.title)" }
-                let more = problems.count > 4 ? " und \(problems.count - 4) weitere" : ""
-                Label(shown.joined(separator: ", ") + more + ". Diese Zeilen werden übersprungen.", systemImage: "exclamationmark.triangle")
+                let shown = problems.prefix(4).map { String(localized: "Zeile \(String($0.line)): \($0.reason.title)") }.joined(separator: ", ")
+                let message = problems.count > 4
+                    ? String(localized: "\(shown) und \(problems.count - 4) weitere. Diese Zeilen werden übersprungen.")
+                    : String(localized: "\(shown). Diese Zeilen werden übersprungen.")
+                Label(message, systemImage: "exclamationmark.triangle")
                     .foregroundStyle(.orange)
             }
             Text("Importierte Umsätze gelten als gebucht und werden danach wie abgeglichene kategorisiert. Ein späterer Abgleich verdoppelt sie nicht, wenn die Bank denselben Verwendungszweck liefert.")
@@ -209,7 +211,7 @@ struct CSVImportSheet: View {
         .font(.callout)
     }
 
-    private static let dateStyle = Date.FormatStyle(locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone)
+    private static let dateStyle = Date.FormatStyle(locale: Locale.autoupdatingCurrent, timeZone: BankDay.bankTimeZone)
         .day(.twoDigits).month(.twoDigits).year()
 
     private func runImport() {
@@ -223,7 +225,7 @@ struct CSVImportSheet: View {
             case let .failure(message):
                 session.error = message
             case let .success(count, account):
-                AccessibilityNotification.Announcement(count == 1 ? "1 Umsatz importiert" : "\(count) Umsätze importiert").post()
+                AccessibilityNotification.Announcement(count == 1 ? String(localized: "1 Umsatz importiert") : String(localized: "\(count) Umsätze importiert")).post()
                 // Locked meanwhile: `close()` dropped the sheet and the selection stays empty.
                 if !model.lock.isLocked { model.selection = .account(account) }
                 dismiss()

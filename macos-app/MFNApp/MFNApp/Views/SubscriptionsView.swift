@@ -114,7 +114,7 @@ struct SubscriptionsView: View {
                 ContentUnavailableView {
                     Label("Keine Treffer", systemImage: "line.3.horizontal.decrease")
                 } description: {
-                    Text(filter.isActive ? "Zu diesem Filter gibt es keine regelmäßige Zahlung." : "Alle Einträge sind ausgeblendet.")
+                    Text(filter.isActive ? String(localized: "Zu diesem Filter gibt es keine regelmäßige Zahlung.") : String(localized: "Alle Einträge sind ausgeblendet."))
                 } actions: {
                     if filter.isActive {
                         Button("Filter zurücksetzen") { filter = RecurringFilter() }
@@ -161,7 +161,7 @@ struct SubscriptionsView: View {
             }
         }
         .listStyle(.inset)
-        .accessibilityLabel(income == true ? "Einnahmen" : income == false ? "Ausgaben" : "Fixkosten")
+        .accessibilityLabel(income == true ? String(localized: "Einnahmen") : income == false ? String(localized: "Ausgaben") : String(localized: "Fixkosten"))
         // Everything the context menu offers is reachable from the keyboard: arrows select,
         // Return (or a double click) edits, ⌫ hides or deletes, the menu key opens the menu.
         .contextMenu(forSelectionType: String.self) { ids in
@@ -205,7 +205,7 @@ struct SubscriptionsView: View {
     }
 
     @ViewBuilder
-    private func section(_ title: String, _ payments: [RecurringPayment], hidden: Bool = false, footer: String? = nil) -> some View {
+    private func section(_ title: LocalizedStringKey, _ payments: [RecurringPayment], hidden: Bool = false, footer: LocalizedStringKey? = nil) -> some View {
         if !payments.isEmpty {
             Section {
                 ForEach(payments) { payment in
@@ -221,8 +221,10 @@ struct SubscriptionsView: View {
 
     private func subtitle(_ overview: RecurringOverview) -> String {
         let count = overview.expenses.count + overview.income.count
-        let text = count == 1 ? "1 regelmäßige Zahlung" : "\(count) regelmäßige Zahlungen"
-        return filter.isActive ? text + " (gefiltert)" : text
+        if filter.isActive {
+            return count == 1 ? String(localized: "1 regelmäßige Zahlung (gefiltert)") : String(localized: "\(count) regelmäßige Zahlungen (gefiltert)")
+        }
+        return count == 1 ? String(localized: "1 regelmäßige Zahlung") : String(localized: "\(count) regelmäßige Zahlungen")
     }
 }
 
@@ -368,7 +370,7 @@ private struct SubscriptionHeader: View {
                 Label("Ausgeblendete (\(overview.hidden.count))", systemImage: showsHidden ? "eye" : "eye.slash")
             }
             .toggleStyle(.button)
-            .help(showsHidden ? "Ausgeblendete Einträge verbergen" : "Ausgeblendete Einträge am Ende der Liste zeigen")
+            .help(showsHidden ? String(localized: "Ausgeblendete Einträge verbergen") : String(localized: "Ausgeblendete Einträge am Ende der Liste zeigen"))
             // The toggle's own value says whether they are shown.
             .accessibilityLabel("Ausgeblendete Einträge, \(overview.hidden.count)")
         }
@@ -388,7 +390,7 @@ private struct SubscriptionHeader: View {
         }
     }
 
-    private func figure(_ title: String, cents: Int) -> some View {
+    private func figure(_ title: LocalizedStringKey, cents: Int) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(.callout)
@@ -445,7 +447,11 @@ private struct SubscriptionRow: View {
                         .lineLimit(1)
                         .help(payment.title)
                     if let change = payment.priceChange {
-                        HintChip(text: model.hideAmounts ? "Preis geändert" : "Preis geändert, vorher \(Money.format(abs(change.previousCents)))")
+                        if model.hideAmounts {
+                            HintChip(text: "Preis geändert")
+                        } else {
+                            HintChip(text: "Preis geändert, vorher \(Money.format(abs(change.previousCents)))")
+                        }
                     }
                     if payment.isEnded {
                         HintChip(text: "Ausgeblieben", dashed: true)
@@ -484,50 +490,50 @@ private struct SubscriptionRow: View {
     }
 
     private var accountName: String {
-        model.account(payment.accountID)?.name ?? "Konto"
+        model.account(payment.accountID)?.name ?? String(localized: "Konto")
     }
 
     /// A monthly payment per year, a yearly one per month.
     private var otherRhythmText: String {
-        let (cents, unit) = payment.cadence != .yearly ? (payment.yearlyCents, "pro Jahr") : (payment.monthlyCents, "pro Monat")
+        let (cents, unit) = payment.cadence != .yearly ? (payment.yearlyCents, String(localized: "pro Jahr")) : (payment.monthlyCents, String(localized: "pro Monat"))
         return model.hideAmounts ? "••••• \(unit)" : "\(Money.format(abs(cents))) \(unit)"
     }
 
     private var detail: String {
         let when = payment.isEnded
-            ? "zuletzt am \(DayFormat.short(payment.last))"
-            : "nächste um den \(DayFormat.short(payment.next))"
-        return "\(payment.cadence.title) · \(accountName) · \(when)"
+            ? String(localized: "zuletzt am \(DayFormat.short(payment.last))")
+            : String(localized: "nächste um den \(DayFormat.short(payment.next))")
+        return String(localized: "\(payment.cadence.title) · \(accountName) · \(when)")
     }
 
     /// What MFN read from the bookings, for a payment the user changed.
     private var detectedText: String? {
         guard let detected = payment.detected else { return nil }
-        let amount = model.hideAmounts ? "Betrag ausgeblendet" : Money.format(detected.cents, signed: true)
-        return "Erkannt: \(detected.title), \(amount), \(detected.cadence.title.lowercased())"
+        let amount = model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(detected.cents, signed: true)
+        return String(localized: "Erkannt: \(detected.title), \(amount), \(detected.cadence.title.lowercased())")
     }
 
     /// Everything the row shows, in words: also what only a chip, the sign or the place in the
     /// list says to the eye.
     private var accessibilityText: String {
-        var parts = [payment.title, payment.isIncome ? "Einnahme" : "Ausgabe", payment.cadence.title, accountName]
+        var parts = [payment.title, payment.isIncome ? String(localized: "Einnahme") : String(localized: "Ausgabe"), payment.cadence.title, accountName]
         if model.hideAmounts {
-            parts.append("Betrag ausgeblendet")
+            parts.append(String(localized: "Betrag ausgeblendet"))
         } else {
             parts.append(Money.format(payment.cents, signed: true))
             parts.append(otherRhythmText)
         }
         if let change = payment.priceChange {
-            parts.append(model.hideAmounts ? "Preis geändert" : "Preis geändert, vorher \(Money.format(abs(change.previousCents)))")
+            parts.append(model.hideAmounts ? String(localized: "Preis geändert") : String(localized: "Preis geändert, vorher \(Money.format(abs(change.previousCents)))"))
         }
         if payment.isOwn {
-            parts.append("eigener Eintrag")
+            parts.append(String(localized: "eigener Eintrag"))
         } else if let detectedText {
-            parts.append("angepasst")
+            parts.append(String(localized: "angepasst"))
             parts.append(detectedText)
         }
-        if isHidden { parts.append("ausgeblendet") }
-        parts.append(payment.isEnded ? "ausgeblieben, zuletzt am \(DayFormat.short(payment.last))" : "nächste um den \(DayFormat.short(payment.next))")
+        if isHidden { parts.append(String(localized: "ausgeblendet")) }
+        parts.append(payment.isEnded ? String(localized: "ausgeblieben, zuletzt am \(DayFormat.short(payment.last))") : String(localized: "nächste um den \(DayFormat.short(payment.next))"))
         return parts.joined(separator: ", ")
     }
 }
@@ -612,16 +618,16 @@ private struct RecurringEntryEditor: View {
     }
 
     private var heading: String {
-        if draft.detected != nil { return "Regelmäßige Zahlung anpassen" }
-        return draft.entryID == nil ? "Eigener Eintrag" : "Eigenen Eintrag bearbeiten"
+        if draft.detected != nil { return String(localized: "Regelmäßige Zahlung anpassen") }
+        return draft.entryID == nil ? String(localized: "Eigener Eintrag") : String(localized: "Eigenen Eintrag bearbeiten")
     }
 
     private var footnote: String {
         if let detected = draft.detected {
-            let amount = model.hideAmounts ? "Betrag ausgeblendet" : Money.format(detected.cents, signed: true)
-            return "Aus den Buchungen erkannt: \(detected.title), \(amount), \(detected.cadence.title.lowercased()). Deine Angaben gelten nur für die Fixkosten; die Buchungen bleiben, wie sie sind."
+            let amount = model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(detected.cents, signed: true)
+            return String(localized: "Aus den Buchungen erkannt: \(detected.title), \(amount), \(detected.cadence.title.lowercased()). Deine Angaben gelten nur für die Fixkosten; die Buchungen bleiben, wie sie sind.")
         }
-        return "Für Zahlungen, die MFN nicht erkennt, etwa bar gezahlte Miete oder ein Konto, das nicht angebunden ist. Der Eintrag zählt nur in den Fixkosten, nicht im Kontostand."
+        return String(localized: "Für Zahlungen, die MFN nicht erkennt, etwa bar gezahlte Miete oder ein Konto, das nicht angebunden ist. Der Eintrag zählt nur in den Fixkosten, nicht im Kontostand.")
     }
 
     private func save() {

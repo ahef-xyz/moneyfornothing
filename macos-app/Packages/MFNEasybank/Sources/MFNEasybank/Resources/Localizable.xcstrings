@@ -1,0 +1,61 @@
+{
+  "sourceLanguage": "de",
+  "strings": {
+    "Anmeldedaten gesendet, easybank schickt gleich einen SMS-Code …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Login details sent, easybank will send an SMS code shortly…"
+          }
+        }
+      }
+    },
+    "Anmeldung bei easybank …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing in to easybank…"
+          }
+        }
+      }
+    },
+    "Anmeldung läuft …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing in…"
+          }
+        }
+      }
+    },
+    "Bitte melde dich bei easybank an und gib den SMS-Code ein.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please sign in to easybank and enter the SMS code."
+          }
+        }
+      }
+    },
+    "SMS-Code (mTAN) von easybank": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SMS code (mTAN) from easybank"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

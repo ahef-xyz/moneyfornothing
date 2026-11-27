@@ -5,7 +5,7 @@ import SwiftUI
 
 extension CategoryID {
     /// Title from the catalog; unknown IDs (older catalog) show their raw value.
-    var title: String { CategoryCatalog.title(self) }
+    var title: String { CategoryCatalog.localizedTitle(self) }
     var symbol: String { CategoryCatalog.info(self)?.symbol ?? "tag" }
     /// Position in the catalog, for sorting like the picker; unknown IDs last.
     var catalogIndex: Int { CategoryFormat.catalogIndex[self] ?? .max }
@@ -14,18 +14,18 @@ extension CategoryID {
 extension CategorySource {
     var title: String {
         switch self {
-        case .rule: "Regel"
-        case .knn: "Ähnliche Buchungen"
-        case .llm: "KI (Foundation Models, auf dem Mac)"
-        case .manual: "Manuell"
+        case .rule: String(localized: "Regel")
+        case .knn: String(localized: "Ähnliche Buchungen")
+        case .llm: String(localized: "KI (Foundation Models, auf dem Mac)")
+        case .manual: String(localized: "Manuell")
         }
     }
 
     /// Short marker in list chips. Rule and manual need none (they are certain).
     var shortTitle: String? {
         switch self {
-        case .knn: "ähnlich"
-        case .llm: "KI"
+        case .knn: String(localized: "ähnlich")
+        case .llm: String(localized: "KI")
         case .rule, .manual: nil
         }
     }
@@ -46,14 +46,14 @@ enum CategoryFormat {
     )
 
     static func confidence(_ value: Double) -> String {
-        value.formatted(.number.precision(.fractionLength(2)).locale(Locale(identifier: "de_DE")))
+        value.formatted(.number.precision(.fractionLength(2)).locale(Locale.autoupdatingCurrent))
     }
 
     /// "Regel" / "KI · Konfidenz 0,64" – for tooltips.
     static func provenance(_ transaction: MFNCore.Transaction) -> String {
-        guard let source = transaction.categorySource else { return "Quelle unbekannt" }
+        guard let source = transaction.categorySource else { return String(localized: "Quelle unbekannt") }
         guard source != .manual, let confidence = transaction.confidence else { return source.title }
-        return "\(source.title) · Konfidenz \(Self.confidence(confidence))"
+        return String(localized: "\(source.title) · Konfidenz \(Self.confidence(confidence))")
     }
 
     /// Catalog grouped for pickers, optionally filtered by a search text.
@@ -62,15 +62,22 @@ enum CategoryFormat {
         return CategoryInfo.Group.allCases.compactMap { group in
             let items = CategoryCatalog.all.filter { info in
                 guard info.group == group else { return false }
-                let haystack = fold(info.title + " " + group.title + " " + info.id.rawValue)
+                guard !words.isEmpty, let haystack = haystacks[info.id] else { return true }
                 return words.allSatisfy(haystack.contains)
             }
             return items.isEmpty ? nil : (group, items)
         }
     }
 
+    private static let foldLocale = Locale(identifier: "de_DE")
+
+    /// Folded search text per category, built once (titles do not change while the app runs).
+    private static let haystacks: [CategoryID: String] = Dictionary(uniqueKeysWithValues: CategoryCatalog.all.map { info in
+        (info.id, fold(info.title + " " + info.localizedTitle + " " + info.group.title + " " + info.group.localizedTitle + " " + info.id.rawValue))
+    })
+
     static func fold(_ text: String) -> String {
-        text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "de_DE"))
+        text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: foldLocale)
             .trimmingCharacters(in: .whitespaces)
     }
 }
@@ -166,13 +173,11 @@ struct CategoryPickerSheet: View {
     @State private var selection: CategoryChoice?
     @FocusState private var searchFocused: Bool
 
-    private var groups: [(group: CategoryInfo.Group, items: [CategoryInfo])] {
-        CategoryFormat.groups(matching: search)
-    }
+    @State private var groups: [(group: CategoryInfo.Group, items: [CategoryInfo])] = CategoryFormat.groups()
 
     private var showsNone: Bool {
         let folded = CategoryFormat.fold(search)
-        return folded.isEmpty || CategoryFormat.fold("Keine Kategorie").contains(folded)
+        return folded.isEmpty || (CategoryFormat.fold("Keine Kategorie") + " " + CategoryFormat.fold(String(localized: "Keine Kategorie"))).contains(folded)
     }
 
     /// Rows top to bottom, for the arrow keys in the search field.
@@ -201,9 +206,9 @@ struct CategoryPickerSheet: View {
                         .tag(CategoryChoice.none)
                 }
                 ForEach(groups, id: \.group) { entry in
-                    Section(entry.group.title) {
+                    Section(entry.group.localizedTitle) {
                         ForEach(entry.items) { info in
-                            Label(info.title, systemImage: info.symbol)
+                            Label(info.localizedTitle, systemImage: info.symbol)
                                 .tag(CategoryChoice.category(info.id))
                         }
                     }
@@ -234,6 +239,7 @@ struct CategoryPickerSheet: View {
             searchFocused = true
         }
         .onChange(of: search) {
+            groups = CategoryFormat.groups(matching: search)
             if let selection, choices.contains(selection) { return }
             selection = choices.first
         }
@@ -271,9 +277,9 @@ struct CategoryMenuPicker: View {
         Picker("Kategorie", selection: $selection) {
             Text("Bitte wählen").tag(CategoryID?.none)
             ForEach(CategoryFormat.groups(), id: \.group) { entry in
-                Section(entry.group.title) {
+                Section(entry.group.localizedTitle) {
                     ForEach(entry.items) { info in
-                        Label(info.title, systemImage: info.symbol).tag(CategoryID?.some(info.id))
+                        Label(info.localizedTitle, systemImage: info.symbol).tag(CategoryID?.some(info.id))
                     }
                 }
             }

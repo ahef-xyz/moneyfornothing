@@ -26,6 +26,13 @@ public actor SyncEngine {
     }
 
     public static let minimumAutomaticInterval: TimeInterval = 15 * 60
+    /// v12: banks over YAXI at most every 4 hours: every sync costs calls of the user's YAXI
+    /// contingent (1,000 a month free), and PSD2 banks allow only a few accesses a day without the user.
+    public static let minimumYAXIInterval: TimeInterval = 4 * 60 * 60
+
+    public static func minimumAutomaticInterval(for connector: ConnectorID) -> TimeInterval {
+        connector == .yaxi ? minimumYAXIInterval : minimumAutomaticInterval
+    }
     public static let maximumConsecutiveFailures = 3
     /// Overlap for incremental fetches so late bookings with older dates are not missed.
     public static let incrementalOverlapDays = 14
@@ -126,7 +133,8 @@ public actor SyncEngine {
         let state = await store.syncState(for: id)
         // The bank rejected the stored credentials: only new ones may be sent (lockout risk).
         // Connectors without stored credentials (visible web login) get typed input each time.
-        if case .failed(.authFailed) = state.phase, !connectorID.credentialFields.isEmpty {
+        // v12: YAXI stores the bank's login too, its fields only come per bank.
+        if case .failed(.authFailed) = state.phase, !connectorID.credentialFields.isEmpty || connectorID == .yaxi {
             Log.sync.notice("Sync \(id.rawValue, privacy: .public) übersprungen: Anmeldung abgelehnt, erst Zugangsdaten ändern")
             return false
         }
@@ -136,7 +144,7 @@ public actor SyncEngine {
         if let until = blockedUntil[id], until > now() { return false }
         if state.consecutiveFailures >= Self.maximumConsecutiveFailures { return false }
         if case let .failed(error) = state.phase, error.forbidsAutomaticRetry { return false }
-        if let last = state.lastSuccess, now().timeIntervalSince(last) < Self.minimumAutomaticInterval { return false }
+        if let last = state.lastSuccess, now().timeIntervalSince(last) < Self.minimumAutomaticInterval(for: connectorID) { return false }
         return true
     }
 

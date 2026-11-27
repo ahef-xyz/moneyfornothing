@@ -1,5 +1,6 @@
 import Foundation
 import MFNCore
+import MFNYAXI
 import Observation
 
 /// State of the "Bank hinzufügen" assistant: bank → credentials → login (inline approvals) →
@@ -20,6 +21,8 @@ final class BankSetup: Identifiable {
         case manualAccount
         /// The account was created: offer the CSV import right away.
         case manualCreated(AccountID)
+        /// v12: search among the banks YAXI reaches.
+        case yaxiSearch
     }
 
     let id = UUID()
@@ -42,6 +45,13 @@ final class BankSetup: Identifiable {
     private(set) var manualCurrencyLocked = false
     /// Opened from the menu straight on the form: no "Zurück" to the bank list.
     private(set) var manualOnly = false
+    /// v12: YAXI search ("Andere Bank über YAXI").
+    var yaxiQuery = ""
+    private(set) var yaxiResults: [YAXIBank] = []
+    private(set) var yaxiSearching = false
+    private(set) var yaxiMessage: String?
+    var yaxiSelection: YAXIBank.ID?
+    @ObservationIgnored private var yaxiSearchTask: Task<Void, Never>?
 
     @ObservationIgnored private unowned let model: AppModel
     @ObservationIgnored private var bankConnector: (any BankConnector)?
@@ -55,7 +65,8 @@ final class BankSetup: Identifiable {
     /// Banks in the order of the list: available ones first. Developer mode adds ING and DKB
     /// over FinTS as separate entries (live tests until the switch with migration exists).
     static var banks: [BankAccess] {
-        let all = ConnectorID.allCases.filter { $0 != .mock && $0.hasConnector }
+        // v12: `.yaxi` is not a bank of its own; it gets a search row in the assistant (0.7.0 M3).
+        let all = ConnectorID.allCases.filter { $0 != .mock && $0 != .yaxi && $0.hasConnector }
         var result = all.filter(ConnectorFactory.canSetUp).map(BankAccess.standard)
         if DeveloperMode.isAvailable {
             result += BankAccess.fintsTestBanks.map(BankAccess.fints)
@@ -63,44 +74,59 @@ final class BankSetup: Identifiable {
         return result + all.filter { !ConnectorFactory.canSetUp($0) }.map(BankAccess.standard)
     }
 
+    /// v12: the row "Andere Bank über YAXI" in the bank list (no bank yet: the search follows).
+    static let yaxiRow = BankAccess(connector: .yaxi, isFinTS: false)
+
     static func unavailableReason(_ access: BankAccess) -> String? {
-        if access.isFinTS || ConnectorFactory.canSetUp(access.connector) { return nil }
-        return "In dieser Version noch nicht verfügbar"
+        if access == yaxiRow || access.isFinTS || ConnectorFactory.canSetUp(access.connector) { return nil }
+        return String(localized: "In dieser Version noch nicht verfügbar")
     }
 
     /// Short hint in the bank list; `nil` for banks without one.
     static func note(_ access: BankAccess) -> String? {
         // Without the registration (`MFNApp/Config`) the bank rejects every FinTS request (9078).
         if access.isFinTS, BankAccess.fintsOnly.contains(access.connector), !FinTSRegistration.isRegistered {
-            return "ohne FinTS-Produkt-ID"
+            return String(localized: "ohne FinTS-Produkt-ID")
         }
         if access.isFinTS, !BankAccess.fintsOnly.contains(access.connector) {
-            return FinTSRegistration.isRegistered ? "Entwickler · Test" : "Entwickler · ohne Produkt-ID"
+            return FinTSRegistration.isRegistered ? String(localized: "Entwickler · Test") : String(localized: "Entwickler · ohne Produkt-ID")
         }
         switch access.connector {
-        case .dkb: return "Web-Banking · FinTS folgt"
-        case .paypal: return "Anmeldung im PayPal-Fenster"
+        case .dkb: return String(localized: "Web-Banking · FinTS folgt")
+        case .paypal: return String(localized: "Anmeldung im PayPal-Fenster")
         default: return nil
         }
     }
 
+    /// The bank's own advice (YAXI), shown apart from the localized explanation.
+    static func advice(_ access: BankAccess) -> String? {
+        guard let advice = access.yaxiBank?.advice, !advice.isEmpty else { return nil }
+        return advice
+    }
+
     /// Longer explanation below the credentials.
     static func detail(_ access: BankAccess) -> String? {
+        if let bank = access.yaxiBank {
+            if bank.credentialFields.isEmpty {
+                return String(localized: "MFN erreicht \(bank.name) über YAXI mit deinem eigenen YAXI-Zugang. Die Bank gibt den Zugriff für YAXIs geprüfte Umgebung frei; YAXI kann deine Umsätze dabei nicht lesen. Läuft die Freigabe ab, fragt MFN beim nächsten Abgleich von Hand wieder danach.")
+            }
+            return String(localized: "MFN erreicht \(bank.name) über YAXI mit deinem eigenen YAXI-Zugang. Deine Zugangsdaten gehen verschlüsselt an YAXIs geprüfte Umgebung, die sich bei der Bank anmeldet; YAXI selbst kann sie nicht lesen. MFN speichert sie nur im Schlüsselbund dieses Macs und braucht sie erst wieder, wenn die Bank eine neue Freigabe verlangt.")
+        }
         let name = access.connector.displayName
         if access.connector == .ing {
-            return "MFN liest die ING über FinTS (HBCI): Zugangsnummer oder Benutzername und PIN, beim Lesen keine TAN. Die ING liefert dort die Umsätze der letzten 90 Tage."
+            return String(localized: "MFN liest die ING über FinTS (HBCI): Zugangsnummer oder Benutzername und PIN, beim Lesen keine TAN. Die ING liefert dort die Umsätze der letzten 90 Tage.")
         }
         if access.isFinTS {
-            let approval = access.connector == .dkb
-                ? " Die DKB verlangt bei der Anmeldung und alle 90 Tage eine Freigabe in der DKB-App."
-                : " Die ING verlangt beim Lesen keine TAN."
-            return "Test des FinTS-Zugangs (HBCI): \(name) erscheint als eigene Bank mit eigenen Konten, getrennt von einer Verbindung über das Web-Banking.\(approval) Ohne registrierte Produkt-ID lehnt die Bank jeden Zugriff ab."
+            if access.connector == .dkb {
+                return String(localized: "Test des FinTS-Zugangs (HBCI): \(name) erscheint als eigene Bank mit eigenen Konten, getrennt von einer Verbindung über das Web-Banking. Die DKB verlangt bei der Anmeldung und alle 90 Tage eine Freigabe in der DKB-App. Ohne registrierte Produkt-ID lehnt die Bank jeden Zugriff ab.")
+            }
+            return String(localized: "Test des FinTS-Zugangs (HBCI): \(name) erscheint als eigene Bank mit eigenen Konten, getrennt von einer Verbindung über das Web-Banking. Die ING verlangt beim Lesen keine TAN. Ohne registrierte Produkt-ID lehnt die Bank jeden Zugriff ab.")
         }
         switch access.connector {
         case .paypal:
-            return "PayPal schützt seine Anmeldung gegen Automatisierung. Du meldest dich deshalb in einem Fenster direkt bei PayPal an, mit deinem zweiten Faktor; MFN speichert kein PayPal-Passwort und übernimmt nur die Sitzung. Läuft sie ab, fragt MFN beim nächsten Abgleich von Hand wieder nach der Anmeldung. Zahlungen in einer Währung ohne eigenes Guthaben fehlen noch."
+            return String(localized: "PayPal schützt seine Anmeldung gegen Automatisierung. Du meldest dich deshalb in einem Fenster direkt bei PayPal an, mit deinem zweiten Faktor; MFN speichert kein PayPal-Passwort und übernimmt nur die Sitzung. Läuft sie ab, fragt MFN beim nächsten Abgleich von Hand wieder nach der Anmeldung. Zahlungen in einer Währung ohne eigenes Guthaben fehlen noch.")
         case .dkb:
-            return "MFN liest \(name) vorläufig über das Web-Banking: Jede Anmeldung muss in der \(name)-App freigegeben werden. Der Zugang über FinTS (HBCI) folgt in einer späteren Version."
+            return String(localized: "MFN liest \(name) vorläufig über das Web-Banking: Jede Anmeldung muss in der \(name)-App freigegeben werden. Der Zugang über FinTS (HBCI) folgt in einer späteren Version.")
         default: return nil
         }
     }
@@ -144,8 +170,7 @@ final class BankSetup: Identifiable {
         case let .saved(id, balanceStale):
             finished = true
             finishError = balanceStale
-                ? "Das Konto ist gespeichert, der Kontostand konnte aber nicht neu berechnet werden und ist vielleicht veraltet. "
-                    + "Er wird beim nächsten Import oder Sichern neu berechnet."
+                ? String(localized: "Das Konto ist gespeichert, der Kontostand konnte aber nicht neu berechnet werden und ist vielleicht veraltet. Er wird beim nächsten Import oder Sichern neu berechnet.")
                 : nil
             if manualEditing == nil {
                 step = .manualCreated(id)
@@ -170,12 +195,65 @@ final class BankSetup: Identifiable {
         }
     }
 
+    // MARK: YAXI (v12)
+
+    /// A bank over YAXI without login fields: the login happens on the bank's page or in its app.
+    var loginHappensAtBank: Bool {
+        guard let access, access.connector == .yaxi else { return false }
+        return access.credentialFields.isEmpty
+    }
+
+    /// From the bank list: search a bank YAXI reaches.
+    func chooseYAXI() {
+        guard step == .chooseBank, task == nil else { return }
+        yaxiMessage = model.yaxiAccess.hasKey ? nil : String(localized: "Für Banken über YAXI brauchst du einen eigenen YAXI-Zugang. Lege ihn in den Einstellungen unter „Banken“ an.")
+        step = .yaxiSearch
+    }
+
+    /// Debounced: searches 0.4 s after the last keystroke (each search is one call at YAXI).
+    func yaxiQueryChanged() {
+        yaxiSearchTask?.cancel()
+        let term = yaxiQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard term.count >= 2, model.yaxiAccess.hasKey else {
+            yaxiResults = []
+            yaxiSearching = false
+            return
+        }
+        yaxiSearchTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(400))
+            guard let self, !Task.isCancelled else { return }
+            self.yaxiSearching = true
+            defer { self.yaxiSearching = false }
+            do {
+                let found = try await self.model.yaxiAccess.search(term)
+                guard !Task.isCancelled else { return }
+                self.yaxiResults = found
+                self.yaxiMessage = found.isEmpty ? String(localized: "Keine Bank gefunden. Versuche den Namen oder die BLZ.") : nil
+                if !found.contains(where: { $0.id == self.yaxiSelection }) { self.yaxiSelection = found.first?.id }
+            } catch {
+                guard !Task.isCancelled else { return }
+                self.yaxiResults = []
+                self.yaxiMessage = switch error as? ConnectorError {
+                case .authFailed?: String(localized: "YAXI hat deinen Schlüssel abgelehnt. Prüfe ihn in den Einstellungen unter „Banken“.")
+                case .bankUnavailable?: String(localized: "YAXI ist gerade nicht erreichbar.")
+                default: String(localized: "Die Suche bei YAXI ist fehlgeschlagen.")
+                }
+            }
+        }
+    }
+
+    /// The bank from the search: on to the login form with its fields.
+    func chooseYAXIBank() {
+        guard step == .yaxiSearch, let id = yaxiSelection, let bank = yaxiResults.first(where: { $0.id == id }) else { return }
+        access = .yaxi(bank)
+        name = uniqueName(bank.name)
+        values = [:]
+        step = .credentials
+    }
+
     // MARK: Steps
 
-    func chooseBank() {
-        guard let access, Self.unavailableReason(access) == nil else { return }
-        // The plain bank name: the access (FinTS) is shown in the bank list only, not in the sidebar.
-        let base = access.connector.displayName
+    private func uniqueName(_ base: String) -> String {
         let existing = Set(model.snapshot.connections.map(\.displayName))
         var candidate = base
         var number = 2
@@ -183,19 +261,35 @@ final class BankSetup: Identifiable {
             candidate = "\(base) \(number)"
             number += 1
         }
-        name = candidate
+        return candidate
+    }
+
+    func chooseBank() {
+        guard let access, Self.unavailableReason(access) == nil else { return }
+        if access == Self.yaxiRow {
+            chooseYAXI()
+            return
+        }
+        // The plain bank name: the access (FinTS) is shown in the bank list only, not in the sidebar.
+        name = uniqueName(access.connector.displayName)
         values = [:]
         step = .credentials
     }
 
     func backToBanks() {
-        guard step == .credentials || (step == .manualAccount && !manualOnly) else { return }
+        // A bank found over YAXI goes back to the search, not to the list.
+        if step == .credentials, access?.connector == .yaxi {
+            step = .yaxiSearch
+            return
+        }
+        guard step == .credentials || step == .yaxiSearch || (step == .manualAccount && !manualOnly) else { return }
+        yaxiSearchTask?.cancel()
         step = .chooseBank
     }
 
     var credentialProblem: String? {
-        guard let access else { return "Keine Bank gewählt." }
-        if name.trimmingCharacters(in: .whitespaces).isEmpty { return "Name fehlt." }
+        guard let access else { return String(localized: "Keine Bank gewählt.") }
+        if name.trimmingCharacters(in: .whitespaces).isEmpty { return String(localized: "Name fehlt.") }
         let fields = access.credentialFields
         return CredentialForm.problem(CredentialForm.cleaned(values, fields: fields).values, fields: fields)
     }
@@ -220,8 +314,17 @@ final class BankSetup: Identifiable {
         do {
             try model.credentialStore.set(CredentialForm.cleaned(values, fields: access.credentialFields), for: connection.id)
         } catch {
-            step = .failed("Die Zugangsdaten konnten nicht im Schlüsselbund gespeichert werden: \(error.localizedDescription)")
+            step = .failed(String(localized: "Die Zugangsdaten konnten nicht im Schlüsselbund gespeichert werden: \(error.localizedDescription)"))
             return
+        }
+        if let bank = access.yaxiBank {
+            // v12: which bank the new YAXI connection reaches, before its first call.
+            do {
+                try YAXISetup.prepare(connection.id, bank: bank)
+            } catch {
+                step = .failed(String(localized: "Die Bank konnte nicht im Schlüsselbund vermerkt werden: \(error.localizedDescription)"))
+                return
+            }
         }
         self.connection = connection
         model.presenter.inlineConnections.insert(connection.id)
@@ -291,16 +394,16 @@ final class BankSetup: Identifiable {
 
     /// Only the error kind, never its payload (may carry stored values or paths).
     static func finishMessage(for error: any Error) -> String {
-        "Die Bank konnte nicht gespeichert werden (\(AppModel.errorKind(error)))."
+        String(localized: "Die Bank konnte nicht gespeichert werden (\(AppModel.errorKind(error))).")
     }
 
     static func message(for error: any Error) -> String {
         switch error as? ConnectorError {
-        case .authFailed?: "Die Anmeldung wurde abgelehnt. Bitte die Zugangsdaten prüfen. MFN versucht es nicht automatisch erneut, damit der Zugang nicht gesperrt wird."
-        case .cancelled?: "Die Anmeldung wurde abgebrochen oder hat zu lange gedauert."
-        case .bankUnavailable?: "Die Bank ist gerade nicht erreichbar."
-        case let error?: "Anmeldung nicht möglich: \(error.description)"
-        case nil: "Anmeldung nicht möglich: \(error.localizedDescription)"
+        case .authFailed?: String(localized: "Die Anmeldung wurde abgelehnt. Bitte die Zugangsdaten prüfen. MFN versucht es nicht automatisch erneut, damit der Zugang nicht gesperrt wird.")
+        case .cancelled?: String(localized: "Die Anmeldung wurde abgebrochen oder hat zu lange gedauert.")
+        case .bankUnavailable?: String(localized: "Die Bank ist gerade nicht erreichbar.")
+        case let error?: String(localized: "Anmeldung nicht möglich: \(error.description)")
+        case nil: String(localized: "Anmeldung nicht möglich: \(error.localizedDescription)")
         }
     }
 }

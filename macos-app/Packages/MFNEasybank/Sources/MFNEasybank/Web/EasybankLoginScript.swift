@@ -1,5 +1,6 @@
 import Foundation
 import MFNCore
+import MFNScrape
 
 /// Headless login for `banking.easybank.de` (protocol v4, `WebLoginAutomation`).
 ///
@@ -34,7 +35,10 @@ import MFNCore
 /// filled twice (lockout risk). A captcha is not a credential error either. The script only fills
 /// pages on `banking.easybank.de`; another host before the submit is a format error.
 enum EasybankLoginScript {
-    static let approvalMessage = "Anmeldedaten gesendet, easybank schickt gleich einen SMS-Code …"
+    static let approvalMessage = String(localized: "Anmeldedaten gesendet, easybank schickt gleich einen SMS-Code …", bundle: .module)
+    static let progressMessage = String(localized: "Anmeldung läuft …", bundle: .module)
+    static let loginMessage = String(localized: "Anmeldung bei easybank …", bundle: .module)
+    static let smsCodePrompt = String(localized: "SMS-Code (mTAN) von easybank", bundle: .module)
     /// `sessionStorage` key remembering the submit across page loads (value `"1"`).
     static let submittedMarker = "mfn.easybank.submitted"
     /// The only host the script fills the form on (`EasybankEndpoints.host`).
@@ -47,7 +51,7 @@ enum EasybankLoginScript {
     static var automation: WebLoginAutomation {
         WebLoginAutomation(
             script: source,
-            message: "Anmeldung bei easybank …",
+            message: loginMessage,
             timeout: 300
         )
     }
@@ -59,9 +63,9 @@ enum EasybankLoginScript {
     static let source = """
     const POLL_MS = \(pollMilliseconds);
     const MAX_POLLS = \(maxPolls);
-    const APPROVAL = \(jsString(approvalMessage));
-    const MARKER = \(jsString(submittedMarker));
-    const LOGIN_HOST = \(jsString(loginHost));
+    const APPROVAL = \(JavaScriptLiteral.string(approvalMessage));
+    const MARKER = \(JavaScriptLiteral.string(submittedMarker));
+    const LOGIN_HOST = \(JavaScriptLiteral.string(loginHost));
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     const readMarker = () => { try { return window.sessionStorage.getItem(MARKER) === "1"; } catch (error) { return false; } };
     const writeMarker = () => { try { window.sessionStorage.setItem(MARKER, "1"); } catch (error) {} };
@@ -185,7 +189,7 @@ enum EasybankLoginScript {
           }
         } else {
           const length = Number(otp.maxLength) > 0 ? Number(otp.maxLength) : 6;
-          const code = String(await mfn.requestCode("SMS-Code (mTAN) von easybank", length)).trim();
+          const code = String(await mfn.requestCode(\(JavaScriptLiteral.string(smsCodePrompt)), length)).trim();
           // Live 2026-11-10: the page answered "Bitte geben Sie die mTAN ein." – the field found
           // before waiting for the user had been re-rendered. Look it up again now.
           const field = input("OTPPassword") || otp;
@@ -199,7 +203,7 @@ enum EasybankLoginScript {
           st.otpSubmitted = st.loads;
           const next = button("SMSButtonGroup");
           if (next) { next.click(); } else { pressEnter(field); }
-          mfn.status("Anmeldung läuft …");
+          mfn.status(\(JavaScriptLiteral.string(progressMessage)));
         }
         await sleep(POLL_MS);
         continue;
@@ -245,12 +249,4 @@ enum EasybankLoginScript {
     }
     return st;
     """
-
-    /// JSON string literal, for constants in the script (never for credentials).
-    private static func jsString(_ text: String) -> String {
-        guard let data = try? JSONEncoder().encode(text), let literal = String(data: data, encoding: .utf8) else {
-            return "\"\""
-        }
-        return literal
-    }
 }

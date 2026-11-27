@@ -27,18 +27,30 @@ struct ImportIndex {
 struct ImportRemovalRequest: Identifiable {
     let id = UUID()
     let ids: Set<TransactionID>
-    /// "aus „Giro“", "dieses Imports"; completes the message.
-    let scope: String?
+    enum Scope {
+        /// Name of the account the rows belong to.
+        case account(String)
+        case batch
+    }
+
+    let scope: Scope?
 
     var title: String {
-        ids.count == 1 ? "1 importierten Umsatz entfernen?" : "\(ids.count) importierte Umsätze entfernen?"
+        ids.count == 1 ? String(localized: "1 importierten Umsatz entfernen?") : String(localized: "\(ids.count) importierte Umsätze entfernen?")
     }
 
     var message: String {
-        let what = ids.count == 1 ? "Der Umsatz wird" : "Die Umsätze werden"
-        let scopeText = scope.map { " \($0)" } ?? ""
-        return "\(what)\(scopeText) aus MFN gelöscht. Umsätze aus dem Abgleich mit der Bank bleiben unverändert. "
-            + "Ein erneuter Import der Datei bringt sie zurück."
+        let single = ids.count == 1
+        let head: String = switch scope {
+        case nil:
+            single ? String(localized: "Der Umsatz wird aus MFN gelöscht.") : String(localized: "Die Umsätze werden aus MFN gelöscht.")
+        case let .account(name)?:
+            single ? String(localized: "Der Umsatz aus „\(name)“ wird aus MFN gelöscht.") : String(localized: "Die Umsätze aus „\(name)“ werden aus MFN gelöscht.")
+        case .batch?:
+            single ? String(localized: "Der Umsatz dieses Imports wird aus MFN gelöscht.") : String(localized: "Die Umsätze dieses Imports werden aus MFN gelöscht.")
+        }
+        let tail = String(localized: "Umsätze aus dem Abgleich mit der Bank bleiben unverändert. Ein erneuter Import der Datei bringt sie zurück.")
+        return head + " " + tail
     }
 }
 
@@ -90,7 +102,7 @@ extension AppModel {
     func requestRemoveImports(of account: AccountID) {
         guard canRemoveImports, importedCount(of: account) > 0 else { return }
         let ids = snapshot.transactions.lazy.filter { $0.accountID == account && $0.importID != nil }.map(\.id)
-        let name = self.account(account).map { "aus „\($0.name)“" }
+        let name = self.account(account).map { ImportRemovalRequest.Scope.account($0.name) }
         importRemoval = ImportRemovalRequest(ids: Set(ids), scope: name)
     }
 
@@ -98,7 +110,7 @@ extension AppModel {
     func requestRemoveImport(_ batch: ImportBatchID) {
         guard canRemoveImports, importedCount(ofImport: batch) > 0 else { return }
         let ids = snapshot.transactions.lazy.filter { $0.importID == batch }.map(\.id)
-        importRemoval = ImportRemovalRequest(ids: Set(ids), scope: "dieses Imports")
+        importRemoval = ImportRemovalRequest(ids: Set(ids), scope: .batch)
     }
 
     /// The confirmed removal: one store write, then the hook for dependent figures.
@@ -115,19 +127,19 @@ extension AppModel {
             // Counts only, never contents.
             Log.logger("import").info("Importierte Umsätze entfernt: \(removal.transactions.count, privacy: .public), Importe geleert: \(removal.emptiedBatches.count, privacy: .public)")
             AccessibilityNotification.Announcement(
-                removal.transactions.count == 1 ? "1 Umsatz entfernt" : "\(removal.transactions.count) Umsätze entfernt"
+                removal.transactions.count == 1 ? String(localized: "1 Umsatz entfernt") : String(localized: "\(removal.transactions.count) Umsätze entfernt")
             ).post()
             await transactionsRemoved(accounts: removal.accounts)
         } catch let error as TransactionRemovalError {
             guard !isStale(session) else { return }
             switch error {
             case .notImported:
-                importRemovalFailure = "Die Auswahl enthält Umsätze aus dem Abgleich mit der Bank. Entfernt werden können nur importierte Umsätze."
+                importRemovalFailure = String(localized: "Die Auswahl enthält Umsätze aus dem Abgleich mit der Bank. Entfernt werden können nur importierte Umsätze.")
             }
         } catch {
             Log.logger("import").error("Entfernen fehlgeschlagen: \(String(describing: type(of: error)), privacy: .public)")
             guard !isStale(session) else { return }
-            importRemovalFailure = "Die Umsätze konnten nicht entfernt werden."
+            importRemovalFailure = String(localized: "Die Umsätze konnten nicht entfernt werden.")
         }
     }
 
@@ -152,7 +164,7 @@ extension AppModel {
 extension ImportBatch {
     /// "CSV-Import (ING)", "CSV-Import" for generic detection.
     var sourceTitle: String {
-        formatName.map { "CSV-Import (\($0))" } ?? "CSV-Import"
+        formatName.map { String(localized: "CSV-Import (\($0))") } ?? String(localized: "CSV-Import")
     }
 }
 

@@ -1,0 +1,72 @@
+{
+  "sourceLanguage": "de",
+  "strings": {
+    "Anmeldung bei der DKB abgeschlossen …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in to DKB completed…"
+          }
+        }
+      }
+    },
+    "Anmeldung bei der DKB …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing in to DKB…"
+          }
+        }
+      }
+    },
+    "Bitte bei der DKB anmelden und in der DKB-App bestätigen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please sign in to DKB and confirm in the DKB app."
+          }
+        }
+      }
+    },
+    "Bitte in der DKB-App bestätigen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please confirm in the DKB app."
+          }
+        }
+      }
+    },
+    "Die DKB möchte eine Bestätigung: „Bankseite anzeigen“ und „Ich bin ein Mensch“ anklicken.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DKB asks for a confirmation: click \"Show Bank Page\" and \"I Am Human\"."
+          }
+        }
+      }
+    },
+    "Sicherheitsprüfung der DKB läuft …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DKB security check in progress…"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

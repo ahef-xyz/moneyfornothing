@@ -3,13 +3,13 @@ import SwiftUI
 
 enum Money {
     /// The common case, built once (lists format thousands of amounts).
-    private static let euro = Decimal.FormatStyle.Currency(code: "EUR", locale: Locale(identifier: "de_DE"))
+    private static let euro = Decimal.FormatStyle.Currency(code: "EUR", locale: Locale.autoupdatingCurrent)
 
     static func format(_ cents: Int, currency: String = "EUR", signed: Bool = false) -> String {
         let value = Decimal(cents) / 100
         let text = currency == "EUR"
             ? value.formatted(euro)
-            : value.formatted(.currency(code: currency).locale(Locale(identifier: "de_DE")))
+            : value.formatted(.currency(code: currency).locale(Locale.autoupdatingCurrent))
         return signed && cents > 0 ? "+" + text : text
     }
 }
@@ -73,7 +73,7 @@ struct AmountText: View {
         Text(model.hideAmounts ? "•••••" : Money.format(cents, currency: currency, signed: signed))
             .monospacedDigit()
             .foregroundStyle(style)
-            .accessibilityLabel(model.hideAmounts ? "Betrag ausgeblendet" : Money.format(cents, currency: currency, signed: signed))
+            .accessibilityLabel(model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(cents, currency: currency, signed: signed))
     }
 }
 
@@ -87,23 +87,27 @@ extension View {
 
 enum DayFormat {
     /// "heute, 08:42" / "gestern, 18:10" / "6. Nov., 09:15"
+    private static let timeStyle = Date.FormatStyle.dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits)
+    private static let dayMonthStyle = Date.FormatStyle.dateTime.day().month(.abbreviated)
+    private static let shortStyle = Date.FormatStyle(locale: Locale.autoupdatingCurrent, timeZone: BankDay.bankTimeZone).day().month(.abbreviated).year()
+
     static func syncTime(_ date: Date) -> String {
         let calendar = Calendar.current
-        let time = date.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits))
-        if calendar.isDateInToday(date) { return "heute, \(time)" }
-        if calendar.isDateInYesterday(date) { return "gestern, \(time)" }
-        return date.formatted(.dateTime.day().month(.abbreviated)) + ", " + time
+        let time = date.formatted(timeStyle)
+        if calendar.isDateInToday(date) { return String(localized: "heute, \(time)") }
+        if calendar.isDateInYesterday(date) { return String(localized: "gestern, \(time)") }
+        return date.formatted(dayMonthStyle) + ", " + time
     }
 
-    /// "12. Nov. 2026" for a bank day (bank time zone, German).
+    /// "12. Nov. 2026" for a bank day (bank time zone, user locale).
     static func short(_ day: BankDay) -> String {
-        day.startDate.formatted(Date.FormatStyle(locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone).day().month(.abbreviated).year())
+        day.startDate.formatted(shortStyle)
     }
 
     /// Short form for the sidebar header: time today, otherwise the date.
     static func shortSyncTime(_ date: Date) -> String {
         Calendar.current.isDateInToday(date)
-            ? date.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits))
-            : date.formatted(.dateTime.day().month(.abbreviated))
+            ? date.formatted(timeStyle)
+            : date.formatted(dayMonthStyle)
     }
 }

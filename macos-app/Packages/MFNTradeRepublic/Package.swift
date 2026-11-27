@@ -4,6 +4,7 @@ import PackageDescription
 // Trade Republic connector. Owned by the Trade Republic agent (docs/archive/phase-2/AGENT-TradeRepublic.md); everything else is read-only for it.
 let package = Package(
     name: "MFNTradeRepublic",
+    defaultLocalization: "de",
     platforms: [.macOS(.v26)],
     products: [
         .library(name: "MFNTradeRepublic", targets: ["MFNTradeRepublic"]),
@@ -13,7 +14,7 @@ let package = Package(
         .package(path: "../MFNConformance"),
     ],
     targets: [
-        .target(name: "MFNTradeRepublic", dependencies: [.product(name: "MFNCore", package: "MFNCore")]),
+        .target(name: "MFNTradeRepublic", dependencies: [.product(name: "MFNCore", package: "MFNCore")], resources: [.process("Resources")]),
         .testTarget(
             name: "MFNTradeRepublicTests",
             dependencies: [

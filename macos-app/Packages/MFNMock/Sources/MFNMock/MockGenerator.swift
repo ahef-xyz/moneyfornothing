@@ -28,6 +28,8 @@ struct MockGenerator {
         Connection(id: MockConnections.c24, connectorID: .c24, displayName: "C24"),
         Connection(id: MockConnections.easybank, connectorID: .easybank, displayName: "easybank"),
         Connection(id: MockConnections.paypal, connectorID: .paypal, displayName: "PayPal"),
+        // v12: a bank reached over YAXI (0.7.0); the mock connector serves it, no YAXI key, no network.
+        Connection(id: MockConnections.sparkasse, connectorID: .yaxi, displayName: "YAXI: Sparkasse"),
     ]
 
     private static let accounts: [Account] = [
@@ -43,6 +45,8 @@ struct MockGenerator {
         Account(id: MockAccounts.easyVisa, connectionID: MockConnections.easybank, type: .card, name: "Visa Card", cardLast4: "7302", creditLimitCents: 300_000),
         Account(id: MockAccounts.easyTagesgeld, connectionID: MockConnections.easybank, iban: "DE00 2002 0000 0000 0000 06", type: .tagesgeld, name: "Tagesgeld"),
         Account(id: MockAccounts.paypal, connectionID: MockConnections.paypal, type: .giro, name: "PayPal"),
+        Account(id: MockAccounts.sparkasseGiro, connectionID: MockConnections.sparkasse, iban: "DE00 3705 0198 0000 0000 07", type: .giro, name: "Girokonto"),
+        Account(id: MockAccounts.sparkasseTagesgeld, connectionID: MockConnections.sparkasse, iban: "DE00 3705 0198 0000 0000 08", type: .tagesgeld, name: "Tagesgeld"),
     ]
 
     private static let openingBalances: [AccountID: Int] = [
@@ -56,6 +60,8 @@ struct MockGenerator {
         MockAccounts.easyVisa: 0,
         MockAccounts.easyTagesgeld: 1_500_000,
         MockAccounts.paypal: 8_500,
+        MockAccounts.sparkasseGiro: 300_000,
+        MockAccounts.sparkasseTagesgeld: 500_000,
     ]
 
     private static let overdrafts: [AccountID: Int] = [
@@ -119,6 +125,7 @@ struct MockGenerator {
         generateC24()
         generateEasybank()
         generatePayPal()
+        generateSparkasse()
         let dkbStatements = settleCard(MockAccounts.dkbVisa, closingDay: 22, dueAfterDays: 5, payer: MockAccounts.dkbGiro, payerName: "DKB AG", creditorID: nil)
         let easyStatements = settleCard(MockAccounts.easyVisa, closingDay: 7, dueAfterDays: 13, payer: MockAccounts.ingGiro, payerName: "easybank AG", creditorID: "DE00ZZZ00000000001")
 
@@ -251,6 +258,27 @@ struct MockGenerator {
         monthly(day: 14) { me, day in
             me.add(MockAccounts.paypal, day, -me.vary(1_800, by: 600), "Buchhandlung Lesezeichen", "Zahlung", iban: nil)
         }
+    }
+
+    /// The bank over YAXI: a small everyday account fed from the ING account, rent and utilities, a few
+    /// card payments, and a Tagesgeld with interest. Generated last, so the other banks keep their data.
+    private mutating func generateSparkasse() {
+        let giro = MockAccounts.sparkasseGiro
+        monthly(day: 21) { me, day in
+            me.add(MockAccounts.ingGiro, day, -38_000, "Eigenes Sparkasse Girokonto", "Umbuchung Miete und Alltag", iban: "DE00 3705 0198 0000 0000 07")
+            me.add(giro, day, 38_000, "Eigenes ING Girokonto", "Umbuchung Miete und Alltag", iban: "DE00 5001 0517 0000 0000 01")
+        }
+        monthly(day: 3) { me, day in
+            me.add(giro, day, -28_000, "Hausverwaltung Beispiel GmbH", "Miete Zimmer Musterweg 1", iban: "DE00 3705 0198 0000 0000 21", mref: "MIETE-1", creditorID: "DE00ZZZ00000000009")
+        }
+        monthly(day: 8) { me, day in
+            me.add(giro, day, -4_000, "Stadtwerke Musterstadt", "Strom und Wasser Abschlag", iban: "DE00 3705 0198 0000 0000 22", mref: "SW-17", creditorID: "DE00ZZZ00000000010")
+        }
+        monthly(day: 30) { me, day in
+            me.add(MockAccounts.sparkasseTagesgeld, day, me.vary(1_300, by: 200), "Sparkasse", "Zinsen", iban: nil)
+        }
+        randomSpending(giro, perMonth: 2, merchants: Self.groceries + Self.everyday, purposePrefix: "Kartenzahlung girocard")
+        recentPending(giro, count: 1, merchants: Self.groceries, purposePrefix: "Kartenzahlung girocard")
     }
 
     private mutating func generateEasybank() {

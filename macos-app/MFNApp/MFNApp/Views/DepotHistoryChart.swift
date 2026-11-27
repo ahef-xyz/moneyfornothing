@@ -26,10 +26,20 @@ struct DepotHistoryChart: View {
 
         var title: String {
             switch self {
-            case .month: "1 Monat"
-            case .halfYear: "6 Monate"
-            case .year: "1 Jahr"
-            case .all: "Gesamter Verlauf"
+            case .month: String(localized: "1 Monat")
+            case .halfYear: String(localized: "6 Monate")
+            case .year: String(localized: "1 Jahr")
+            case .all: String(localized: "Gesamter Verlauf")
+            }
+        }
+
+        /// Short label of the segment.
+        var label: String {
+            switch self {
+            case .month: String(localized: "1M")
+            case .halfYear: String(localized: "6M")
+            case .year: String(localized: "1J")
+            case .all: String(localized: "Max")
             }
         }
     }
@@ -48,8 +58,8 @@ struct DepotHistoryChart: View {
         VStack(alignment: .leading, spacing: 6) {
             if all.count < 2 {
                 Label(all.isEmpty
-                      ? "Der Verlauf wird ab dem nächsten Abgleich aufgezeichnet, die Bank liefert keinen."
-                      : "Verlauf seit \(DayFormat.short(all[0].day)). Ab dem zweiten Tag mit Abgleich erscheint hier ein Diagramm.",
+                      ? String(localized: "Der Verlauf wird ab dem nächsten Abgleich aufgezeichnet, die Bank liefert keinen.")
+                      : String(localized: "Verlauf seit \(DayFormat.short(all[0].day)). Ab dem zweiten Tag mit Abgleich erscheint hier ein Diagramm."),
                       systemImage: "chart.xyaxis.line")
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -88,7 +98,7 @@ struct DepotHistoryChart: View {
 
     private var picker: some View {
         Picker("Zeitraum", selection: $range) {
-            ForEach(Range.allCases) { Text($0.rawValue).tag($0).help($0.title).accessibilityLabel($0.title) }
+            ForEach(Range.allCases) { Text($0.label).tag($0).help($0.title).accessibilityLabel($0.title) }
         }
         .pickerStyle(.segmented)
         .labelsHidden()
@@ -112,9 +122,9 @@ struct DepotHistoryChart: View {
         let currency = last.currency
         var parts = ["\(DayFormat.short(first.day)): \(Money.format(first.valueCents, currency: currency))",
                      "\(DayFormat.short(last.day)): \(Money.format(last.valueCents, currency: currency))",
-                     "Veränderung \(Money.format(last.valueCents - first.valueCents, currency: currency, signed: true))"]
+                     String(localized: "Veränderung \(Money.format(last.valueCents - first.valueCents, currency: currency, signed: true))")]
         if let purchase = last.purchaseCents {
-            parts.append("Einstandswert \(Money.format(purchase, currency: currency))")
+            parts.append(String(localized: "Einstandswert \(Money.format(purchase, currency: currency))"))
         }
         return parts.joined(separator: " · ")
     }
@@ -186,7 +196,7 @@ struct DepotHistoryChart: View {
             }
             .chartXAxis {
                 AxisMarks(values: .automatic(desiredCount: 5)) { _ in
-                    AxisValueLabel(format: .dateTime.day().month(.abbreviated).locale(Locale(identifier: "de_DE")))
+                    AxisValueLabel(format: .dateTime.day().month(.abbreviated).locale(Locale.autoupdatingCurrent))
                 }
             }
             .chartXSelection(value: $hovered)
@@ -215,7 +225,7 @@ struct DepotHistoryChart: View {
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
 
-        private func row(_ label: String, _ cents: Int, signed: Bool = false) -> some View {
+        private func row(_ label: LocalizedStringKey, _ cents: Int, signed: Bool = false) -> some View {
             HStack(spacing: 8) {
                 Text(label)
                 Spacer(minLength: 4)
@@ -227,7 +237,7 @@ struct DepotHistoryChart: View {
 
     private struct LegendLine: View {
         let dashed: Bool
-        let text: String
+        let text: LocalizedStringKey
 
         var body: some View {
             HStack(spacing: 4) {
@@ -253,17 +263,17 @@ private struct DepotChartDescriptor: AXChartDescriptorRepresentable {
         let labels = points.map { DayFormat.short($0.day) }
         let values = points.flatMap { [$0.valueCents] + ($0.purchaseCents.map { [$0] } ?? []) }.map { Double($0) / 100 }
         let low = values.min() ?? 0, high = values.max() ?? 0
-        let xAxis = AXCategoricalDataAxisDescriptor(title: "Tag", categoryOrder: labels)
-        let yAxis = AXNumericDataAxisDescriptor(title: "Wert", range: low...max(high, low + 1), gridlinePositions: []) {
+        let xAxis = AXCategoricalDataAxisDescriptor(title: String(localized: "Tag"), categoryOrder: labels)
+        let yAxis = AXNumericDataAxisDescriptor(title: String(localized: "Wert"), range: low...max(high, low + 1), gridlinePositions: []) {
             Money.format(Int(($0 * 100).rounded()), currency: currency)
         }
-        let value = AXDataSeriesDescriptor(name: "Depotwert", isContinuous: true, dataPoints: zip(labels, points).map {
+        let value = AXDataSeriesDescriptor(name: String(localized: "Depotwert"), isContinuous: true, dataPoints: zip(labels, points).map {
             AXDataPoint(x: $0.0, y: Double($0.1.valueCents) / 100)
         })
-        let purchase = AXDataSeriesDescriptor(name: "Einstandswert", isContinuous: true, dataPoints: zip(labels, points).compactMap { label, point in
+        let purchase = AXDataSeriesDescriptor(name: String(localized: "Einstandswert"), isContinuous: true, dataPoints: zip(labels, points).compactMap { label, point in
             point.purchaseCents.map { AXDataPoint(x: label, y: Double($0) / 100) }
         })
-        return AXChartDescriptor(title: "Depotverlauf", summary: summary, xAxis: xAxis, yAxis: yAxis, additionalAxes: [],
+        return AXChartDescriptor(title: String(localized: "Depotverlauf"), summary: summary, xAxis: xAxis, yAxis: yAxis, additionalAxes: [],
                                  series: purchase.dataPoints.isEmpty ? [value] : [value, purchase])
     }
 }

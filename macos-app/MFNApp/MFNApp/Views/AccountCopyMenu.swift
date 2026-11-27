@@ -36,7 +36,7 @@ struct AccountCopyMenu: View {
         .controlSize(.small)
         .fixedSize()
         .help("Bankverbindung, IBAN, Kontostand kopieren oder GiroCode anzeigen")
-        .accessibilityLabel(copied ? "Kopiert" : "Kontodaten")
+        .accessibilityLabel(copied ? String(localized: "Kopiert") : String(localized: "Kontodaten"))
         .popover(isPresented: $showsGiroCode, arrowEdge: .bottom) {
             if let iban = account.iban {
                 GiroCodeView(holder: NSFullUserName(), iban: iban, bic: BICLookup.institution(forIBAN: iban)?.bic)
@@ -46,7 +46,7 @@ struct AccountCopyMenu: View {
 
     private func confirm() {
         copied = true
-        AccessibilityNotification.Announcement("Kopiert").post()
+        AccessibilityNotification.Announcement(String(localized: "Kopiert")).post()
         // A second copy restarts the 1.5 s instead of an older timer clearing it early.
         resetCopied?.cancel()
         resetCopied = Task {
@@ -116,22 +116,23 @@ struct AccountCopyItems: View {
     ///     BIC: BYLADEM1001 (DKB)
     private var details: String {
         var lines: [String] = []
-        if !holder.isEmpty { lines.append("Name: \(holder)") }
+        if !holder.isEmpty { lines.append(String(localized: "Name: \(holder)")) }
         if let iban = account.iban { lines.append("IBAN: \(IBANFormat.grouped(iban))") }
         if let institution { lines.append("BIC: \(institution.bic) (\(institution.name))") }
         return lines.joined(separator: "\n")
     }
 
     /// Copies "1.234,56 € (Stand 14.11.2026)": a pasted balance says when it was current.
-    private func amountEntry(_ title: String, cents: Int, balance: Balance, symbol: String) -> some View {
+    private func amountEntry(_ title: LocalizedStringResource, cents: Int, balance: Balance, symbol: String) -> some View {
         let amount = Money.format(cents, currency: balance.currency)
-        let date = balance.asOf.formatted(.dateTime.day(.twoDigits).month(.twoDigits).year().locale(Locale(identifier: "de_DE")))
-        let text = "\(amount) (Stand \(date))"
-        return entry(title, value: model.hideAmounts ? "••••• (Stand \(date))" : text, copies: text, symbol: symbol)
+        let date = balance.asOf.formatted(.dateTime.day(.twoDigits).month(.twoDigits).year().locale(Locale.autoupdatingCurrent))
+        let text = String(localized: "\(amount) (Stand \(date))")
+        return entry(title, value: model.hideAmounts ? String(localized: "••••• (Stand \(date))") : text, copies: text, symbol: symbol)
     }
 
-    private func entry(_ title: String, value: String, copies text: String, symbol: String) -> some View {
-        Button {
+    private func entry(_ title: LocalizedStringResource, value: String, copies text: String, symbol: String) -> some View {
+        let spoken = String(localized: title)
+        return Button {
             NSPasteboard.general.copyConcealed(text)
             onCopy()
         } label: {
@@ -142,7 +143,7 @@ struct AccountCopyItems: View {
                 Image(systemName: symbol)
             }
         }
-        .accessibilityLabel("\(title) kopieren")
+        .accessibilityLabel("\(spoken) kopieren")
         .accessibilityValue(value)
     }
 }
@@ -184,10 +185,10 @@ private struct GiroCodeView: View {
                     .multilineTextAlignment(.center)
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
-                Button(copied ? "Kopiert" : "Bild kopieren", systemImage: copied ? "checkmark" : "doc.on.doc") {
+                Button(copied ? String(localized: "Kopiert") : String(localized: "Bild kopieren"), systemImage: copied ? "checkmark" : "doc.on.doc") {
                     NSPasteboard.general.copyConcealed(image)
                     copied = true
-                    AccessibilityNotification.Announcement("Kopiert").post()
+                    AccessibilityNotification.Announcement(String(localized: "Kopiert")).post()
                     resetCopied?.cancel()
                     resetCopied = Task {
                         try? await Task.sleep(for: .seconds(1.5))
@@ -304,8 +305,8 @@ struct AccountSyncButton: View {
     /// in the sidebar and as an alert).
     private var announcement: String? {
         switch phase {
-        case .syncing: "Abgleich läuft"
-        case .waitingForApproval: "Warte auf Freigabe"
+        case .syncing: String(localized: "Abgleich läuft")
+        case .waitingForApproval: String(localized: "Warte auf Freigabe")
         case .idle, .failed, .storeFailed: nil
         }
     }
@@ -315,7 +316,7 @@ struct AccountSyncButton: View {
             model.syncConnection(connectionID)
         } label: {
             Label {
-                Text(isBusy ? "Wird abgeglichen …" : "Abgleichen")
+                Text(isBusy ? String(localized: "Wird abgeglichen …") : String(localized: "Abgleichen"))
             } icon: {
                 Image(systemName: "arrow.clockwise")
                     .symbolEffect(.rotate, options: .repeat(.continuous), isActive: isBusy && !reduceMotion)

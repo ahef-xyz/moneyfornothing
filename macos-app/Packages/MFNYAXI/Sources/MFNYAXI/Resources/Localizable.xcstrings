@@ -1,0 +1,94 @@
+{
+  "sourceLanguage": "de",
+  "strings": {
+    "%@ braucht eine neue Freigabe.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ needs a new approval."
+          }
+        }
+      }
+    },
+    "Benutzername": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Username"
+          }
+        }
+      }
+    },
+    "Bitte bestätige den Zugriff in der App deiner Bank.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please confirm access in your bank's app."
+          }
+        }
+      }
+    },
+    "Bitte wähle aus.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please choose one."
+          }
+        }
+      }
+    },
+    "Gib die TAN zur Grafik ein.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the TAN shown in the image."
+          }
+        }
+      }
+    },
+    "Melde dich auf der Seite deiner Bank an und gib den Zugriff frei. MFN sieht dabei weder deine Zugangsdaten noch die Seite.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in on your bank's page and approve access. MFN sees neither your login details nor the page."
+          }
+        }
+      }
+    },
+    "Passwort": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password"
+          }
+        }
+      }
+    },
+    "YAXI-Schlüssel fehlt (Einstellungen → Banken)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YAXI key missing (Settings → Banks)"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

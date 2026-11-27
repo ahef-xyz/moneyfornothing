@@ -288,7 +288,7 @@ enum CSVSamples {
         var doc = try document("01.11.2026;Laden;-1,00\n02.11.2026;Laden;-2,00\n")
         #expect(doc.headerRow == nil)
         #expect(!doc.mapping.isComplete)
-        #expect(doc.columnNames == ["Spalte 1", "Spalte 2", "Spalte 3"])
+        #expect(doc.columnNames == (1...3).map { String(localized: "Spalte \($0)", bundle: .module) })
         #expect(doc.transactions(for: account).transactions.isEmpty)
         doc.mapping = CSVMapping([.bookingDate: 0, .counterparty: 1, .amount: 2])
         #expect(doc.transactions(for: account).transactions.map(\.amountCents) == [-100, -200])

@@ -14,7 +14,7 @@ enum ForecastHorizon: Int, CaseIterable, Identifiable {
     case one = 1, three = 3, six = 6, twelve = 12
 
     var id: Int { rawValue }
-    var title: String { rawValue == 1 ? "1 Monat" : "\(rawValue) Monate" }
+    var title: String { rawValue == 1 ? String(localized: "1 Monat") : String(localized: "\(rawValue) Monate") }
 
     /// Shortest horizon that shows `day`, at least three months.
     static func covering(_ day: BankDay?, today: BankDay) -> ForecastHorizon {
@@ -24,7 +24,7 @@ enum ForecastHorizon: Int, CaseIterable, Identifiable {
 }
 
 enum ForecastFormat {
-    static let locale = Locale(identifier: "de_DE")
+    static let locale = Locale.autoupdatingCurrent
     static let day = Date.FormatStyle(locale: locale, timeZone: BankDay.bankTimeZone).day().month(.abbreviated)
     static let dayYear = Date.FormatStyle(locale: locale, timeZone: BankDay.bankTimeZone).day().month(.abbreviated).year()
 
@@ -35,9 +35,9 @@ enum ForecastFormat {
 
     static func kind(_ event: ForecastEvent) -> String {
         switch event.source {
-        case .bank: "Von der Bank angekündigt"
-        case .manual: "Selbst geplant"
-        case .recurring: "Regelmäßig, geschätzt"
+        case .bank: String(localized: "Von der Bank angekündigt")
+        case .manual: String(localized: "Selbst geplant")
+        case .recurring: String(localized: "Regelmäßig, geschätzt")
         }
     }
 
@@ -85,7 +85,7 @@ struct ForecastSheet: View {
 
         var resolvedTitle: String {
             let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
-            return trimmed.isEmpty ? (isExpense ? "Geplante Ausgabe" : "Geplante Einnahme") : trimmed
+            return trimmed.isEmpty ? (isExpense ? String(localized: "Geplante Ausgabe") : String(localized: "Geplante Einnahme")) : trimmed
         }
     }
 
@@ -345,19 +345,19 @@ struct ForecastSheet: View {
     private func rowLabel(_ row: Row, isDraft: Bool) -> String {
         let event = row.event
         var parts = [ForecastFormat.text(event.day, today: today), event.title, kindText(event, isDraft: isDraft)]
-        parts.append(model.hideAmounts ? "Betrag ausgeblendet" : Money.format(event.cents, signed: true))
+        parts.append(model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(event.cents, signed: true))
         if let after = row.after {
-            if !model.hideAmounts { parts.append("Saldo danach \(Money.format(after))" + (after < 0 ? ", unter null" : "")) }
+            if !model.hideAmounts { parts.append(after < 0 ? String(localized: "Saldo danach \(Money.format(after)), unter null") : String(localized: "Saldo danach \(Money.format(after))")) }
         } else {
-            parts.append("nicht eingerechnet")
+            parts.append(String(localized: "nicht eingerechnet"))
         }
         return parts.joined(separator: ", ")
     }
 
     private func kindText(_ event: ForecastEvent, isDraft: Bool) -> String {
-        if isDraft { return applied.editing == nil ? "Entwurf, noch nicht gemerkt" : "In Bearbeitung" }
+        if isDraft { return applied.editing == nil ? String(localized: "Entwurf, noch nicht gemerkt") : String(localized: "In Bearbeitung") }
         let kind = ForecastFormat.kind(event)
-        return event.isOverdue ? "\(kind) · fällig seit \(ForecastFormat.text(event.dueDay, today: today))" : kind
+        return event.isOverdue ? String(localized: "\(kind) · fällig seit \(ForecastFormat.text(event.dueDay, today: today))") : kind
     }
 
     /// A booking looks like the planned item: it is not counted until the user decides.
@@ -387,7 +387,7 @@ struct ForecastSheet: View {
         .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 
-    private func figure(_ title: String, cents: Int, warns: Bool = false) -> some View {
+    private func figure(_ title: LocalizedStringKey, cents: Int, warns: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(.caption)
@@ -410,7 +410,7 @@ struct ForecastSheet: View {
     @ViewBuilder
     private func form(_ verdict: Verdict) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(draft.editing == nil ? "Was wäre, wenn …" : "Geplante Buchung ändern")
+            Text(draft.editing == nil ? String(localized: "Was wäre, wenn …") : String(localized: "Geplante Buchung ändern"))
                 .font(.headline)
             HStack(spacing: 10) {
                 Picker("Art", selection: $draft.isExpense) {
@@ -446,12 +446,12 @@ struct ForecastSheet: View {
             }
             HStack {
                 if !draft.isEmpty {
-                    Button(draft.editing == nil ? "Verwerfen" : "Änderung verwerfen") { reset() }
+                    Button(draft.editing == nil ? String(localized: "Verwerfen") : String(localized: "Änderung verwerfen")) { reset() }
                 }
                 Spacer()
                 Button("Fertig") { dismiss() }
                     .keyboardShortcut(.cancelAction)
-                Button(draft.editing == nil ? "Merken" : "Sichern") { save() }
+                Button(draft.editing == nil ? String(localized: "Merken") : String(localized: "Sichern")) { save() }
                     .keyboardShortcut(.defaultAction)
                     .disabled(draft.cents == nil)
                     .help("Als geplante Buchung in die Prognose aufnehmen. MFN bewegt kein Geld.")
@@ -473,25 +473,25 @@ struct ForecastSheet: View {
 
     private func verdict(_ basis: SnapshotIndex.ForecastBasis, included: [ForecastEvent], path: ForecastPath) -> Verdict {
         guard let draftEvent else {
-            return Verdict(kind: .hint, text: "Betrag und Datum eingeben: Die Prognose zeigt sofort, ob es reicht. Gespeichert wird erst mit „Merken“.")
+            return Verdict(kind: .hint, text: String(localized: "Betrag und Datum eingeben: Die Prognose zeigt sofort, ob es reicht. Gespeichert wird erst mit „Merken“."))
         }
-        if model.hideAmounts { return Verdict(kind: .neutral, text: "Beträge sind ausgeblendet (⇧⌘H).") }
+        if model.hideAmounts { return Verdict(kind: .neutral, text: String(localized: "Beträge sind ausgeblendet (⇧⌘H).")) }
         guard let index = path.steps.firstIndex(where: { $0.event.id == draftEvent.id }) else {
-            return Verdict(kind: .neutral, text: applied.day > until ? "Das Datum liegt hinter dem gewählten Zeitraum." : "Die Buchung ist oben herausgerechnet.")
+            return Verdict(kind: .neutral, text: applied.day > until ? String(localized: "Das Datum liegt hinter dem gewählten Zeitraum.") : String(localized: "Die Buchung ist oben herausgerechnet."))
         }
         let after = path.steps[index...].min { $0.cents < $1.cents } ?? path.steps[index]
         let day = ForecastFormat.text(after.day, today: today)
         if after.cents >= 0 {
-            return Verdict(kind: .good, text: "Geht: Danach bleiben bis \(ForecastFormat.text(until, today: today)) mindestens \(Money.format(after.cents)) (am \(day)).")
+            return Verdict(kind: .good, text: String(localized: "Geht: Danach bleiben bis \(ForecastFormat.text(until, today: today)) mindestens \(Money.format(after.cents)) (am \(day))."))
         }
         guard draftEvent.cents < 0 else {
-            return Verdict(kind: .short, text: "Auch damit fehlen am \(day) noch \(Money.format(-after.cents)).")
+            return Verdict(kind: .short, text: String(localized: "Auch damit fehlen am \(day) noch \(Money.format(-after.cents))."))
         }
         let others = included.filter { $0.id != draftEvent.id }
         let earliest = BalanceForecast.earliestDay(spending: -draftEvent.cents, start: basis.startCents, events: others, today: today, until: until)
-        let hint = earliest.map { "Frühestens möglich ab \(ForecastFormat.text($0, today: today))." }
-            ?? "Bis \(ForecastFormat.text(until, today: today)) reicht es an keinem Tag."
-        return Verdict(kind: .short, text: "Reicht nicht: Am \(day) fehlen \(Money.format(-after.cents)). \(hint)")
+        let hint = earliest.map { String(localized: "Frühestens möglich ab \(ForecastFormat.text($0, today: today)).") }
+            ?? String(localized: "Bis \(ForecastFormat.text(until, today: today)) reicht es an keinem Tag.")
+        return Verdict(kind: .short, text: String(localized: "Reicht nicht: Am \(day) fehlen \(Money.format(-after.cents)). \(hint)"))
     }
 
     /// The verdict with its symbol (shape, not colour alone). VoiceOver hears a new verdict once
@@ -534,7 +534,7 @@ struct ForecastSheet: View {
     private func load(_ item: PlannedItem) {
         draft = Draft(
             isExpense: item.amountCents < 0,
-            amountText: (Decimal(abs(item.amountCents)) / 100).formatted(.number.locale(ForecastFormat.locale)),
+            amountText: RecurringDraft.text(item.amountCents, locale: ForecastFormat.locale),
             date: item.day.startDate.addingTimeInterval(12 * 3600),
             title: item.title,
             editing: item
@@ -712,7 +712,7 @@ private struct ForecastChartDescriptor: AXChartDescriptorRepresentable {
         // Categories must be unique: forecast days are marked, repeated days numbered.
         var seen: [String: Int] = [:]
         func label(_ day: BankDay, forecast: Bool) -> String {
-            let base = ForecastFormat.text(day, today: today) + (forecast ? " (Prognose)" : "")
+            let base = forecast ? String(localized: "\(ForecastFormat.text(day, today: today)) (Prognose)") : ForecastFormat.text(day, today: today)
             let count = seen[base, default: 0]
             seen[base] = count + 1
             return count == 0 ? base : "\(base) \(count + 1)"
@@ -722,15 +722,15 @@ private struct ForecastChartDescriptor: AXChartDescriptorRepresentable {
             .map { (label($0.0, forecast: true), $0.1) }
         let values = (before + future).map { Double($0.1) / 100 }
         let low = values.min() ?? 0, high = values.max() ?? 0
-        let xAxis = AXCategoricalDataAxisDescriptor(title: "Tag", categoryOrder: (before + future).map(\.0))
-        let yAxis = AXNumericDataAxisDescriptor(title: "Saldo", range: low...max(high, low + 1), gridlinePositions: []) {
+        let xAxis = AXCategoricalDataAxisDescriptor(title: String(localized: "Tag"), categoryOrder: (before + future).map(\.0))
+        let yAxis = AXNumericDataAxisDescriptor(title: String(localized: "Saldo"), range: low...max(high, low + 1), gridlinePositions: []) {
             Money.format(Int(($0 * 100).rounded()))
         }
         func series(_ name: String, _ points: [(String, Int)]) -> AXDataSeriesDescriptor {
             AXDataSeriesDescriptor(name: name, isContinuous: true, dataPoints: points.map { AXDataPoint(x: $0.0, y: Double($0.1) / 100) })
         }
-        return AXChartDescriptor(title: "Saldoverlauf mit Prognose", summary: nil, xAxis: xAxis, yAxis: yAxis, additionalAxes: [],
-                                 series: [series("Saldo", before), series("Prognose", future)])
+        return AXChartDescriptor(title: String(localized: "Saldoverlauf mit Prognose"), summary: nil, xAxis: xAxis, yAxis: yAxis, additionalAxes: [],
+                                 series: [series(String(localized: "Saldo"), before), series(String(localized: "Prognose"), future)])
     }
 }
 
@@ -755,10 +755,10 @@ struct PlannedItemRow: View {
 
     private var subtitle: String {
         let today = BankDay.today
-        let own = accountName.map { "\($0) · selbst geplant" } ?? "Selbst geplant"
-        if isMatched { return "\(own) · schon gebucht? In der Prognose klären" }
-        if item.day < today { return "\(own) · fällig seit \(ForecastFormat.text(item.day, today: today))" }
-        return "\(own) · fällig am \(ForecastFormat.text(item.day, today: today))"
+        let own = accountName.map { String(localized: "\($0) · selbst geplant") } ?? String(localized: "Selbst geplant")
+        if isMatched { return String(localized: "\(own) · schon gebucht? In der Prognose klären") }
+        if item.day < today { return String(localized: "\(own) · fällig seit \(ForecastFormat.text(item.day, today: today))") }
+        return String(localized: "\(own) · fällig am \(ForecastFormat.text(item.day, today: today))")
     }
 
     var body: some View {
@@ -804,7 +804,7 @@ struct PlannedItemRow: View {
         .accessibilityElement(children: .ignore)
         .accessibilityAddTraits(.isButton)
         .accessibilityLabel("\(item.title), \(subtitle)")
-        .accessibilityValue(model.hideAmounts ? "Betrag ausgeblendet" : Money.format(item.amountCents, signed: true))
+        .accessibilityValue(model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(item.amountCents, signed: true))
         .accessibilityHint("Öffnet die Prognose")
         .accessibilityAction { model.showForecast(for: account, editing: item.id) }
         // The context menu's commands for VoiceOver and the keyboard (actions rotor).

@@ -102,8 +102,8 @@ struct MergeReportSheet: View {
     /// The warning is in the title, so it cannot be overlooked in the message.
     private var confirmationTitle: String {
         let suspicious = loadedPlan?.suspicious ?? 0
-        let base = "„\(request.source.displayName)“ in „\(request.target.displayName)“ übernehmen?"
-        return suspicious == 0 ? base : "\(base) \(suspicious) Umsätze gibt es nur im Web, obwohl sie im FinTS-Zeitraum liegen."
+        let base = String(localized: "„\(request.source.displayName)“ in „\(request.target.displayName)“ übernehmen?")
+        return suspicious == 0 ? base : String(localized: "\(base) \(suspicious) Umsätze gibt es nur im Web, obwohl sie im FinTS-Zeitraum liegen.")
     }
 
     private func done(_ backup: URL) -> some View {
@@ -127,7 +127,7 @@ struct MergeReportSheet: View {
                         LabeledContent("Neuer Kontoname", value: newName)
                     }
                     LabeledContent("FinTS-Zeitraum ab") {
-                        Text(account.windowStart.map { $0.startDate.formatted(date: .abbreviated, time: .omitted) } ?? "noch keine Umsätze")
+                        Text(account.windowStart.map { $0.startDate.formatted(date: .abbreviated, time: .omitted) } ?? String(localized: "noch keine Umsätze"))
                     }
                     CountRow(label: "Doppelt, werden zusammengeführt", value: account.matched.count)
                     CountRow(label: "davon nur über Betrag und Tag erkannt", value: account.weakMatches)
@@ -166,10 +166,10 @@ struct MergeReportSheet: View {
             if !plan.unmatchedSourceAccounts.isEmpty || !plan.unmatchedTargetAccounts.isEmpty {
                 Section("Ohne Gegenstück") {
                     ForEach(plan.unmatchedSourceAccounts) { account in
-                        LabeledContent(model.displayName(of: account), value: "nur im Web")
+                        LabeledContent(model.displayName(of: account)) { Text("nur im Web") }
                     }
                     ForEach(plan.unmatchedTargetAccounts) { account in
-                        LabeledContent(model.displayName(of: account), value: "nur über FinTS")
+                        LabeledContent(model.displayName(of: account)) { Text("nur über FinTS") }
                     }
                 }
             }
@@ -187,17 +187,17 @@ struct MergeReportSheet: View {
     private func merge() {
         running = true
         error = nil
-        AccessibilityNotification.Announcement("Zusammenführen läuft").post()
+        AccessibilityNotification.Announcement(String(localized: "Zusammenführen läuft")).post()
         Task {
             let outcome = await model.mergeConnection(request.source, into: request.target)
             running = false
             switch outcome {
             case let .merged(url):
                 backup = url
-                AccessibilityNotification.Announcement("Zusammengeführt").post()
+                AccessibilityNotification.Announcement(String(localized: "Zusammengeführt")).post()
             case let .failed(message):
                 error = message
-                AccessibilityNotification.Announcement("Fehler: \(message)").post()
+                AccessibilityNotification.Announcement(String(localized: "Fehler: \(message)")).post()
             }
         }
     }
@@ -205,18 +205,18 @@ struct MergeReportSheet: View {
     private func deleteBackup(_ url: URL) {
         if let failure = model.deleteBackup(url) {
             error = failure
-            AccessibilityNotification.Announcement("Fehler: \(failure)").post()
+            AccessibilityNotification.Announcement(String(localized: "Fehler: \(failure)")).post()
         } else {
-            AccessibilityNotification.Announcement("Sicherung gelöscht").post()
+            AccessibilityNotification.Announcement(String(localized: "Sicherung gelöscht")).post()
             dismiss()
         }
     }
 
     static func message(_ error: ConnectionMerge.PlanError) -> String {
         switch error {
-        case .unknownConnection: "Eine der beiden Banken gibt es nicht mehr."
-        case .sameConnection: "Das ist zweimal dieselbe Bank."
-        case .differentBanks: "Die beiden Verbindungen gehören zu verschiedenen Banken."
+        case .unknownConnection: String(localized: "Eine der beiden Banken gibt es nicht mehr.")
+        case .sameConnection: String(localized: "Das ist zweimal dieselbe Bank.")
+        case .differentBanks: String(localized: "Die beiden Verbindungen gehören zu verschiedenen Banken.")
         }
     }
 }
@@ -237,7 +237,7 @@ private struct ErrorText: View {
 
 /// One count; `attention` adds a symbol (not colour alone) and "bitte prüfen" for VoiceOver.
 private struct CountRow: View {
-    let label: String
+    let label: LocalizedStringKey
     let value: Int
     var attention = false
 
@@ -253,7 +253,7 @@ private struct CountRow: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
-        .accessibilityValue(attention ? "\(value), bitte prüfen" : "\(value)")
+        .accessibilityValue(attention ? String(localized: "\(value), bitte prüfen") : String(value))
     }
 }
 
@@ -284,6 +284,6 @@ private struct TransactionLine: View {
     }
 
     private var amount: String {
-        model.hideAmounts ? "Betrag ausgeblendet" : Money.format(transaction.amountCents, currency: transaction.currency, signed: true)
+        model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(transaction.amountCents, currency: transaction.currency, signed: true)
     }
 }

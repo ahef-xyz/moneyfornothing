@@ -5,6 +5,9 @@ public struct CategoryInfo: Hashable, Sendable, Identifiable {
     public let id: CategoryID
     /// German title shown in the UI.
     public let title: String
+    /// Title in the user's language. `title` stays German (stable key for CSV round trips and
+    /// matching); the database stores only `id`, so display code should use this.
+    public var localizedTitle: String { CategoryCatalog.localizedTitle(id) }
     public let group: Group
     /// SF Symbol name.
     public let symbol: String
@@ -13,6 +16,13 @@ public struct CategoryInfo: Hashable, Sendable, Identifiable {
 
     public enum Group: String, CaseIterable, Hashable, Sendable {
         case einnahmen, wohnen, lebenshaltung, mobilitaet, freizeit, einkaufen, gesundheit, familie, finanzen, sonstiges
+
+        /// Group title in the user's language (see `title`).
+        public var localizedTitle: String { Self.localizedTitles[self] ?? title }
+
+        private static let localizedTitles: [Group: String] = Dictionary(uniqueKeysWithValues: allCases.map {
+            ($0, String(localized: String.LocalizationValue($0.title), bundle: .module))
+        })
 
         public var title: String {
             switch self {
@@ -86,6 +96,16 @@ public enum CategoryCatalog {
 
     /// Title for any ID, also unknown ones (from an older catalog).
     public static func title(_ id: CategoryID) -> String { byID[id]?.title ?? id.rawValue }
+
+    /// Display title for any ID in the user's language; built-in categories are looked up in the
+    /// catalog, unknown IDs fall back to the ID itself. Nothing is stored translated.
+    public static func localizedTitle(_ id: CategoryID) -> String {
+        localizedTitles[id] ?? id.rawValue
+    }
+
+    private static let localizedTitles: [CategoryID: String] = Dictionary(uniqueKeysWithValues: all.map {
+        ($0.id, String(localized: String.LocalizationValue($0.title), bundle: .module))
+    })
 
     private static func c(_ id: String, _ title: String, _ group: CategoryInfo.Group, _ symbol: String, income: Bool = false) -> CategoryInfo {
         CategoryInfo(id: CategoryID(id), title: title, group: group, symbol: symbol, isIncome: income)

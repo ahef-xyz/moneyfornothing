@@ -30,7 +30,7 @@ actor TRSession {
         url: URL(string: "https://app.traderepublic.com/login") ?? URL(fileURLWithPath: "/"),
         completion: .cookiesPresent([sessionCookieName]),
         cookieDomains: [cookieDomain],
-        message: "Bitte bei Trade Republic anmelden und die Anmeldung in der Trade-Republic-App bestätigen.",
+        message: String(localized: "Bitte bei Trade Republic anmelden und die Anmeldung in der Trade-Republic-App bestätigen.", bundle: .module),
         // v4: headless with the stored phone number + PIN (see `TRLoginScript`).
         automation: TRLoginScript.automation
     ))

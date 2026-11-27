@@ -42,7 +42,7 @@ public struct CSVDocument: Sendable, Hashable {
     public var columnNames: [String] {
         let header = headerRow.map { table.rows[$0] } ?? []
         return (0..<columnCount).map { index in
-            index < header.count && !header[index].isEmpty ? header[index] : "Spalte \(index + 1)"
+            index < header.count && !header[index].isEmpty ? header[index] : String(localized: "Spalte \(index + 1)", bundle: .module)
         }
     }
 
@@ -236,11 +236,11 @@ public struct CSVSkippedRow: Sendable, Hashable {
 
         public var title: String {
             switch self {
-            case .unreadableDate: "Datum nicht lesbar"
-            case .unreadableAmount: "Betrag nicht lesbar"
-            case .notBooked: "noch nicht gebucht"
-            case .cancelled: "storniert"
-            case .otherAccount: "anderes Konto"
+            case .unreadableDate: String(localized: "Datum nicht lesbar", bundle: .module)
+            case .unreadableAmount: String(localized: "Betrag nicht lesbar", bundle: .module)
+            case .notBooked: String(localized: "noch nicht gebucht", bundle: .module)
+            case .cancelled: String(localized: "storniert", bundle: .module)
+            case .otherAccount: String(localized: "anderes Konto", bundle: .module)
             }
         }
 

@@ -191,9 +191,9 @@ struct CSVPreviewRow: Identifiable, Sendable {
 
         var title: String {
             switch self {
-            case .new: "Neu"
-            case .duplicate: "Vorhanden"
-            case .likelyDuplicate: "Wohl vorhanden"
+            case .new: String(localized: "Neu")
+            case .duplicate: String(localized: "Vorhanden")
+            case .likelyDuplicate: String(localized: "Wohl vorhanden")
             }
         }
     }
@@ -226,8 +226,8 @@ extension AppModel {
         panel.allowedContentTypes = [.commaSeparatedText, .tabSeparatedText, .plainText, .text]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
-        panel.message = "Wähle die CSV-Datei mit den Umsätzen aus dem Online-Banking."
-        panel.prompt = "Auswählen"
+        panel.message = String(localized: "Wähle die CSV-Datei mit den Umsätzen aus dem Online-Banking.")
+        panel.prompt = String(localized: "Auswählen")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         // Locked while the panel was open.
         guard canImportCSV else { return }
@@ -274,10 +274,10 @@ extension AppModel {
             data = try handle.read(upToCount: maxCSVImportBytes + 1) ?? Data()
         } catch {
             Log.logger("import").error("CSV-Datei nicht gelesen: \(String(describing: type(of: error)), privacy: .public)")
-            return .failure(CSVOpenFailure(message: "Die Datei konnte nicht gelesen werden."))
+            return .failure(CSVOpenFailure(message: String(localized: "Die Datei konnte nicht gelesen werden.")))
         }
         guard data.count <= maxCSVImportBytes else {
-            return .failure(CSVOpenFailure(message: "Die Datei ist zu groß (mehr als 50 MB)."))
+            return .failure(CSVOpenFailure(message: String(localized: "Die Datei ist zu groß (mehr als 50 MB).")))
         }
         do {
             return .success((data, try CSVDocument(data: data)))

@@ -183,8 +183,8 @@ struct MenuBarPanel: View {
                 Image(systemName: model.hideAmounts ? "eye" : "eye.slash")
             }
             .disabled(model.lock.isLocked)
-            .help(model.hideAmounts ? "Beträge einblenden (⇧⌘H)" : "Beträge ausblenden (⇧⌘H)")
-            .accessibilityLabel(model.hideAmounts ? "Beträge einblenden" : "Beträge ausblenden")
+            .help(model.hideAmounts ? String(localized: "Beträge einblenden (⇧⌘H)") : String(localized: "Beträge ausblenden (⇧⌘H)"))
+            .accessibilityLabel(model.hideAmounts ? String(localized: "Beträge einblenden") : String(localized: "Beträge ausblenden"))
             // Without a Dock icon there is no app menu: Settings must be reachable from here.
             SettingsLink {
                 Image(systemName: "gearshape")
@@ -229,7 +229,7 @@ private struct RowIcon: View {
 
 private struct SectionTitle: View {
     let text: String
-    init(_ text: String) { self.text = text }
+    init(_ text: LocalizedStringResource) { self.text = String(localized: text) }
 
     var body: some View {
         Text(text.uppercased())

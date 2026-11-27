@@ -63,7 +63,7 @@ struct ManualAccountDraft: Equatable {
 
     private var validated: Result<ManualAccountFields, Problem> {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedName.isEmpty else { return .failure(Problem(message: "Name fehlt.")) }
+        guard !trimmedName.isEmpty else { return .failure(Problem(message: String(localized: "Name fehlt."))) }
         var iban: String?
         if let normalized = ManualAccount.normalizedIBAN(self.iban) {
             if let problem = ManualAccount.validate(iban: normalized) { return .failure(Problem(message: problem.message)) }
@@ -72,7 +72,7 @@ struct ManualAccountDraft: Equatable {
         var opening: OpeningBalance?
         if !openingAmount.trimmingCharacters(in: .whitespaces).isEmpty {
             guard let cents = CSVValues.cents(openingAmount) else {
-                return .failure(Problem(message: "Der Startsaldo ist kein Betrag, z. B. 1.234,56 oder -50,00."))
+                return .failure(Problem(message: String(localized: "Der Startsaldo ist kein Betrag, z. B. 1.234,56 oder -50,00.")))
             }
             opening = OpeningBalance(cents: cents, day: usesOpeningDate ? Self.bankDay(picked: openingDate) : nil)
         }
@@ -100,10 +100,10 @@ struct ManualAccountDraft: Equatable {
 
     static func title(_ type: AccountType) -> String {
         switch type {
-        case .giro: "Girokonto"
-        case .tagesgeld: "Tagesgeld"
-        case .card: "Kreditkarte"
-        case .depot: "Depot"
+        case .giro: String(localized: "Girokonto")
+        case .tagesgeld: String(localized: "Tagesgeld")
+        case .card: String(localized: "Kreditkarte")
+        case .depot: String(localized: "Depot")
         }
     }
 }

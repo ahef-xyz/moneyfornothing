@@ -64,11 +64,13 @@ import Testing
     }
 
     @Test func everyBankHasAnHTTPSHomepage() {
-        for connector in ConnectorID.allCases where connector != .mock && connector != .manual {
+        for connector in ConnectorID.allCases where connector != .mock && connector != .manual && connector != .yaxi {
             #expect(BankIconStore.homepage(for: connector)?.scheme == "https")
         }
         #expect(BankIconStore.homepage(for: .mock) == nil)
         // v10: an account without a bank connection has no favicon.
         #expect(BankIconStore.homepage(for: .manual) == nil)
+        // v12: YAXI reaches many banks; no single homepage, no extra host.
+        #expect(BankIconStore.homepage(for: .yaxi) == nil)
     }
 }

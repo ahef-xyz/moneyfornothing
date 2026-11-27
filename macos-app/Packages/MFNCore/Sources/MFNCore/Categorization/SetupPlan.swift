@@ -206,7 +206,10 @@ struct SetupPlanBuilder: Sendable {
         if case let .counterpartIBAN(iban) = match,
            let id = context.ownAccountsByIBAN[iban],
            let account = snapshot.accounts.first(where: { $0.id == id }) {
-            return "\(account.type == .card ? "Kreditkarte" : "Eigenes Konto"): \(snapshot.displayName(of: account))"
+            let name = snapshot.displayName(of: account)
+            return account.type == .card
+                ? String(localized: "Kreditkarte: \(name)", bundle: .module)
+                : String(localized: "Eigenes Konto: \(name)", bundle: .module)
         }
         return Self.title(transaction, match)
     }

@@ -49,9 +49,9 @@ struct CredentialForm: View {
     static func problem(_ values: [String: String], fields: [CredentialField]) -> String? {
         for field in fields {
             let value = values[field.key] ?? ""
-            if value.isEmpty { return "\(field.label) fehlt." }
-            if field.isNumeric, !value.allSatisfy(\.isNumber) { return "\(field.label): nur Ziffern." }
-            if let length = field.length, value.count != length { return "\(field.label): genau \(length) Zeichen." }
+            if value.isEmpty { return String(localized: "\(field.label) fehlt.") }
+            if field.isNumeric, !value.allSatisfy(\.isNumber) { return String(localized: "\(field.label): nur Ziffern.") }
+            if let length = field.length, value.count != length { return String(localized: "\(field.label): genau \(length) Zeichen.") }
         }
         return nil
     }

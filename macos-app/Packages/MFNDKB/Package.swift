@@ -4,6 +4,7 @@ import PackageDescription
 // DKB connector via the web-banking JSON API behind banking.dkb.de (until FinTS is registered).
 let package = Package(
     name: "MFNDKB",
+    defaultLocalization: "de",
     platforms: [.macOS(.v26)],
     products: [
         .library(name: "MFNDKB", targets: ["MFNDKB"]),
@@ -14,7 +15,7 @@ let package = Package(
         .package(path: "../MFNConformance"),
     ],
     targets: [
-        .target(name: "MFNDKB", dependencies: [.product(name: "MFNCore", package: "MFNCore"), .product(name: "MFNScrape", package: "MFNScrape")]),
+        .target(name: "MFNDKB", dependencies: [.product(name: "MFNCore", package: "MFNCore"), .product(name: "MFNScrape", package: "MFNScrape")], resources: [.process("Resources")]),
         .testTarget(
             name: "MFNDKBTests",
             dependencies: [

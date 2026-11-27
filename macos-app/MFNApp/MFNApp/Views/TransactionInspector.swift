@@ -40,7 +40,7 @@ private struct TransactionDetails: View {
                 if let person = model.initiators[transaction.id] {
                     LabeledContent("Ausgeführt von") {
                         Label(person.name, systemImage: "person")
-                            .help(person.id.map { "ID bei der Bank: \($0)" } ?? person.name)
+                            .help(person.id.map { String(localized: "ID bei der Bank: \($0)") } ?? person.name)
                     }
                 }
                 if let account = model.account(transaction.accountID),
@@ -187,7 +187,7 @@ private struct ImportSourceRows: View {
     let importID: ImportBatchID
     @Environment(AppModel.self) private var model
 
-    private static let dateStyle = Date.FormatStyle(date: .numeric, time: .shortened, locale: Locale(identifier: "de_DE"))
+    private static let dateStyle = Date.FormatStyle(date: .numeric, time: .shortened, locale: Locale.autoupdatingCurrent)
 
     var body: some View {
         let batch = model.snapshot.importBatch(importID)
@@ -256,7 +256,7 @@ private struct Hero: View {
 
     private var subtitle: String? {
         // ⇧⌘H hides the original amount as well.
-        model.foreignAmountText(of: transaction).map { "ursprünglich \($0)" }
+        model.foreignAmountText(of: transaction).map { String(localized: "ursprünglich \($0)") }
     }
 }
 
@@ -301,7 +301,7 @@ private struct ConfidenceGauge: View {
             Gauge(value: confidence, in: 0...1) { EmptyView() }
                 .gaugeStyle(.linearCapacity)
                 .tint(confidence < Categorizer.reviewThreshold ? Color.accentColor : Color.secondary)
-            Text(confidence.formatted(.number.precision(.fractionLength(2)).locale(Locale(identifier: "de_DE"))))
+            Text(confidence.formatted(.number.precision(.fractionLength(2)).locale(Locale.autoupdatingCurrent)))
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
         }
@@ -310,7 +310,7 @@ private struct ConfidenceGauge: View {
 }
 
 struct CopyableRow: View {
-    let label: String
+    let label: LocalizedStringKey
     let value: String
     var copyValue: String?
     var monospaced = false
@@ -330,8 +330,8 @@ struct CopyableRow: View {
                 }
                 .buttonStyle(.borderless)
                 .foregroundStyle(.secondary)
-                .help("\(label) kopieren")
-                .accessibilityLabel("\(label) kopieren")
+                .help(Text("\(Text(label)) kopieren"))
+                .accessibilityLabel(Text("\(Text(label)) kopieren"))
             }
         }
     }
@@ -431,7 +431,7 @@ private struct MultiSelectionSummary: View {
 }
 
 enum InspectorFormat {
-    private static let style = Date.FormatStyle(locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone)
+    private static let style = Date.FormatStyle(locale: Locale.autoupdatingCurrent, timeZone: BankDay.bankTimeZone)
 
     /// "Mo., 9. Nov. 2026"
     static func date(_ day: BankDay) -> String {

@@ -1,3 +1,5 @@
+import MFNScrape
+
 /// Headless login for `banking.dkb.de/login` (protocol v4, `WebLoginAutomation`).
 ///
 /// Form, not `fetch`: the login needs a Friendly Captcha token (proof of work in the page, `eu.frcapi.com`), a
@@ -33,19 +35,20 @@
 /// `focus()` in the hidden web view starts the captcha, the method chooser markup, and whether a declined push
 /// reloads the page or only re-renders the form.
 enum DKBLoginScript {
-    static let confirmMessage = "Bitte in der DKB-App bestätigen."
-    static let captchaMessage = "Sicherheitsprüfung der DKB läuft …"
-    static let doneMessage = "Anmeldung bei der DKB abgeschlossen …"
-    static let captchaClickMessage = "Die DKB möchte eine Bestätigung: „Bankseite anzeigen“ und „Ich bin ein Mensch“ anklicken."
+    static let confirmMessage = String(localized: "Bitte in der DKB-App bestätigen.", bundle: .module)
+    static let captchaMessage = String(localized: "Sicherheitsprüfung der DKB läuft …", bundle: .module)
+    static let doneMessage = String(localized: "Anmeldung bei der DKB abgeschlossen …", bundle: .module)
+    static let captchaClickMessage = String(localized: "Die DKB möchte eine Bestätigung: „Bankseite anzeigen“ und „Ich bin ein Mensch“ anklicken.", bundle: .module)
+    static let loginMessage = String(localized: "Anmeldung bei der DKB …", bundle: .module)
     static let submittedMarker = "mfn-dkb-submitted"
     /// The only host the script fills the form on (`DKBEndpoints.production`).
     static let loginHost = "banking.dkb.de"
 
     static let source = #"""
-        const CONFIRM = "Bitte in der DKB-App bestätigen.";
-        const CAPTCHA_STATUS = "Sicherheitsprüfung der DKB läuft …";
-        const DONE = "Anmeldung bei der DKB abgeschlossen …";
-        const CAPTCHA_CLICK = "\#(captchaClickMessage)";
+        const CONFIRM = \#(JavaScriptLiteral.string(confirmMessage));
+        const CAPTCHA_STATUS = \#(JavaScriptLiteral.string(captchaMessage));
+        const DONE = \#(JavaScriptLiteral.string(doneMessage));
+        const CAPTCHA_CLICK = \#(JavaScriptLiteral.string(captchaClickMessage));
         const MARKER = "mfn-dkb-submitted";
         const LOGIN_HOST = "\#(loginHost)";
         // UNVERIFIED: fallbacks after the first entry are guesses.
@@ -239,7 +242,7 @@ enum DKBLoginScript {
           current = { phase: "submitted" };
           markSubmitted();
           enabled.click();
-          mfn.status("Anmeldung bei der DKB …");
+          mfn.status(\#(JavaScriptLiteral.string(loginMessage)));
         }
 
         // Single page app: watch until an error shows, the approval completes (the app closes the web view) or time is up.

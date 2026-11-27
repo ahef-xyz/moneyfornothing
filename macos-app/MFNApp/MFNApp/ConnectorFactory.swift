@@ -5,13 +5,14 @@ import MFNEasybank
 import MFNN26
 import MFNPayPal
 import MFNTradeRepublic
+import MFNYAXI
 
 /// `ConnectorID` → connector of this build. The only place the app names connector packages.
 enum ConnectorFactory {
     /// `nil` for banks without a connector in the app yet.
     static func make(_ connection: Connection, presenter: any AuthChallengePresenter) -> (any BankConnector)? {
         // FinTS connections (developer mode, see `BankAccess`) read their credentials per call.
-        if BankAccess.of(connection).isFinTS {
+        if BankAccess.isFinTS(connection) {
             guard BankAccess.fintsBanks.contains(connection.connectorID) else { return nil }
             return FinTSConnection(connection: connection, presenter: presenter)
         }
@@ -29,6 +30,11 @@ enum ConnectorFactory {
         case .mock: nil
         // v10: accounts without a bank connection never get a connector (no sync).
         case .manual: nil
+        // v12: any bank through YAXI with the user's own key. The bank login (Keychain) is only
+        // read when the bank needs a new consent.
+        case .yaxi: YAXIConnector(connectionID: connection.id, presenter: presenter) { [id = connection.id] in
+            YAXISetup.bank(of: id)?.login(from: try CredentialStore().credentials(for: id))
+        }
         }
         return connector
     }

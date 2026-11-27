@@ -33,7 +33,8 @@ public enum AuthChallenge: Hashable, Codable, Sendable {
     /// `.confirmed` once the user says they approved, or the connector cancels the presentation
     /// itself after a successful poll.
     case decoupled(message: String, pollInterval: TimeInterval)
-    /// Enter a code (Trade Republic 2FA, chipTAN).
+    /// Enter a code (Trade Republic 2FA, chipTAN). v12: `length` 0 = any length (YAXI does not
+    /// always know it).
     case code(prompt: String, length: Int)
     /// Confirm a push notification on the phone (C24, easybank).
     case pushConfirm(message: String)
@@ -41,6 +42,51 @@ public enum AuthChallenge: Hashable, Codable, Sendable {
     /// `request.completion` and returns `.webSession` with the cookies of `request.cookieDomains`
     /// plus one pseudo-cookie per found `request.storageKeys` entry.
     case webLogin(WebLoginRequest)
+    /// v12: pick one of the bank's options (TAN method, account). The presenter answers
+    /// `.code(<option key>)`; the key must be one of `options`.
+    case choice(prompt: String, options: [AuthOption])
+    /// v12: enter a code read off an image (photoTAN, chipTAN optic as animated GIF). `length` 0 =
+    /// any length. The presenter answers `.code`.
+    case imageCode(prompt: String, length: Int, image: AuthImage)
+    /// v12: enter a secret the bank asks for in a dialog (PIN, password), shown masked. `length` 0 =
+    /// any length. The presenter answers `.code`.
+    case secret(prompt: String, length: Int)
+}
+
+/// v12: one option of `AuthChallenge.choice`. Texts come from the bank: shown as plain text only.
+public struct AuthOption: Hashable, Codable, Sendable, Identifiable {
+    public var key: String
+    public var label: String
+    public var detail: String?
+
+    public var id: String { key }
+
+    public init(key: String, label: String, detail: String? = nil) {
+        self.key = key
+        self.label = label
+        self.detail = detail
+    }
+}
+
+/// v12: the image of `AuthChallenge.imageCode`. Bytes from the bank, decoded by the system image
+/// frameworks only (PNG, JPEG, GIF), never interpreted otherwise.
+public struct AuthImage: Hashable, Codable, Sendable, CustomStringConvertible {
+    /// Largest image the app shows (a photoTAN is a few kB, a chipTAN GIF well below this).
+    public static let maximumBytes = 2_000_000
+
+    public var mimeType: String
+    public var data: Data
+    /// Width on screen in millimetres when it matters (chipTAN optic: 62.5 mm so the TAN generator
+    /// can read it), `nil` = natural size.
+    public var physicalWidthMM: Double?
+
+    public init(mimeType: String, data: Data, physicalWidthMM: Double? = nil) {
+        self.mimeType = mimeType
+        self.data = data
+        self.physicalWidthMM = physicalWidthMM
+    }
+
+    public var description: String { "AuthImage(\(mimeType), \(data.count) bytes)" }
 }
 
 /// What the app needs to run a web login for a scraping connector.
@@ -236,15 +282,32 @@ public enum ConnectorError: Error, Hashable, Codable, Sendable, CustomStringConv
 
     public var description: String {
         switch self {
-        case .authRequired: "Freigabe erforderlich"
-        case .authFailed: "Anmeldung fehlgeschlagen"
-        case .sessionExpired: "Sitzung abgelaufen"
-        case let .rateLimited(retryAfter): "Zu viele Anfragen, erneut in \(Int(retryAfter)) s"
-        case .bankUnavailable: "Bank nicht erreichbar"
-        case let .formatChanged(detail): "Antwortformat geändert: \(detail)"
-        case .unsupportedAccount: "Konto wird nicht unterstützt"
-        case .cancelled: "Abgebrochen"
+        case .authRequired: String(localized: "Freigabe erforderlich", bundle: .module)
+        case .authFailed: String(localized: "Anmeldung fehlgeschlagen", bundle: .module)
+        case .sessionExpired: String(localized: "Sitzung abgelaufen", bundle: .module)
+        case let .rateLimited(retryAfter): Self.rateLimitedText(retryAfter: retryAfter)
+        case .bankUnavailable: String(localized: "Bank nicht erreichbar", bundle: .module)
+        case let .formatChanged(detail): String(localized: "Antwortformat geändert: \(detail)", bundle: .module)
+        case .unsupportedAccount: String(localized: "Konto wird nicht unterstützt", bundle: .module)
+        case .cancelled: String(localized: "Abgebrochen", bundle: .module)
         }
+    }
+
+    /// Short waits in seconds or minutes, long ones (quota pauses) as a time of day or a date.
+    static func rateLimitedText(retryAfter: TimeInterval, now: Date = Date()) -> String {
+        let seconds = max(0, Int(retryAfter))
+        if seconds < 120 {
+            return String(localized: "Zu viele Anfragen, erneut in \(seconds) s", bundle: .module)
+        }
+        if seconds < 3600 {
+            let minutes = (seconds + 59) / 60
+            return String(localized: "Zu viele Anfragen, erneut in \(minutes) min", bundle: .module)
+        }
+        let until = now.addingTimeInterval(retryAfter)
+        let text = seconds < 24 * 3600
+            ? until.formatted(Date.FormatStyle(date: .omitted, time: .shortened).locale(Locale.autoupdatingCurrent))
+            : until.formatted(Date.FormatStyle().day().month(.abbreviated).locale(Locale.autoupdatingCurrent))
+        return String(localized: "Zu viele Anfragen, erneut ab \(text)", bundle: .module)
     }
 
     /// Errors after which MFN must not retry automatically (risk of locking the bank login).

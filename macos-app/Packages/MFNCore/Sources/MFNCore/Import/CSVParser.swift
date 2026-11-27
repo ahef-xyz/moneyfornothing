@@ -10,7 +10,7 @@ public enum CSVEncoding: String, Sendable, Hashable, CaseIterable {
 
     public var displayName: String {
         switch self {
-        case .utf8BOM: "UTF-8 (mit BOM)"
+        case .utf8BOM: String(localized: "UTF-8 (mit BOM)", bundle: .module)
         case .utf8: "UTF-8"
         case .utf16: "UTF-16"
         case .windows1252: "Windows-1252 / ISO-8859-1"
@@ -25,9 +25,9 @@ public enum CSVDelimiter: String, Sendable, Hashable, CaseIterable {
 
     public var displayName: String {
         switch self {
-        case .semicolon: "Semikolon"
-        case .comma: "Komma"
-        case .tab: "Tabulator"
+        case .semicolon: String(localized: "Semikolon", bundle: .module)
+        case .comma: String(localized: "Komma", bundle: .module)
+        case .tab: String(localized: "Tabulator", bundle: .module)
         }
     }
 
@@ -66,10 +66,10 @@ public enum CSVImportError: Error, Sendable, Hashable {
 
     public var message: String {
         switch self {
-        case .empty: "Die Datei enthält keine Zeilen."
-        case .unknownEncoding: "Die Zeichenkodierung der Datei ist unbekannt."
-        case let .unclosedQuote(line): "Ein Anführungszeichen ab Zeile \(line) wird nicht geschlossen."
-        case .noHeader: "Keine Kopfzeile mit Datum und Betrag gefunden."
+        case .empty: String(localized: "Die Datei enthält keine Zeilen.", bundle: .module)
+        case .unknownEncoding: String(localized: "Die Zeichenkodierung der Datei ist unbekannt.", bundle: .module)
+        case let .unclosedQuote(line): String(localized: "Ein Anführungszeichen ab Zeile \(String(line)) wird nicht geschlossen.", bundle: .module)
+        case .noHeader: String(localized: "Keine Kopfzeile mit Datum und Betrag gefunden.", bundle: .module)
         }
     }
 }

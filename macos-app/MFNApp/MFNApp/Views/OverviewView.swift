@@ -14,9 +14,11 @@ struct OverviewView: View {
     @FocusState private var focus: OverviewFocus?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private static let chartColumns = [GridItem(.adaptive(minimum: 380), spacing: 16, alignment: .top)]
-    private static let bankColumns = [GridItem(.adaptive(minimum: 340), spacing: 16, alignment: .top)]
-    private static let figureColumns = [GridItem(.adaptive(minimum: 190), spacing: 16, alignment: .top)]
+    // Not `LazyVGrid`: with many accounts arriving at once (C24, 7 accounts) while a sheet closes,
+    // the lazy placement looped on the main thread for minutes. The grids hold a few boxes only.
+    private static let chartColumns = AdaptiveColumns(minimum: 380, spacing: 16)
+    private static let bankColumns = AdaptiveColumns(minimum: 340, spacing: 16)
+    private static let figureColumns = AdaptiveColumns(minimum: 190, spacing: 16)
 
     private var hidden: Set<OverviewSection> { OverviewSection.decode(hiddenRaw) }
 
@@ -31,7 +33,7 @@ struct OverviewView: View {
                 } actions: {
                     Button("Bank hinzufügen …") { model.showBankSetup() }
                         .disabled(!model.canAddBank)
-                        .help(model.isDemo ? "In der Demo nicht verfügbar" : "Bank hinzufügen (⇧⌘N)")
+                        .help(model.isDemo ? String(localized: "In der Demo nicht verfügbar") : String(localized: "Bank hinzufügen (⇧⌘N)"))
                 }
             } else if hidden.count == OverviewSection.allCases.count {
                 ContentUnavailableView {
@@ -55,7 +57,7 @@ struct OverviewView: View {
                             KeyFigures(data: data, columns: Self.figureColumns, focus: $focus, hide: hide)
                         }
                         if shows(.flows) || shows(.spending) {
-                            LazyVGrid(columns: Self.chartColumns, alignment: .leading, spacing: 16) {
+                            Self.chartColumns {
                                 if shows(.flows) {
                                     DashboardBox(.flows, subtitle: "Letzte 6 Monate, ohne Umbuchungen zwischen eigenen Konten", hide: hide) {
                                         FlowChart(months: data.flows)
@@ -69,7 +71,7 @@ struct OverviewView: View {
                             }
                         }
                         if shows(.accounts) {
-                            LazyVGrid(columns: Self.bankColumns, alignment: .leading, spacing: 16) {
+                            Self.bankColumns {
                                 ForEach(connections) { connection in
                                     BankOverviewSection(connection: connection, focus: $focus, hide: hide)
                                 }
@@ -209,7 +211,9 @@ struct OverviewView: View {
 
     private func subtitle(_ connections: [Connection]) -> String {
         let accounts = model.snapshot.accounts.count
-        return "\(connections.count) \(connections.count == 1 ? "Bank" : "Banken") · \(accounts) \(accounts == 1 ? "Konto" : "Konten")"
+        let banks = connections.count == 1 ? String(localized: "1 Bank") : String(localized: "\(connections.count) Banken")
+        let accountsText = accounts == 1 ? String(localized: "1 Konto") : String(localized: "\(accounts) Konten")
+        return "\(banks) · \(accountsText)"
     }
 }
 
@@ -225,12 +229,12 @@ enum OverviewSection: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .balance: "Gesamtsaldo"
-        case .figures: "Kennzahlen"
-        case .flows: "Einnahmen und Ausgaben"
-        case .spending: "Ausgaben nach Bereich"
-        case .accounts: "Banken und Konten"
-        case .latest: "Neueste Umsätze"
+        case .balance: String(localized: "Gesamtsaldo")
+        case .figures: String(localized: "Kennzahlen")
+        case .flows: String(localized: "Einnahmen und Ausgaben")
+        case .spending: String(localized: "Ausgaben nach Bereich")
+        case .accounts: String(localized: "Banken und Konten")
+        case .latest: String(localized: "Neueste Umsätze")
         }
     }
 
@@ -259,13 +263,13 @@ enum OverviewSection: String, CaseIterable, Identifiable {
 private struct DashboardBox<Accessory: View, Content: View>: View {
     let title: String?
     let symbol: String?
-    let subtitle: String?
+    let subtitle: LocalizedStringKey?
     let section: OverviewSection?
     let hide: ((OverviewSection) -> Void)?
     let accessory: Accessory
     let content: Content
 
-    init(_ section: OverviewSection, subtitle: String? = nil, hide: @escaping (OverviewSection) -> Void,
+    init(_ section: OverviewSection, subtitle: LocalizedStringKey? = nil, hide: @escaping (OverviewSection) -> Void,
          @ViewBuilder accessory: () -> Accessory = { EmptyView() }, @ViewBuilder content: () -> Content) {
         title = section == .balance ? nil : section.title
         symbol = section.symbol
@@ -410,10 +414,10 @@ private struct OverviewData {
 
         let sorted = groups.filter { $0.value > 0 }.sorted { $0.value > $1.value }
         var top = sorted.prefix(Self.spendingGroups - 1).map { entry in
-            GroupSpending(title: entry.key?.title ?? "Ohne Kategorie", symbol: entry.key.map(Self.symbol) ?? "questionmark.circle", cents: entry.value)
+            GroupSpending(title: entry.key?.localizedTitle ?? String(localized: "Ohne Kategorie"), symbol: entry.key.map(Self.symbol) ?? "questionmark.circle", cents: entry.value)
         }
         let rest = sorted.dropFirst(Self.spendingGroups - 1).reduce(0) { $0 + $1.value }
-        if rest > 0 { top.append(GroupSpending(title: "Übrige", symbol: "ellipsis.circle", cents: rest)) }
+        if rest > 0 { top.append(GroupSpending(title: String(localized: "Übrige"), symbol: "ellipsis.circle", cents: rest)) }
         spending = top
 
         latest = Array(model.latestOverall.filter { visible.contains($0.accountID) }.prefix(8))
@@ -446,7 +450,7 @@ private struct OverviewData {
 
 /// Compact euro labels for chart axes ("12 Tsd. €").
 private enum ChartFormat {
-    static let locale = Locale(identifier: "de_DE")
+    static let locale = Locale.autoupdatingCurrent
 
     static func axis(_ euros: Double) -> String {
         Int(euros.rounded()).formatted(.number.notation(.compactName).locale(locale)) + " €"
@@ -482,7 +486,7 @@ private struct OverviewHero: View {
                     .foregroundStyle(.secondary)
                 AmountText(cents: data.totalCents, colorsInflow: false)
                     .font(.system(.largeTitle, design: .default).weight(.semibold))
-                    .accessibilityLabel(model.hideAmounts ? "Gesamtsaldo, Betrag ausgeblendet" : "Gesamtsaldo \(Money.format(data.totalCents))")
+                    .accessibilityLabel(model.hideAmounts ? String(localized: "Gesamtsaldo, Betrag ausgeblendet") : String(localized: "Gesamtsaldo \(Money.format(data.totalCents))"))
                 HStack(spacing: 4) {
                     // The direction alone would tell what hidden amounts hide.
                     if !model.hideAmounts {
@@ -522,7 +526,7 @@ private struct BalanceChart: View {
 
     var body: some View {
         if model.hideAmounts {
-            HiddenChart(title: "Saldo der letzten 12 Monate")
+            HiddenChart(title: String(localized: "Saldo der letzten 12 Monate"))
         } else {
             Chart {
                 ForEach(points) { point in
@@ -538,7 +542,7 @@ private struct BalanceChart: View {
                     RuleMark(x: .value("Monat", point.month, unit: .month))
                         .foregroundStyle(Color.secondary.opacity(0.4))
                         .annotation(position: .top, overflowResolution: .init(x: .fit, y: .disabled)) {
-                            ChartTooltip(title: Self.pointTitle(point, last: point.id == points.last?.id), lines: [("Saldo", point.cents)])
+                            ChartTooltip(title: Self.pointTitle(point, last: point.id == points.last?.id), lines: [(String(localized: "Saldo"), point.cents)])
                         }
                     PointMark(x: .value("Monat", point.month, unit: .month), y: .value("Saldo", Double(point.cents) / 100))
                         .symbolSize(60)
@@ -566,12 +570,12 @@ private struct BalanceChart: View {
 
     private var summary: String {
         guard let first = points.first, let last = points.last else { return "" }
-        return "von \(Money.format(first.cents)) Ende \(first.month.formatted(ChartFormat.monthLong)) auf \(Money.format(last.cents)) heute"
+        return String(localized: "von \(Money.format(first.cents)) Ende \(first.month.formatted(ChartFormat.monthLong)) auf \(Money.format(last.cents)) heute")
     }
 
     /// Each point is the balance at the end of its month (plotted at the month's start); the last is today.
     private static func pointTitle(_ point: OverviewData.BalancePoint, last: Bool) -> String {
-        last ? "Heute" : "Ende \(point.month.formatted(ChartFormat.monthLong))"
+        last ? String(localized: "Heute") : String(localized: "Ende \(point.month.formatted(ChartFormat.monthLong))")
     }
 }
 
@@ -622,26 +626,26 @@ private struct ChartTooltip: View {
 /// review. Income is green (the only place for green, CLAUDE.md §6), the review count accent.
 private struct KeyFigures: View {
     let data: OverviewData
-    let columns: [GridItem]
+    let columns: AdaptiveColumns
     let focus: FocusState<OverviewFocus?>.Binding
     let hide: (OverviewSection) -> Void
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
-            tile("Einnahmen im \(monthName)", symbol: "arrow.down.left") {
+        columns {
+            tile(String(localized: "Einnahmen im \(monthName)"), symbol: "arrow.down.left") {
                 AmountText(cents: data.thisMonth?.income ?? 0)
             }
-            tile("Ausgaben im \(monthName)", symbol: "arrow.up.right") {
+            tile(String(localized: "Ausgaben im \(monthName)"), symbol: "arrow.up.right") {
                 AmountText(cents: -(data.thisMonth?.spending ?? 0), colorsInflow: false)
             }
-            tile(model.pendingCount == 1 ? "1 vorgemerkter Umsatz" : "\(model.pendingCount) vorgemerkte Umsätze", symbol: "clock", opens: true) {
+            tile(model.pendingCount == 1 ? String(localized: "1 vorgemerkter Umsatz") : String(localized: "\(model.pendingCount) vorgemerkte Umsätze"), symbol: "clock", opens: true) {
                 AmountText(cents: model.pendingTotalCents, colorsInflow: false)
             }
             .overviewTarget(.pending, focus: focus, cornerRadius: 12, highlight: false) { model.selection = .pending }
             .help("Vorgemerkte anzeigen (⌘2)")
-            tile("Zu prüfen", symbol: "checklist", opens: true) {
-                Text(model.reviewCount == 0 ? "Nichts" : "\(model.reviewCount)")
+            tile(String(localized: "Zu prüfen"), symbol: "checklist", opens: true) {
+                Text(model.reviewCount == 0 ? String(localized: "Nichts") : "\(model.reviewCount)")
                     .monospacedDigit()
                     .foregroundStyle(model.reviewCount == 0 ? AnyShapeStyle(.secondary) : AnyShapeStyle(Color.accentColor))
             }
@@ -651,7 +655,7 @@ private struct KeyFigures: View {
             let planned = model.plannedOverview
             if let next = planned.next, let account = model.account(next.accountID) {
                 // Short enough for one line: a wrapped title made this tile taller than the others.
-                tile(planned.count == 1 ? "1 geplante Buchung" : "\(planned.count) geplante Buchungen", symbol: "calendar.badge.plus", opens: true) {
+                tile(planned.count == 1 ? String(localized: "1 geplante Buchung") : String(localized: "\(planned.count) geplante Buchungen"), symbol: "calendar.badge.plus", opens: true) {
                     // One line like the other tiles (same height); the next one is in the tooltip.
                     AmountText(cents: planned.cents, colorsInflow: false)
                 }
@@ -712,17 +716,17 @@ private struct FlowChart: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             if model.hideAmounts {
-                HiddenChart(title: "Einnahmen und Ausgaben").frame(height: 200)
+                HiddenChart(title: String(localized: "Einnahmen und Ausgaben")).frame(height: 200)
             } else {
                 Chart {
                     ForEach(months) { month in
                         BarMark(x: .value("Monat", month.month, unit: .month), y: .value("Betrag", Double(month.income) / 100))
-                            .position(by: .value("Art", "Einnahmen"))
-                            .foregroundStyle(by: .value("Art", "Einnahmen"))
+                            .position(by: .value("Art", String(localized: "Einnahmen")))
+                            .foregroundStyle(by: .value("Art", String(localized: "Einnahmen")))
                             .cornerRadius(4)
                         BarMark(x: .value("Monat", month.month, unit: .month), y: .value("Betrag", Double(month.spending) / 100))
-                            .position(by: .value("Art", "Ausgaben"))
-                            .foregroundStyle(by: .value("Art", "Ausgaben"))
+                            .position(by: .value("Art", String(localized: "Ausgaben")))
+                            .foregroundStyle(by: .value("Art", String(localized: "Ausgaben")))
                             .cornerRadius(4)
                     }
                     if let month = selectedMonth {
@@ -732,11 +736,11 @@ private struct FlowChart: View {
                             .zIndex(-1)
                             .annotation(position: .top, overflowResolution: .init(x: .fit, y: .disabled)) {
                                 ChartTooltip(title: month.month.formatted(ChartFormat.monthLong),
-                                             lines: [("Einnahmen", month.income), ("Ausgaben", -month.spending), ("Saldo", month.income - month.spending)])
+                                             lines: [(String(localized: "Einnahmen"), month.income), (String(localized: "Ausgaben"), -month.spending), (String(localized: "Saldo"), month.income - month.spending)])
                             }
                     }
                 }
-                .chartForegroundStyleScale(["Einnahmen": Color.green, "Ausgaben": Color.secondary.opacity(0.8)])
+                .chartForegroundStyleScale([String(localized: "Einnahmen"): Color.green, String(localized: "Ausgaben"): Color.secondary.opacity(0.8)])
                 .chartLegend(position: .top, alignment: .leading)
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .month)) { _ in
@@ -753,7 +757,7 @@ private struct FlowChart: View {
                 .frame(height: 200)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Einnahmen und Ausgaben der letzten 6 Monate")
-                .accessibilityValue(months.map { "\($0.month.formatted(ChartFormat.monthLong)): Einnahmen \(Money.format($0.income)), Ausgaben \(Money.format($0.spending))" }.joined(separator: "; "))
+                .accessibilityValue(months.map { String(localized: "\($0.month.formatted(ChartFormat.monthLong)): Einnahmen \(Money.format($0.income)), Ausgaben \(Money.format($0.spending))") }.joined(separator: "; "))
             }
         }
     }
@@ -767,7 +771,7 @@ private struct SpendingChart: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             if model.hideAmounts {
-                HiddenChart(title: "Ausgaben nach Bereich").frame(height: 200)
+                HiddenChart(title: String(localized: "Ausgaben nach Bereich")).frame(height: 200)
             } else if groups.isEmpty {
                 Text("Noch keine Ausgaben in diesem Monat.")
                     .font(.callout)
@@ -885,7 +889,7 @@ private struct BankOverviewHeader: View {
         guard let request = model.presenter.request(for: connection.id) else { return false }
         switch request.challenge {
         case .decoupled, .pushConfirm: return true
-        case .code, .webLogin: return false
+        case .code, .webLogin, .choice, .imageCode, .secret: return false
         }
     }
 
@@ -907,7 +911,7 @@ private struct BankOverviewHeader: View {
             Spacer(minLength: 12)
             AmountText(cents: model.totalBalanceCents(of: connection.id), colorsInflow: false)
                 .font(.headline)
-                .accessibilityLabel(model.hideAmounts ? "Summe \(connection.displayName), Betrag ausgeblendet" : "Summe \(connection.displayName): \(Money.format(model.totalBalanceCents(of: connection.id)))")
+                .accessibilityLabel(model.hideAmounts ? String(localized: "Summe \(connection.displayName), Betrag ausgeblendet") : String(localized: "Summe \(connection.displayName): \(Money.format(model.totalBalanceCents(of: connection.id)))"))
             action
         }
         // The state changes on its own: VoiceOver hears problems without looking for them.
@@ -920,9 +924,9 @@ private struct BankOverviewHeader: View {
 
     private static func announcement(_ phase: SyncState.Phase, bank: String) -> String? {
         switch phase {
-        case .waitingForApproval: "\(bank): Anmeldung nötig"
-        case let .failed(error): "\(bank): Fehler – \(error.description)"
-        case .storeFailed: "\(bank): Speichern fehlgeschlagen"
+        case .waitingForApproval: String(localized: "\(bank): Anmeldung nötig")
+        case let .failed(error): String(localized: "\(bank): Fehler – \(error.description)")
+        case .storeFailed: String(localized: "\(bank): Speichern fehlgeschlagen")
         case .idle, .syncing: nil
         }
     }
@@ -969,7 +973,7 @@ private struct BankOverviewHeader: View {
             .accessibilityElement(children: .combine)
         case .waitingForApproval:
             Label {
-                Text(hasOpenApproval ? "Anmeldung nötig – bitte in der \(connection.displayName)-App freigeben" : "Anmeldung nötig")
+                Text(hasOpenApproval ? String(localized: "Anmeldung nötig – bitte in der \(connection.displayName)-App freigeben") : String(localized: "Anmeldung nötig"))
             } icon: {
                 Image(systemName: "person.badge.key").foregroundStyle(.orange)
             }
@@ -1086,17 +1090,17 @@ private struct AccountOverviewRow: View {
         var parts = [account.name, detail]
         let newCount = model.newCount(of: account.id)
         if newCount > 0 { parts.append(NewCountBadge.text(newCount)) }
-        if !model.isCountedInTotals(account.id) { parts.append("nicht in der Summe") }
+        if !model.isCountedInTotals(account.id) { parts.append(String(localized: "nicht in der Summe")) }
         if let shortfall = model.shortfall(for: account.id) { parts.append(ShortfallFormat.short(shortfall)) }
         if let status = model.budgetStatus(for: account.id) {
-            parts.append("Budget \(Int((status.spentFraction * 100).rounded())) Prozent ausgegeben, \(BudgetRing.stateWord(status))")
+            parts.append(String(localized: "Budget \(Int((status.spentFraction * 100).rounded())) Prozent ausgegeben, \(BudgetRing.stateWord(status))"))
         }
         return parts.joined(separator: ", ")
     }
 
     private var balanceValue: String {
-        guard let balance = model.snapshot.balances[account.id] else { return "kein Saldo" }
-        return model.hideAmounts ? "Betrag ausgeblendet" : Money.format(balance.bookedCents, currency: balance.currency)
+        guard let balance = model.snapshot.balances[account.id] else { return String(localized: "kein Saldo") }
+        return model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(balance.bookedCents, currency: balance.currency)
     }
 }
 
@@ -1163,14 +1167,14 @@ private struct OverviewTransactionLine: View {
         .italic(isPending)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
-        .accessibilityValue(model.hideAmounts ? "Betrag ausgeblendet" : Money.format(transaction.amountCents, currency: transaction.currency, signed: true))
+        .accessibilityValue(model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(transaction.amountCents, currency: transaction.currency, signed: true))
         .accessibilityHint("Im Konto anzeigen")
     }
 
     private var label: String {
         var parts = [transaction.counterpartName]
-        if isPending { parts.append("vorgemerkt") }
-        if model.isNew(transaction.id) { parts.append("neu") }
+        if isPending { parts.append(String(localized: "vorgemerkt")) }
+        if model.isNew(transaction.id) { parts.append(String(localized: "neu")) }
         parts.append(Self.date(transaction.effectiveDate))
         if let accountName { parts.append(accountName) }
         // The purpose is otherwise only in the tooltip.
@@ -1179,7 +1183,7 @@ private struct OverviewTransactionLine: View {
         return parts.joined(separator: ", ")
     }
 
-    private static let dayMonth = Date.FormatStyle(locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone).day().month(.abbreviated)
+    private static let dayMonth = Date.FormatStyle(locale: Locale.autoupdatingCurrent, timeZone: BankDay.bankTimeZone).day().month(.abbreviated)
     private static let dayMonthYear = dayMonth.year(.twoDigits)
 
     /// "3. Nov." this year, "3. Nov. 25" otherwise.
@@ -1335,7 +1339,7 @@ struct AccountBalanceChart: View {
                 FocusHighlight(cornerRadius: 6, fill: false)
             }
             .contentShape(Rectangle())
-            .help(summary + "\nKlicken öffnet die Prognose (⌥⌘P).")
+            .help(summary + "\n" + String(localized: "Klicken öffnet die Prognose (⌥⌘P)."))
             .onTapGesture {
                 focused = false   // the ring is for the keyboard
                 open()
@@ -1359,7 +1363,7 @@ struct AccountBalanceChart: View {
 
     private struct LegendLine: View {
         let dashed: Bool
-        let text: String
+        let text: LocalizedStringKey
 
         var body: some View {
             HStack(spacing: 3) {
@@ -1374,15 +1378,15 @@ struct AccountBalanceChart: View {
         }
     }
 
-    static let dayFormat = Date.FormatStyle(locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone).day().month(.abbreviated)
+    static let dayFormat = Date.FormatStyle(locale: Locale.autoupdatingCurrent, timeZone: BankDay.bankTimeZone).day().month(.abbreviated)
 
     private static func summary(_ curve: SnapshotIndex.BalanceCurve) -> String {
         var lines: [String] = []
-        if let first = curve.past.first { lines.append("Vor 30 Tagen: \(Money.format(first.cents))") }
-        lines.append("Heute gebucht: \(Money.format(curve.todayCents))")
-        lines.append("Prognose \(curve.end.startDate.formatted(dayFormat)): \(Money.format(curve.endCents)) (mit vorgemerkten, geplanten und regelmäßigen Buchungen)")
+        if let first = curve.past.first { lines.append(String(localized: "Vor 30 Tagen: \(Money.format(first.cents))")) }
+        lines.append(String(localized: "Heute gebucht: \(Money.format(curve.todayCents))"))
+        lines.append(String(localized: "Prognose \(curve.end.startDate.formatted(dayFormat)): \(Money.format(curve.endCents)) (mit vorgemerkten, geplanten und regelmäßigen Buchungen)"))
         if let low = curve.lowest {
-            lines.append("Tiefster Stand: \(Money.format(low.cents)) am \(low.day.startDate.formatted(dayFormat))")
+            lines.append(String(localized: "Tiefster Stand: \(Money.format(low.cents)) am \(low.day.startDate.formatted(dayFormat))"))
         }
         return lines.joined(separator: "\n")
     }
@@ -1397,7 +1401,8 @@ private struct BalanceChartDescriptor: AXChartDescriptorRepresentable {
         // Categories must be unique: forecast days are marked, repeated days numbered.
         var seen: [String: Int] = [:]
         func label(_ point: SnapshotIndex.BalanceCurve.Point) -> String {
-            let base = point.day.startDate.formatted(AccountBalanceChart.dayFormat) + (point.isForecast ? " (Prognose)" : "")
+            let dayText = point.day.startDate.formatted(AccountBalanceChart.dayFormat)
+            let base = point.isForecast ? String(localized: "\(dayText) (Prognose)") : dayText
             let count = seen[base, default: 0]
             seen[base] = count + 1
             return count == 0 ? base : "\(base) \(count + 1)"
@@ -1405,16 +1410,61 @@ private struct BalanceChartDescriptor: AXChartDescriptorRepresentable {
         let labelled = all.map { (label($0), $0) }
         let values = all.map { Double($0.cents) / 100 }
         let low = values.min() ?? 0, high = values.max() ?? 0
-        let xAxis = AXCategoricalDataAxisDescriptor(title: "Tag", categoryOrder: labelled.map(\.0))
-        let yAxis = AXNumericDataAxisDescriptor(title: "Saldo", range: low...max(high, low + 1), gridlinePositions: []) {
+        let xAxis = AXCategoricalDataAxisDescriptor(title: String(localized: "Tag"), categoryOrder: labelled.map(\.0))
+        let yAxis = AXNumericDataAxisDescriptor(title: String(localized: "Saldo"), range: low...max(high, low + 1), gridlinePositions: []) {
             Money.format(Int(($0 * 100).rounded()))
         }
-        let past = AXDataSeriesDescriptor(name: "Saldo", isContinuous: true, dataPoints: labelled.filter { !$0.1.isForecast }.map {
+        let past = AXDataSeriesDescriptor(name: String(localized: "Saldo"), isContinuous: true, dataPoints: labelled.filter { !$0.1.isForecast }.map {
             AXDataPoint(x: $0.0, y: Double($0.1.cents) / 100)
         })
-        let forecast = AXDataSeriesDescriptor(name: "Prognose", isContinuous: true, dataPoints: labelled.filter { $0.1.isForecast }.map {
+        let forecast = AXDataSeriesDescriptor(name: String(localized: "Prognose"), isContinuous: true, dataPoints: labelled.filter { $0.1.isForecast }.map {
             AXDataPoint(x: $0.0, y: Double($0.1.cents) / 100)
         })
-        return AXChartDescriptor(title: "Saldoverlauf", summary: nil, xAxis: xAxis, yAxis: yAxis, additionalAxes: [], series: [past, forecast])
+        return AXChartDescriptor(title: String(localized: "Saldoverlauf"), summary: nil, xAxis: xAxis, yAxis: yAxis, additionalAxes: [], series: [past, forecast])
+    }
+}
+
+// MARK: - Layout
+
+/// Like `LazyVGrid` with one `.adaptive(minimum:)` column, but eager: as many columns of at least
+/// `minimum` as fit, rows as high as their highest cell, cells top-leading.
+struct AdaptiveColumns: Layout {
+    let minimum: CGFloat
+    let spacing: CGFloat
+
+    private func columns(for width: CGFloat) -> (count: Int, width: CGFloat) {
+        let count = max(1, Int((width + spacing) / (minimum + spacing)))
+        return (count, max(0, (width - spacing * CGFloat(count - 1)) / CGFloat(count)))
+    }
+
+    private func rowHeights(_ subviews: Subviews, count: Int, cellWidth: CGFloat) -> [CGFloat] {
+        stride(from: 0, to: subviews.count, by: count).map { start in
+            subviews[start..<min(start + count, subviews.count)]
+                .map { $0.sizeThatFits(ProposedViewSize(width: cellWidth, height: nil)).height }
+                .max() ?? 0
+        }
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard !subviews.isEmpty else { return .zero }
+        let width = proposal.width ?? minimum * CGFloat(subviews.count) + spacing * CGFloat(subviews.count - 1)
+        let (count, cellWidth) = columns(for: width)
+        let heights = rowHeights(subviews, count: count, cellWidth: cellWidth)
+        return CGSize(width: width, height: heights.reduce(0, +) + spacing * CGFloat(max(0, heights.count - 1)))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let (count, cellWidth) = columns(for: bounds.width)
+        let heights = rowHeights(subviews, count: count, cellWidth: cellWidth)
+        var y = bounds.minY
+        for (row, height) in heights.enumerated() {
+            for column in 0..<count {
+                let index = row * count + column
+                guard index < subviews.count else { break }
+                let x = bounds.minX + CGFloat(column) * (cellWidth + spacing)
+                subviews[index].place(at: CGPoint(x: x, y: y), anchor: .topLeading, proposal: ProposedViewSize(width: cellWidth, height: nil))
+            }
+            y += height + spacing
+        }
     }
 }

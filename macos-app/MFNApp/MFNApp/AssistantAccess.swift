@@ -144,7 +144,7 @@ final class AssistantAccess {
         }
         reseal()
         if hadSomething, stored != nil {
-            problem = "Die MCP-Einstellungen wurden außerhalb von MFN geändert oder gehören zur anderen Datenbank. Der Zugang ist deshalb aus, und kein Konto ist mehr freigegeben. Schalte ihn bei Bedarf neu ein und wähle die Konten wieder aus."
+            problem = String(localized: "Die MCP-Einstellungen wurden außerhalb von MFN geändert oder gehören zur anderen Datenbank. Der Zugang ist deshalb aus, und kein Konto ist mehr freigegeben. Schalte ihn bei Bedarf neu ein und wähle die Konten wieder aus.")
         }
     }
 
@@ -167,11 +167,11 @@ final class AssistantAccess {
     private func start() {
         guard server == nil else { return }
         guard let teamID = PeerVerifier.ownTeamID() else {
-            problem = "Diese MFN-Version ist nicht mit einem Entwicklerzertifikat signiert. Ohne Signatur kann MFN den Helfer nicht prüfen, deshalb bleibt der Zugang zu."
+            problem = String(localized: "Diese MFN-Version ist nicht mit einem Entwicklerzertifikat signiert. Ohne Signatur kann MFN den Helfer nicht prüfen, deshalb bleibt der Zugang zu.")
             return
         }
         guard let url = Self.socketURL else {
-            problem = "Der gemeinsame Ordner für den Helfer fehlt (App-Group-Berechtigung)."
+            problem = String(localized: "Der gemeinsame Ordner für den Helfer fehlt (App-Group-Berechtigung).")
             return
         }
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
@@ -186,7 +186,7 @@ final class AssistantAccess {
                 try await server.start(path: url.path) { token in PeerVerifier.isHelper(token, teamID: teamID) }
             } catch {
                 Self.logger.error("MCP: start failed: \(String(describing: error), privacy: .public)")
-                self.problem = "Der Zugang konnte nicht geöffnet werden (\(String(describing: error)))."
+                self.problem = String(localized: "Der Zugang konnte nicht geöffnet werden (\(String(describing: error))).")
                 self.server = nil
             }
         }
@@ -198,10 +198,10 @@ final class AssistantAccess {
         connectedClients = clients
         let after = Set(clients.map(\.displayName))
         for name in after.subtracting(before).sorted() {
-            AccessibilityNotification.Announcement("MCP-Programm verbunden: \(name)").post()
+            AccessibilityNotification.Announcement(String(localized: "MCP-Programm verbunden: \(name)")).post()
         }
         for name in before.subtracting(after).sorted() {
-            AccessibilityNotification.Announcement("MCP-Programm getrennt: \(name)").post()
+            AccessibilityNotification.Announcement(String(localized: "MCP-Programm getrennt: \(name)")).post()
         }
     }
 
@@ -341,32 +341,33 @@ final class AssistantAccess {
         // The name is the executable's own (anyone can call a binary "Claude"): without a
         // verified developer signature the headline says so first.
         if let parent = client.parent, parent.teamID != nil {
-            alert.messageText = "„\(parent.name)“ möchte deine Finanzdaten lesen"
+            alert.messageText = String(localized: "„\(parent.name)“ möchte deine Finanzdaten lesen")
         } else {
-            alert.messageText = "Ein Programm ohne Entwickler-Signatur („\(client.parent?.name ?? "unbekannt")“) möchte deine Finanzdaten lesen"
+            let unnamed = String(localized: "unbekannt")
+            alert.messageText = String(localized: "Ein Programm ohne Entwickler-Signatur („\(client.parent?.name ?? unnamed)“) möchte deine Finanzdaten lesen")
         }
         var lines = [
-            "Programm: \(client.originDescription)",
-            "Der Assistent sieht Salden, Umsätze und Namen von Gegenparteien der freigegebenen Konten. Mit einem Cloud-Modell gehen diese Daten an dessen Anbieter.",
+            String(localized: "Programm: \(client.originDescription)"),
+            String(localized: "Der Assistent sieht Salden, Umsätze und Namen von Gegenparteien der freigegebenen Konten. Mit einem Cloud-Modell gehen diese Daten an dessen Anbieter."),
         ]
-        if let declared = client.declaredName { lines.insert("Nennt sich selbst: „\(declared)“", at: 1) }
+        if let declared = client.declaredName { lines.insert(String(localized: "Nennt sich selbst: „\(declared)“"), at: 1) }
         if client.parent?.approvalKey == nil {
-            lines.append("„Immer erlauben“ gibt es nur für Programme mit Entwickler-Signatur, die MFNs Helfer direkt starten.")
+            lines.append(String(localized: "„Immer erlauben“ gibt es nur für Programme mit Entwickler-Signatur, die MFNs Helfer direkt starten."))
         }
-        lines.append("Ohne Antwort innerhalb von 2 Minuten lehnt MFN ab.")
+        lines.append(String(localized: "Ohne Antwort innerhalb von 2 Minuten lehnt MFN ab."))
         alert.informativeText = lines.joined(separator: "\n\n")
         // "Ablehnen" is the default: a stray Return never grants access.
-        alert.addButton(withTitle: "Ablehnen")
-        alert.addButton(withTitle: "Einmal erlauben").keyEquivalent = ""
+        alert.addButton(withTitle: String(localized: "Ablehnen"))
+        alert.addButton(withTitle: String(localized: "Einmal erlauben")).keyEquivalent = ""
         let canAlways = client.parent?.approvalKey != nil
-        if canAlways { alert.addButton(withTitle: "Immer erlauben").keyEquivalent = "" }
+        if canAlways { alert.addButton(withTitle: String(localized: "Immer erlauben")).keyEquivalent = "" }
         NSApp.activate()
         alertOnScreen = true
         let response = alert.runModal()
         alertOnScreen = false
         if response == .abort {
             // Timed out or MFN locked while the prompt was up.
-            AccessibilityNotification.Announcement("MCP-Anfrage abgelaufen, abgelehnt").post()
+            AccessibilityNotification.Announcement(String(localized: "MCP-Anfrage abgelaufen, abgelehnt")).post()
         }
         let decision: Decision = switch response {
         case .alertSecondButtonReturn: .once
@@ -433,15 +434,19 @@ final class AssistantAccess {
 extension MCPClientInfo {
     /// For the prompt: who started the helper, as far as MFN can tell.
     var originDescription: String {
-        guard let parent else { return "Unbekannt (der Helfer hat keine Angaben geschickt)." }
+        guard let parent else { return String(localized: "Unbekannt (der Helfer hat keine Angaben geschickt).") }
         var text = parent.name
         if let identifier = parent.identifier { text += " (\(identifier))" }
-        if let team = parent.teamID {
-            text += ", signiert von Entwickler-Team \(team)"
-        } else {
-            text += ", ohne Entwickler-Signatur"
+        let via = parent.via.joined(separator: ", ")
+        switch (parent.teamID, parent.via.isEmpty) {
+        case let (team?, true):
+            return String(localized: "\(text), signiert von Entwickler-Team \(team)")
+        case let (team?, false):
+            return String(localized: "\(text), signiert von Entwickler-Team \(team), gestartet über \(via)")
+        case (nil, true):
+            return String(localized: "\(text), ohne Entwickler-Signatur")
+        case (nil, false):
+            return String(localized: "\(text), ohne Entwickler-Signatur, gestartet über \(via)")
         }
-        if !parent.via.isEmpty { text += ", gestartet über \(parent.via.joined(separator: ", "))" }
-        return text
     }
 }

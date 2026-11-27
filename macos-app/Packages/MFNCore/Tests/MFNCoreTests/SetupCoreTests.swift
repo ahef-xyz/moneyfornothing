@@ -383,7 +383,7 @@ private func monthly(_ months: Int, _ make: (BankDay, Int) -> Transaction) -> [T
 
         let transfers = plan.candidates(.transfer)
         let savings = try #require(transfers.first { $0.match == .counterpartIBAN("DE02500105170137075030") })
-        #expect(savings.title == "Eigenes Konto: Tagesgeld")
+        #expect(savings.title.hasSuffix(": Tagesgeld"))
         #expect(savings.transactionIDs.count == 3)
         #expect(savings.suggestion?.categoryID == "umbuchung")
         #expect(transfers.contains { $0.match == .counterpartIBAN("DE02120300000000202051") })

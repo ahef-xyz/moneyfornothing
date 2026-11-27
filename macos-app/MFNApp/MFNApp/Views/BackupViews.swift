@@ -24,7 +24,7 @@ struct BackupSettings: View {
                     .onChange(of: auto.isEnabled) { model.runAutoBackupIfDue() }
                 LabeledContent("Ordner") {
                     HStack {
-                        Text(auto.folderPath ?? "Nicht gewählt")
+                        Text(auto.folderPath ?? String(localized: "Nicht gewählt"))
                             .foregroundStyle(auto.folderPath == nil ? .secondary : .primary)
                             .lineLimit(1)
                             .truncationMode(.middle)
@@ -43,7 +43,7 @@ struct BackupSettings: View {
                             ProgressView().controlSize(.small)
                                 .accessibilityLabel("Sicherung läuft")
                         }
-                        Text(auto.lastSuccess.map { $0.formatted(date: .abbreviated, time: .shortened) } ?? "Noch keine")
+                        Text(auto.lastSuccess.map { $0.formatted(date: .abbreviated, time: .shortened) } ?? String(localized: "Noch keine"))
                             .foregroundStyle(.secondary)
                         Button("Jetzt sichern") { model.runAutoBackupIfDue(force: true) }
                             .disabled(!auto.hasFolder || auto.isRunning || !model.canBackUp || model.isDemo)
@@ -54,7 +54,7 @@ struct BackupSettings: View {
                     if let error { AccessibilityNotification.Announcement(error).post() }
                 }
                 .onChange(of: auto.lastSuccess) { _, date in
-                    if date != nil { AccessibilityNotification.Announcement("Sicherung erstellt").post() }
+                    if date != nil { AccessibilityNotification.Announcement(String(localized: "Sicherung erstellt")).post() }
                 }
                 if let error = auto.lastError {
                     Label(error, systemImage: "exclamationmark.triangle.fill")
@@ -119,7 +119,7 @@ struct RestoreBackupSheet: View {
         .frame(width: 440)
         .onAppear { focusesPassword = true }
         .onChange(of: model.isBackingUp) { _, running in
-            if running { AccessibilityNotification.Announcement("Die Sicherung wird geprüft und wiederhergestellt").post() }
+            if running { AccessibilityNotification.Announcement(String(localized: "Die Sicherung wird geprüft und wiederhergestellt")).post() }
         }
         .onChange(of: error) { _, error in
             if let error { AccessibilityNotification.Announcement(error).post() }
@@ -128,8 +128,8 @@ struct RestoreBackupSheet: View {
 
     private var explanation: String {
         replacesData
-            ? "Gib das Passwort ein, das beim Erstellen der Sicherung galt. Die Sicherung ersetzt deine jetzigen Daten; diese bleiben als verschlüsselte Kopie im Datenordner. Danach sperrt MFN."
-            : "Gib das Passwort ein, das beim Erstellen der Sicherung galt. Es bleibt das Passwort deiner Datenbank."
+            ? String(localized: "Gib das Passwort ein, das beim Erstellen der Sicherung galt. Die Sicherung ersetzt deine jetzigen Daten; diese bleiben als verschlüsselte Kopie im Datenordner. Danach sperrt MFN.")
+            : String(localized: "Gib das Passwort ein, das beim Erstellen der Sicherung galt. Es bleibt das Passwort deiner Datenbank.")
     }
 
     private func submit() {

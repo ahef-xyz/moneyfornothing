@@ -219,7 +219,7 @@ final class TRLoginHarness {
         #expect(api[1].url == "https://api.traderepublic.com" + Self.processPath)
         #expect(api[1].body == nil)
 
-        #expect(harness.statuses.contains("Bitte in der Trade-Republic-App bestätigen."))
+        #expect(harness.statuses.contains(TRLoginScript.confirmMessage))
         #expect(harness.sessionStorage.isEmpty) // marker removed after success
         #expect(harness.codePrompts.isEmpty)
     }

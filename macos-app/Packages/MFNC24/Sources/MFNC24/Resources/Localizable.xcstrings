@@ -1,0 +1,83 @@
+{
+  "sourceLanguage": "de",
+  "strings": {
+    "6 Ziffern aus der C24-App": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6 digits from the C24 app"
+          }
+        }
+      }
+    },
+    "Angemeldet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed in."
+          }
+        }
+      }
+    },
+    "Anmeldung bei C24 wird vorbereitet …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing sign-in to C24…"
+          }
+        }
+      }
+    },
+    "Gib die 6 Ziffern aus der C24-App ein.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the 6 digits from the C24 app."
+          }
+        }
+      }
+    },
+    "QR-Code abgelaufen, neuer Code wird erzeugt.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "QR code expired, creating a new one."
+          }
+        }
+      }
+    },
+    "Scanne den QR-Code mit der C24-App und gib die 6 Ziffern aus der App ein.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan the QR code with the C24 app and enter the 6 digits from the app."
+          }
+        }
+      }
+    },
+    "Scanne den QR-Code mit der C24-App.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan the QR code with the C24 app."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

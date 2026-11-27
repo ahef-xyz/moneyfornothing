@@ -51,7 +51,7 @@ enum PayPalEndpoints {
             url: url,
             completion: .urlPrefix("https://\(host)/myaccount"),
             cookieDomains: ["paypal.com"],
-            message: "Bitte melde dich bei PayPal an. MFN übernimmt danach die Sitzung und liest nur.",
+            message: String(localized: "Bitte melde dich bei PayPal an. MFN übernimmt danach die Sitzung und liest nur.", bundle: .module),
             storageKeys: [.javaScript(key: userAgentName, expression: "navigator.userAgent", domain: host)]
         )
     }

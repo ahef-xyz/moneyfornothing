@@ -157,7 +157,7 @@ private struct SetupStepList: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(setup.plan == nil || isEmpty)
-                .help(isEmpty ? "Hier gibt es nichts zu entscheiden" : step.title)
+                .help(isEmpty ? String(localized: "Hier gibt es nichts zu entscheiden") : step.title)
             }
             Spacer()
         }

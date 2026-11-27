@@ -35,11 +35,11 @@ enum C24LoginScript {
         /// The page treats more than 2 rotations as expired.
         var maxTokenChanges: Int = 2
         var maxQRCodes: Int = 5
-        var scanMessage = "Scanne den QR-Code mit der C24-App."
-        var expiredMessage = "QR-Code abgelaufen, neuer Code wird erzeugt."
-        var pinMessage = "Gib die 6 Ziffern aus der C24-App ein."
-        var pinPrompt = "6 Ziffern aus der C24-App"
-        var doneMessage = "Angemeldet."
+        var scanMessage = String(localized: "Scanne den QR-Code mit der C24-App.", bundle: .module)
+        var expiredMessage = String(localized: "QR-Code abgelaufen, neuer Code wird erzeugt.", bundle: .module)
+        var pinMessage = String(localized: "Gib die 6 Ziffern aus der C24-App ein.", bundle: .module)
+        var pinPrompt = String(localized: "6 Ziffern aus der C24-App", bundle: .module)
+        var doneMessage = String(localized: "Angemeldet.", bundle: .module)
     }
 
     static func config(for endpoints: C24Endpoints) -> Config {
@@ -58,7 +58,7 @@ enum C24LoginScript {
     static func automation(for endpoints: C24Endpoints) -> WebLoginAutomation {
         WebLoginAutomation(
             script: script(config(for: endpoints)),
-            message: "Anmeldung bei C24 wird vorbereitet …",
+            message: String(localized: "Anmeldung bei C24 wird vorbereitet …", bundle: .module),
             timeout: 300
         )
     }

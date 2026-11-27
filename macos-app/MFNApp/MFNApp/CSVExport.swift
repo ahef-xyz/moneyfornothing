@@ -69,7 +69,7 @@ extension AppModel {
     private func export(_ transactions: [MFNCore.Transaction], scope: String, accountName: (AccountID) -> String) {
         guard !transactions.isEmpty else {
             NSSound.beep()
-            AccessibilityNotification.Announcement("Keine Umsätze zum Exportieren").post()
+            AccessibilityNotification.Announcement(String(localized: "Keine Umsätze zum Exportieren")).post()
             return
         }
         // Value snapshot of what the file needs, built off the main actor while the panel is open.
@@ -85,9 +85,9 @@ extension AppModel {
         }
 
         let panel = NSSavePanel()
-        panel.title = "Umsätze als CSV exportieren"
-        panel.message = transactions.count == 1 ? "1 Umsatz" : "\(transactions.count) Umsätze"
-        panel.prompt = "Exportieren"
+        panel.title = String(localized: "Umsätze als CSV exportieren")
+        panel.message = transactions.count == 1 ? String(localized: "1 Umsatz") : String(localized: "\(transactions.count) Umsätze")
+        panel.prompt = String(localized: "Exportieren")
         panel.nameFieldStringValue = TransactionCSVExporter.fileName(scope: scope)
         panel.allowedContentTypes = [.commaSeparatedText]
         panel.canCreateDirectories = true
@@ -113,7 +113,7 @@ extension AppModel {
                     Log.logger("export").error("CSV export failed: \(error.localizedDescription, privacy: .private)")
                     guard !isStale(session) else { return }
                     let alert = NSAlert()
-                    alert.messageText = "Die CSV-Datei konnte nicht gesichert werden."
+                    alert.messageText = String(localized: "Die CSV-Datei konnte nicht gesichert werden.")
                     alert.informativeText = error.localizedDescription
                     alert.alertStyle = .warning
                     alert.runModal()

@@ -1,6 +1,7 @@
 import Foundation
 import JavaScriptCore
 import MFNCore
+import MFNScrape
 import Testing
 @testable import MFNC24
 
@@ -118,6 +119,8 @@ extension C24Endpoints {
 private typealias R = ScriptRun.Response
 
 @Suite struct C24LoginScriptTests {
+    private let config = C24LoginScript.config(for: .production)
+
     @Test func loginRequestCarriesAutomationOnlyWhenSwitchedOn() throws {
         var visible = C24Endpoints.production
         visible.headlessLogin = false
@@ -168,7 +171,7 @@ private typealias R = ScriptRun.Response
         let complete = try #require(run.eval("JSON.parse(log.requests[4].body)")?.toDictionary() as? [String: String])
         #expect(complete == ["web_login_pin": "123456", "qrtoken": "qr-2", "web_login_uuid": "uuid-1"])
         #expect(run.eval("log.requests[4].headers['Content-Type']")?.toString() == "application/json")
-        #expect(run.eval("JSON.stringify(log.prompts)")?.toString() == #"[["6 Ziffern aus der C24-App",6]]"#)
+        #expect(run.eval("JSON.stringify(log.prompts)")?.toString() == "[[\(JavaScriptLiteral.string(config.pinPrompt)),6]]")
         #expect(run.eval("log.lastDelay")?.toInt32() == 2_000)
 
         let stored = try #require(run.storedSession)
@@ -176,7 +179,7 @@ private typealias R = ScriptRun.Response
         #expect(session == ["guid": "uuid-1", "accessToken": "acc-1", "refreshToken": "ref-1"])
         // The connector reads the access token from exactly this value.
         #expect(C24SessionStore.accessToken(in: stored, field: "accessToken") == "acc-1")
-        #expect(run.statuses == ["Gib die 6 Ziffern aus der C24-App ein.", "Angemeldet."])
+        #expect(run.statuses == [config.pinMessage, config.doneMessage])
     }
 
     @Test func failedStatusShowsANewQRCode() {
@@ -193,7 +196,7 @@ private typealias R = ScriptRun.Response
         #expect(result.error == nil)
         #expect(result.state == #"{"done":true}"#)
         #expect(run.qrPayloads == ["qr-1", "qr-9"])
-        #expect(run.statuses.first == "QR-Code abgelaufen, neuer Code wird erzeugt.")
+        #expect(run.statuses.first == config.expiredMessage)
         #expect(run.eval("JSON.parse(log.requests[3].body).qrtoken")?.toString() == "qr-9")
     }
 

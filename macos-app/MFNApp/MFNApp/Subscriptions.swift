@@ -101,23 +101,23 @@ extension AppModel {
 extension AppModel {
     /// An own entry, or the change of a detected payment. Returns an error text, `nil` on success.
     func saveRecurringEntry(_ entry: RecurringEntry) async -> String? {
-        guard let store = backupStore else { return "MFN ist gesperrt." }
+        guard let store = backupStore else { return String(localized: "MFN ist gesperrt.") }
         do {
             try await store.upsertRecurringEntry(entry)
             return nil
         } catch {
-            return "Der Eintrag konnte nicht gespeichert werden: \(error)"
+            return String(localized: "Der Eintrag konnte nicht gespeichert werden: \(String(describing: error))")
         }
     }
 
     /// Deletes an own entry, or brings a changed payment back to what the bookings say.
     func removeRecurringEntry(_ id: UUID) async -> String? {
-        guard let store = backupStore else { return "MFN ist gesperrt." }
+        guard let store = backupStore else { return String(localized: "MFN ist gesperrt.") }
         do {
             try await store.removeRecurringEntry(id)
             return nil
         } catch {
-            return "Der Eintrag konnte nicht entfernt werden: \(error)"
+            return String(localized: "Der Eintrag konnte nicht entfernt werden: \(String(describing: error))")
         }
     }
 }
@@ -190,10 +190,11 @@ struct RecurringDraft: Identifiable, Equatable {
                               cadence: cadence, anchorDay: isOwn ? BankDay(date) : nil, createdAt: createdAt ?? now)
     }
 
-    /// "1234,50" for the amount field.
-    static func text(_ cents: Int) -> String {
+    /// "1234,50" (or "1234.50", after the user's region) for the amount field.
+    static func text(_ cents: Int, locale: Locale = .autoupdatingCurrent) -> String {
         let value = abs(cents)
-        return value % 100 == 0 ? "\(value / 100)" : String(format: "%d,%02d", value / 100, value % 100)
+        let separator = locale.decimalSeparator.flatMap { $0 == "." ? "." : nil } ?? ","
+        return value % 100 == 0 ? "\(value / 100)" : String(format: "%d%@%02d", value / 100, separator, value % 100)
     }
 }
 
@@ -254,9 +255,9 @@ struct RecurringFilter: Equatable {
         var id: Self { self }
         var title: String {
             switch self {
-            case .all: "Alle"
-            case .expenses: "Ausgaben"
-            case .income: "Einnahmen"
+            case .all: String(localized: "Alle")
+            case .expenses: String(localized: "Ausgaben")
+            case .income: String(localized: "Einnahmen")
             }
         }
     }
@@ -284,10 +285,10 @@ struct RecurringFilter: Equatable {
 extension RecurringPayment.Cadence {
     var title: String {
         switch self {
-        case .monthly: "Monatlich"
-        case .quarterly: "Vierteljährlich"
-        case .halfYearly: "Halbjährlich"
-        case .yearly: "Jährlich"
+        case .monthly: String(localized: "Monatlich")
+        case .quarterly: String(localized: "Vierteljährlich")
+        case .halfYearly: String(localized: "Halbjährlich")
+        case .yearly: String(localized: "Jährlich")
         }
     }
 }

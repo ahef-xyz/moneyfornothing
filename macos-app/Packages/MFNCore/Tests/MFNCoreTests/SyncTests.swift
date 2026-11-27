@@ -283,6 +283,39 @@ private final class Clock: @unchecked Sendable {
         #expect(await counter.count == 2)
     }
 
+    /// v12: every sync over YAXI costs calls of the user's contingent.
+    @Test func automaticSyncOverYAXIWaitsFourHours() async throws {
+        let store = InMemoryLedgerStore()
+        let counter = CallCounter()
+        let clock = Clock()
+        let engine = SyncEngine(store: store, now: { clock.now })
+        let bank = Connection(id: "c1", connectorID: .yaxi, displayName: "Bank über YAXI")
+        try await engine.register(bank, connector: StubConnector(id: .yaxi, calls: counter))
+
+        await engine.sync("c1", trigger: .automatic)
+        clock.now += 3 * 3600
+        await engine.sync("c1", trigger: .automatic)
+        #expect(await counter.count == 1)
+        await engine.sync("c1", trigger: .manual)
+        #expect(await counter.count == 2, "the user may always sync")
+        clock.now += 4 * 3600 + 1
+        await engine.sync("c1", trigger: .automatic)
+        #expect(await counter.count == 3)
+    }
+
+    /// v12: a YAXI connection stores the bank login although its fields come per bank.
+    @Test func rejectedLoginOverYAXIBlocksManualSync() async throws {
+        let store = InMemoryLedgerStore()
+        let counter = CallCounter()
+        let engine = SyncEngine(store: store)
+        let bank = Connection(id: "c1", connectorID: .yaxi, displayName: "Bank über YAXI")
+        try await engine.register(bank, connector: StubConnector(id: .yaxi, error: .authFailed, calls: counter))
+
+        await engine.sync("c1", trigger: .manual)
+        await engine.sync("c1", trigger: .manual)
+        #expect(await counter.count == 1, "the rejected credentials are not sent again")
+    }
+
     @Test func failedLoginIsNeverRetriedAutomatically() async throws {
         let store = InMemoryLedgerStore()
         let counter = CallCounter()

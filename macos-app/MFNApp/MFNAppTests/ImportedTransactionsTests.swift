@@ -59,9 +59,9 @@ import Testing
     }
 
     @Test func removalRequestTexts() {
-        let one = ImportRemovalRequest(ids: ["a"], scope: "aus „Giro“")
+        let one = ImportRemovalRequest(ids: ["a"], scope: .account("Giro"))
         #expect(one.title == "1 importierten Umsatz entfernen?")
-        #expect(one.message.hasPrefix("Der Umsatz wird aus „Giro“ aus MFN gelöscht."))
+        #expect(one.message.hasPrefix("Der Umsatz aus „Giro“ wird aus MFN gelöscht."))
         let many = ImportRemovalRequest(ids: ["a", "b"], scope: nil)
         #expect(many.title == "2 importierte Umsätze entfernen?")
         #expect(many.message.hasPrefix("Die Umsätze werden aus MFN gelöscht."))

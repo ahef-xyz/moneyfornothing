@@ -12,6 +12,13 @@ struct VaultPasswordView: View {
 
     private var isSetup: Bool { prompt == .setup }
 
+    private var setupHint: LocalizedStringKey {
+        if isSetup { return "Lege ein Passwort für deine Daten fest." }
+        return AppLock.biometryAvailable
+            ? "Der Schlüssel zu dieser Datenbank ist noch nicht auf diesem Mac. Gib einmal das Passwort ein; danach genügt Touch ID."
+            : "Der Schlüssel zu dieser Datenbank ist noch nicht auf diesem Mac. Gib einmal das Passwort ein; danach genügt das Passwort deines Macs."
+    }
+
     private var canSubmit: Bool {
         guard !model.isWorking, !password.isEmpty else { return false }
         if isSetup {
@@ -32,9 +39,7 @@ struct VaultPasswordView: View {
                     Text(isSetup ? "Willkommen bei MoneyForNothing" : "Passwort eingeben")
                         .font(.title2.weight(.semibold))
                         .accessibilityAddTraits(.isHeader)
-                    Text(isSetup
-                         ? "Lege ein Passwort für deine Daten fest."
-                         : "Der Schlüssel zu dieser Datenbank ist noch nicht auf diesem Mac. Gib einmal das Passwort ein; danach genügt \(AppLock.biometryAvailable ? "Touch ID" : "das Passwort deines Macs").")
+                    Text(setupHint)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
@@ -127,7 +132,7 @@ struct VaultPasswordView: View {
 /// One line of the explanation on the setup screen.
 private struct Fact: View {
     let symbol: String
-    let text: String
+    let text: LocalizedStringKey
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
@@ -144,7 +149,7 @@ private struct Fact: View {
 /// Password rule with a live check mark (symbol and text, not colour alone).
 private struct Requirement: View {
     let met: Bool
-    let text: String
+    let text: LocalizedStringKey
 
     var body: some View {
         Label {

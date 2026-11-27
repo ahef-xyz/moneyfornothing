@@ -122,9 +122,9 @@ final class AppLock {
         isAuthenticating = true
         defer { isAuthenticating = false }
         let context = LAContext()
-        context.localizedCancelTitle = "Abbrechen"
+        context.localizedCancelTitle = String(localized: "Abbrechen")
         do {
-            try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "deine Finanzdaten entsperren")
+            try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: String(localized: "deine Finanzdaten entsperren"))
             lastError = nil
             lastActivity = .now
             isLocked = false

@@ -1,0 +1,83 @@
+{
+  "sourceLanguage": "de",
+  "strings": {
+    "Anmeldung bei Trade Republic …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing in to Trade Republic…"
+          }
+        }
+      }
+    },
+    "Anmeldung bestätigt.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in confirmed."
+          }
+        }
+      }
+    },
+    "Anmeldung wird abgeschlossen …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finishing sign-in…"
+          }
+        }
+      }
+    },
+    "Bitte bei Trade Republic anmelden und die Anmeldung in der Trade-Republic-App bestätigen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please sign in to Trade Republic and confirm the sign-in in the Trade Republic app."
+          }
+        }
+      }
+    },
+    "Bitte in der Trade-Republic-App bestätigen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please confirm in the Trade Republic app."
+          }
+        }
+      }
+    },
+    "Code aus der Authenticator-App": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code from the authenticator app"
+          }
+        }
+      }
+    },
+    "Code ungültig, bitte erneut eingeben.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid code, please enter it again."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

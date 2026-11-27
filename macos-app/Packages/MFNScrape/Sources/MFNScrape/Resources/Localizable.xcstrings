@@ -1,0 +1,17 @@
+{
+  "sourceLanguage": "de",
+  "strings": {
+    "Bitte den Code eingeben.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please enter the code."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

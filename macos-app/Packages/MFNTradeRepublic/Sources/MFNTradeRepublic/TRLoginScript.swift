@@ -34,10 +34,20 @@ import MFNCore
 /// Credentials stay in the function argument: never logged, stored or put into `state`.
 enum TRLoginScript {
     static let webOrigin = "https://app.traderepublic.com"
+    static let codeInvalidMessage = String(localized: "Code ungültig, bitte erneut eingeben.", bundle: .module)
+    static let confirmMessage = String(localized: "Bitte in der Trade-Republic-App bestätigen.", bundle: .module)
+    static let authenticatorPrompt = String(localized: "Code aus der Authenticator-App", bundle: .module)
+    static let finishingMessage = String(localized: "Anmeldung wird abgeschlossen …", bundle: .module)
+    static let confirmedMessage = String(localized: "Anmeldung bestätigt.", bundle: .module)
+
+    private static func jsString(_ text: String) -> String {
+        guard let data = try? JSONEncoder().encode(text), let literal = String(data: data, encoding: .utf8) else { return "\"\"" }
+        return literal
+    }
 
     static let automation = WebLoginAutomation(
         script: source,
-        message: "Anmeldung bei Trade Republic …",
+        message: String(localized: "Anmeldung bei Trade Republic …", bundle: .module),
         timeout: 300
     )
 
@@ -211,7 +221,7 @@ enum TRLoginScript {
         const r = await submit(code);
         if (r.ok) return r;
         if (CODE_INVALID.includes(r.code) && attempt < 3) {
-          mfn.status("Code ungültig, bitte erneut eingeben.");
+          mfn.status(\#(jsString(codeInvalidMessage)));
           continue;
         }
         if (CODE_INVALID.includes(r.code)) throw authFailed("code rejected");
@@ -223,7 +233,7 @@ enum TRLoginScript {
     // UNVERIFIED: HTTP status codes of the error answers; only errors[0].errorCode is evaluated.
     async function poll(processId, countdownSeconds) {
       remember(processId);
-      mfn.status("Bitte in der Trade-Republic-App bestätigen.");
+      mfn.status(\#(jsString(confirmMessage)));
       const deadline = Date.now() + (Math.max(Number(countdownSeconds) || 120, 60) + 60) * 1000;
       const path = "/api/v2/auth/web/login/processes/" + encodeURIComponent(processId);
       while (Date.now() < deadline) {
@@ -232,9 +242,9 @@ enum TRLoginScript {
           const s = (r.json && r.json.status) || "";
           if (s === "CONFIRMED" || s === "COMPLETED") return done();
           if (r.json && r.json.requiredAction === "AUTHENTICATOR_VERIFICATION") {
-            await askCode("Code aus der Authenticator-App", 6, (code) =>
+            await askCode(\#(jsString(authenticatorPrompt)), 6, (code) =>
               call("POST", path + "/authenticator-verification", { code }));
-            mfn.status("Anmeldung wird abgeschlossen …");
+            mfn.status(\#(jsString(finishingMessage)));
             continue;
           }
           if (!POLL_PENDING.includes(String(s).toUpperCase())) { forget(); throw authFailed("process ended"); }
@@ -254,7 +264,7 @@ enum TRLoginScript {
     function done() {
       forget();
       forgetSubmitted();
-      mfn.status("Anmeldung bestätigt.");
+      mfn.status(\#(jsString(confirmedMessage)));
       return { step: "done" };
     }
 

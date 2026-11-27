@@ -47,7 +47,7 @@ struct LockView: View {
                     .frame(width: 112, height: 112)
                     .accessibilityHidden(true)
                 VStack(spacing: 6) {
-                    Text(problem == nil ? "MoneyForNothing ist gesperrt" : "MoneyForNothing lässt sich nicht öffnen")
+                    Text(problem == nil ? String(localized: "MoneyForNothing ist gesperrt") : String(localized: "MoneyForNothing lässt sich nicht öffnen"))
                         .font(.title2.weight(.semibold))
                         .accessibilityAddTraits(.isHeader)
                     Text(problem?.message ?? causeText)
@@ -63,12 +63,12 @@ struct LockView: View {
                 if problem?.action == .update {
                     updateButtons
                 } else {
-                    unlockButton(title: problem == nil ? nil : "Erneut versuchen")
+                    unlockButton(title: problem == nil ? nil : String(localized: "Erneut versuchen"))
                         .buttonStyle(.borderedProminent)
                         .keyboardShortcut(.defaultAction)
                         .padding(.top, 6)
                     if problem == nil {
-                        Text(usesTouchID ? "Oder mit dem Passwort deines Macs." : "Mit dem Passwort deines Macs.")
+                        Text(usesTouchID ? String(localized: "Oder mit dem Passwort deines Macs.") : String(localized: "Mit dem Passwort deines Macs."))
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -101,7 +101,7 @@ struct LockView: View {
             }
             guard model.lock.takeAutoPrompt() else { return }
             // VoiceOver hears why focus jumps to a system dialog.
-            AccessibilityNotification.Announcement(usesTouchID ? "Touch ID wird angefordert" : "Passwort wird angefordert").post()
+            AccessibilityNotification.Announcement(usesTouchID ? String(localized: "Touch ID wird angefordert") : String(localized: "Passwort wird angefordert")).post()
             Task { await model.lock.unlock() }
         }
         .onChange(of: model.lock.lastError) { _, problem in
@@ -138,7 +138,7 @@ struct LockView: View {
                 .help(Website.label)
                 .accessibilityHint("Öffnet \(Website.label) im Browser, dort gibt es die aktuelle Version.")
             }
-            unlockButton(title: "Erneut versuchen")
+            unlockButton(title: String(localized: "Erneut versuchen"))
                 .buttonStyle(.bordered)
         }
         .padding(.top, 6)
@@ -148,7 +148,7 @@ struct LockView: View {
         Button {
             Task { await model.lock.unlock() }
         } label: {
-            Label(title ?? (usesTouchID ? "Mit Touch ID entsperren" : "Entsperren"),
+            Label(title ?? (usesTouchID ? String(localized: "Mit Touch ID entsperren") : String(localized: "Entsperren")),
                   systemImage: usesTouchID ? "touchid" : "lock.open")
                 .padding(.horizontal, 6)
         }
@@ -158,10 +158,10 @@ struct LockView: View {
 
     private var causeText: String {
         switch model.lock.cause {
-        case .launch: "Deine Finanzdaten liegen verschlüsselt auf diesem Mac."
-        case .idle: "Automatisch gesperrt nach 5 Minuten ohne Eingabe."
-        case .system: "Gesperrt, weil der Mac gesperrt wurde oder geschlafen hat."
-        case .manual: "Du hast MoneyForNothing gesperrt."
+        case .launch: String(localized: "Deine Finanzdaten liegen verschlüsselt auf diesem Mac.")
+        case .idle: String(localized: "Automatisch gesperrt nach 5 Minuten ohne Eingabe.")
+        case .system: String(localized: "Gesperrt, weil der Mac gesperrt wurde oder geschlafen hat.")
+        case .manual: String(localized: "Du hast MoneyForNothing gesperrt.")
         }
     }
 }
@@ -194,8 +194,8 @@ struct MainView: View {
     private var syncAlerts: [String] {
         model.snapshot.connections.compactMap { connection in
             switch model.snapshot.syncStates[connection.id]?.phase {
-            case .failed: "\(connection.displayName): Abgleich fehlgeschlagen"
-            case .waitingForApproval: "\(connection.displayName): Anmeldung nötig"
+            case .failed: String(localized: "\(connection.displayName): Abgleich fehlgeschlagen")
+            case .waitingForApproval: String(localized: "\(connection.displayName): Anmeldung nötig")
             default: nil
             }
         }
@@ -243,7 +243,7 @@ struct MainView: View {
             ToolbarItemGroup {
                 Button("Alle abgleichen", systemImage: "arrow.clockwise") { model.syncAll() }
                     .help("Alle Konten abgleichen (⌘R)")
-                Button(model.hideAmounts ? "Beträge einblenden" : "Beträge ausblenden",
+                Button(model.hideAmounts ? String(localized: "Beträge einblenden") : String(localized: "Beträge ausblenden"),
                        systemImage: model.hideAmounts ? "eye.slash" : "eye") { model.hideAmounts.toggle() }
                     .help("Beträge ausblenden (⇧⌘H)")
             }

@@ -83,8 +83,8 @@ enum MenuBarIconStyle: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .appIcon: "App-Symbol"
-        case .pick: "Nur Plektrum"
+        case .appIcon: String(localized: "App-Symbol")
+        case .pick: String(localized: "Nur Plektrum")
         }
     }
 }

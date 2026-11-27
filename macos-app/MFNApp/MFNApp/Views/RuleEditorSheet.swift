@@ -9,21 +9,21 @@ struct RuleDraft: Identifiable {
 
         var title: String {
             switch self {
-            case .creditorID: "Gläubiger-ID"
-            case .mandateReference: "Mandatsreferenz"
-            case .counterpartIBAN: "IBAN der Gegenpartei"
-            case .counterpart: "Empfänger/Auftraggeber enthält"
-            case .purpose: "Verwendungszweck enthält"
+            case .creditorID: String(localized: "Gläubiger-ID")
+            case .mandateReference: String(localized: "Mandatsreferenz")
+            case .counterpartIBAN: String(localized: "IBAN der Gegenpartei")
+            case .counterpart: String(localized: "Empfänger/Auftraggeber enthält")
+            case .purpose: String(localized: "Verwendungszweck enthält")
             }
         }
 
         var explanation: String {
             switch self {
-            case .creditorID: "Alle Lastschriften dieses Gläubigers (genaue Übereinstimmung). Sicherstes Merkmal."
-            case .mandateReference: "Nur Lastschriften dieses einen Mandats (genaue Übereinstimmung)."
-            case .counterpartIBAN: "Alle Umsätze von oder an dieses Konto (Leerzeichen egal)."
-            case .counterpart: "Name enthält den Text; Groß-/Kleinschreibung und Akzente egal."
-            case .purpose: "Verwendungszweck enthält den Text; Groß-/Kleinschreibung und Akzente egal."
+            case .creditorID: String(localized: "Alle Lastschriften dieses Gläubigers (genaue Übereinstimmung). Sicherstes Merkmal.")
+            case .mandateReference: String(localized: "Nur Lastschriften dieses einen Mandats (genaue Übereinstimmung).")
+            case .counterpartIBAN: String(localized: "Alle Umsätze von oder an dieses Konto (Leerzeichen egal).")
+            case .counterpart: String(localized: "Name enthält den Text; Groß-/Kleinschreibung und Akzente egal.")
+            case .purpose: String(localized: "Verwendungszweck enthält den Text; Groß-/Kleinschreibung und Akzente egal.")
             }
         }
 
@@ -121,11 +121,11 @@ extension CategoryRule.Match {
     /// "Gläubiger-ID DE98ZZZ09999999999", "Name enthält „REWE“".
     var summary: String {
         switch self {
-        case let .creditorID(v): "Gläubiger-ID \(v)"
-        case let .mandateReference(v): "Mandat \(v)"
-        case let .counterpartIBAN(v): "IBAN \(IBANFormat.grouped(v))"
-        case let .counterpart(v): "Name enthält „\(v)“"
-        case let .purpose(v): "Zweck enthält „\(v)“"
+        case let .creditorID(v): String(localized: "Gläubiger-ID \(v)")
+        case let .mandateReference(v): String(localized: "Mandat \(v)")
+        case let .counterpartIBAN(v): String(localized: "IBAN \(IBANFormat.grouped(v))")
+        case let .counterpart(v): String(localized: "Name enthält „\(v)“")
+        case let .purpose(v): String(localized: "Zweck enthält „\(v)“")
         }
     }
 }

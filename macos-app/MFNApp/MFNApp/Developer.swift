@@ -20,9 +20,9 @@ enum LaunchProfile: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .live: "Echte Daten"
-        case .demo: "Demo mit Beispielbanken"
-        case .fresh: "Frische Installation (Test)"
+        case .live: String(localized: "Echte Daten")
+        case .demo: String(localized: "Demo mit Beispielbanken")
+        case .fresh: String(localized: "Frische Installation (Test)")
         }
     }
 
@@ -30,8 +30,8 @@ enum LaunchProfile: String, CaseIterable, Identifiable {
     var badge: String? {
         switch self {
         case .live: nil
-        case .demo: "Demo"
-        case .fresh: "Testprofil"
+        case .demo: String(localized: "Demo")
+        case .fresh: String(localized: "Testprofil")
         }
     }
 
@@ -95,9 +95,9 @@ enum DeveloperMode {
 
         var errorDescription: String? {
             switch self {
-            case .relaunch: "MFN konnte nicht neu gestartet werden. Bitte MFN selbst neu öffnen."
-            case let .keychain(status): "Der Schlüssel des Testprofils ließ sich nicht aus dem Schlüsselbund löschen (Code \(status))."
-            case .files: "Der Ordner des Testprofils ließ sich nicht löschen."
+            case .relaunch: String(localized: "MFN konnte nicht neu gestartet werden. Bitte MFN selbst neu öffnen.")
+            case let .keychain(status): String(localized: "Der Schlüssel des Testprofils ließ sich nicht aus dem Schlüsselbund löschen (Code \(String(status))).")
+            case .files: String(localized: "Der Ordner des Testprofils ließ sich nicht löschen.")
             }
         }
     }

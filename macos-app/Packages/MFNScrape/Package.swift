@@ -5,6 +5,7 @@ import PackageDescription
 // use it read-only and put wishes into PROPOSALS.md.
 let package = Package(
     name: "MFNScrape",
+    defaultLocalization: "de",
     platforms: [.macOS(.v26)],
     products: [
         .library(name: "MFNScrape", targets: ["MFNScrape"]),
@@ -13,7 +14,7 @@ let package = Package(
         .package(path: "../MFNCore"),
     ],
     targets: [
-        .target(name: "MFNScrape", dependencies: [.product(name: "MFNCore", package: "MFNCore")]),
+        .target(name: "MFNScrape", dependencies: [.product(name: "MFNCore", package: "MFNCore")], resources: [.process("Resources")]),
         .testTarget(name: "MFNScrapeTests", dependencies: ["MFNScrape"]),
     ]
 )

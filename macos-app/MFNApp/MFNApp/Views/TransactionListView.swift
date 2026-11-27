@@ -74,9 +74,11 @@ struct TransactionListView: View {
                             }
                         } header: {
                             SectionHeaderRow(
-                                title: "Selbst geplant",
-                                trailing: "\(ownPlans.count == 1 ? "1 Buchung" : "\(ownPlans.count) Buchungen") · "
-                                    + amount(ownPlans.filter { !matched.contains($0.id) }.reduce(0) { $0 + $1.amountCents }, currency: ledger.sumCurrency)
+                                title: String(localized: "Selbst geplant"),
+                                trailing: {
+                                    let sum = amount(ownPlans.filter { !matched.contains($0.id) }.reduce(0) { $0 + $1.amountCents }, currency: ledger.sumCurrency)
+                                    return ownPlans.count == 1 ? String(localized: "1 Buchung · \(sum)") : String(localized: "\(ownPlans.count) Buchungen · \(sum)")
+                                }()
                             )
                         }
                     }
@@ -85,8 +87,8 @@ struct TransactionListView: View {
                             ForEach(ledger.upcoming) { TransactionRow(transaction: $0, info: ledger.rowInfo(for: $0, isNew: model.isNew($0.id))).equatable() }
                         } header: {
                             SectionHeaderRow(
-                                title: "Vorgemerkt und geplant",
-                                trailing: "\(ledger.upcoming.count) Umsätze · " + amount(ledger.sumCents(ledger.upcoming), currency: ledger.sumCurrency)
+                                title: String(localized: "Vorgemerkt und geplant"),
+                                trailing: String(localized: "\(ledger.upcoming.count) Umsätze · \(amount(ledger.sumCents(ledger.upcoming), currency: ledger.sumCurrency))")
                             )
                         }
                     }
@@ -97,7 +99,7 @@ struct TransactionListView: View {
                             } header: {
                                 SectionHeaderRow(
                                     title: day.title,
-                                    trailing: day.endBalance.map { "Saldo " + amount($0, currency: ledger.sumCurrency) }
+                                    trailing: day.endBalance.map { String(localized: "Saldo \(amount($0, currency: ledger.sumCurrency))") }
                                 )
                             }
                         }
@@ -105,7 +107,7 @@ struct TransactionListView: View {
                         Section {
                             ForEach(page.flat) { TransactionRow(transaction: $0, info: ledger.rowInfo(for: $0, isNew: model.isNew($0.id))).equatable() }
                         } header: {
-                            SectionHeaderRow(title: ledger.query.sort.title, trailing: "\(ledger.flat.count) Umsätze")
+                            SectionHeaderRow(title: ledger.query.sort.title, trailing: String(localized: "\(ledger.flat.count) Umsätze"))
                         }
                     }
                     if page.remaining > 0 {
@@ -281,23 +283,23 @@ struct LedgerBase {
         // `.overview` and `.subscriptions` have their own views; as a list they are "Alle Konten".
         case .overview, .subscriptions, .allAccounts:
             account = nil
-            title = "Alle Konten"
-            subtitle = "\(snapshot.accounts.count) Konten"
+            title = String(localized: "Alle Konten")
+            subtitle = String(localized: "\(snapshot.accounts.count) Konten")
             source = snapshot.transactions
         case .review:
             account = nil
-            title = "Zu prüfen"
-            subtitle = "Konfidenz unter \(Categorizer.reviewThreshold.formatted(.number.locale(Locale(identifier: "de_DE"))))"
+            title = String(localized: "Zu prüfen")
+            subtitle = String(localized: "Konfidenz unter \(Categorizer.reviewThreshold.formatted(.number.locale(Locale.autoupdatingCurrent)))")
             source = snapshot.transactions.filter(model.needsReview)
         case .pending:
             account = nil
-            title = "Vorgemerkt"
-            subtitle = "Alle Konten"
+            title = String(localized: "Vorgemerkt")
+            subtitle = String(localized: "Alle Konten")
             source = snapshot.transactions.filter(\.status.isUpcoming)
         case let .account(id):
             let account = model.account(id)
             self.account = account
-            title = account?.name ?? "Konto"
+            title = account?.name ?? String(localized: "Konto")
             subtitle = account.map { model.connectionName($0.connectionID) } ?? ""
             source = snapshot.transactions(of: id)
         }
@@ -371,7 +373,7 @@ struct LedgerContent {
         let endBalance: Int?
         var id: BankDay { day }
 
-        private static let titleStyle = Date.FormatStyle(date: .complete, time: .omitted, locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone)
+        private static let titleStyle = Date.FormatStyle(date: .complete, time: .omitted, locale: Locale.autoupdatingCurrent, timeZone: BankDay.bankTimeZone)
 
         var title: String { day.startDate.formatted(Self.titleStyle) }
     }
@@ -512,9 +514,9 @@ struct LedgerContent {
 
     var emptyTitle: String {
         switch item {
-        case .review: "Nichts zu prüfen"
-        case .pending: "Keine vorgemerkten Umsätze"
-        case .overview, .subscriptions, .allAccounts, .account: "Keine Umsätze"
+        case .review: String(localized: "Nichts zu prüfen")
+        case .pending: String(localized: "Keine vorgemerkten Umsätze")
+        case .overview, .subscriptions, .allAccounts, .account: String(localized: "Keine Umsätze")
         }
     }
 
@@ -558,12 +560,12 @@ enum ShortfallFormat {
     static let symbol = "exclamationmark.circle.fill"
 
     static func text(_ shortfall: SnapshotIndex.Shortfall) -> String {
-        "Guthaben reicht nicht für geplante Zahlungen: ab \(shortfall.dayText) fehlen bis zu \(shortfall.missingText)"
+        String(localized: "Guthaben reicht nicht für geplante Zahlungen: ab \(shortfall.dayText) fehlen bis zu \(shortfall.missingText)")
     }
 
     /// Short form for the sidebar tooltip and VoiceOver.
     static func short(_ shortfall: SnapshotIndex.Shortfall) -> String {
-        "Reicht nicht für geplante Zahlungen ab \(shortfall.dayText), bis zu \(shortfall.missingText)"
+        String(localized: "Reicht nicht für geplante Zahlungen ab \(shortfall.dayText), bis zu \(shortfall.missingText)")
     }
 }
 
@@ -670,8 +672,8 @@ private struct ShortfallDetails: View {
                     grid(content)
                 }
                 Text(content.lowestIsStart
-                    ? "Rechte Spalte: Kontostand nach der Zahlung. Der Kontostand ist schon heute am tiefsten Punkt."
-                    : "Rechte Spalte: Kontostand nach der Zahlung.")
+                    ? String(localized: "Rechte Spalte: Kontostand nach der Zahlung. Der Kontostand ist schon heute am tiefsten Punkt.")
+                    : String(localized: "Rechte Spalte: Kontostand nach der Zahlung."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -734,19 +736,21 @@ private struct ShortfallDetails: View {
     }
 
     private func spoken(_ cents: Int, signed: Bool = false) -> String {
-        model.hideAmounts ? "Betrag ausgeblendet" : Money.format(cents, signed: signed)
+        model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(cents, signed: signed)
     }
 
     private func rowLabel(_ step: ForecastPath.Step, today: BankDay) -> String {
         [ForecastFormat.text(step.day, today: today), step.event.title, kind(step.event, today: today),
          spoken(step.event.cents, signed: true),
-         "Kontostand danach \(spoken(step.cents))" + (step.cents < 0 && !model.hideAmounts ? ", unter null" : "")]
+         step.cents < 0 && !model.hideAmounts
+            ? String(localized: "Kontostand danach \(spoken(step.cents)), unter null")
+            : String(localized: "Kontostand danach \(spoken(step.cents))")]
             .joined(separator: ", ")
     }
 
     private func kind(_ event: ForecastEvent, today: BankDay) -> String {
         let kind = ForecastFormat.kind(event)
-        return event.isOverdue ? "\(kind) · fällig seit \(ForecastFormat.text(event.dueDay, today: today))" : kind
+        return event.isOverdue ? String(localized: "\(kind) · fällig seit \(ForecastFormat.text(event.dueDay, today: today))") : kind
     }
 }
 
@@ -930,11 +934,11 @@ private struct LedgerHeader: View {
                 Button {
                     model.showBudgetEditor(for: account)
                 } label: {
-                    Label(hasBudget ? "Budget ändern …" : "Budget festlegen …", systemImage: "gauge.with.needle")
+                    Label(hasBudget ? String(localized: "Budget ändern …") : String(localized: "Budget festlegen …"), systemImage: "gauge.with.needle")
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
-                .help(hasBudget ? "Budget ändern oder entfernen" : "Ausgabenbudget für dieses Konto festlegen")
+                .help(hasBudget ? String(localized: "Budget ändern oder entfernen") : String(localized: "Ausgabenbudget für dieses Konto festlegen"))
             }
             if model.forecastBasis(of: account.id) != nil {
                 Button {
@@ -1043,7 +1047,7 @@ private struct LedgerHeader: View {
     }
 
     private var monthName: String {
-        Date().formatted(.dateTime.month(.wide).locale(Locale(identifier: "de_DE")))
+        Date().formatted(.dateTime.month(.wide).locale(Locale.autoupdatingCurrent))
     }
 
     @ViewBuilder
@@ -1054,13 +1058,18 @@ private struct LedgerHeader: View {
                 if let available = balance.availableCents {
                     Figure(label: "Verfügbar", cents: available, currency: balance.currency) {
                         if let planned = ledger.account.map({ model.ownPlannedCents(for: $0.id) }), planned != 0 {
-                            Text("\(model.hideAmounts ? "•••••" : Money.format(available + planned)) nach selbst Geplantem")
-                                .accessibilityLabel(model.hideAmounts ? "Betrag ausgeblendet, nach selbst Geplantem" : "\(Money.format(available + planned)) nach selbst Geplantem")
-                                .help("Verfügbar abzüglich der selbst geplanten Buchungen (\(model.hideAmounts ? "•••••" : Money.format(planned, signed: true)))")
+                            let afterPlanned = model.hideAmounts ? "•••••" : Money.format(available + planned)
+                            let plannedText = model.hideAmounts ? "•••••" : Money.format(planned, signed: true)
+                            Text(String(localized: "\(afterPlanned) nach selbst Geplantem"))
+                                .accessibilityLabel(model.hideAmounts ? String(localized: "Betrag ausgeblendet, nach selbst Geplantem") : String(localized: "\(afterPlanned) nach selbst Geplantem"))
+                                .help(String(localized: "Verfügbar abzüglich der selbst geplanten Buchungen (\(plannedText))"))
                         }
                         if ledger.pendingCents != 0 {
-                            Text("gebucht \(ledger.pendingCents < 0 ? "−" : "+") \(model.hideAmounts ? "•••••" : Money.format(abs(ledger.pendingCents))) vorgemerkt")
-                                .accessibilityLabel(model.hideAmounts ? "Betrag ausgeblendet, vorgemerkt" : "gebucht \(ledger.pendingCents < 0 ? "minus" : "plus") \(Money.format(abs(ledger.pendingCents))) vorgemerkt")
+                            let sign = ledger.pendingCents < 0 ? "−" : "+"
+                            let word = ledger.pendingCents < 0 ? String(localized: "minus") : String(localized: "plus")
+                            let pendingText = model.hideAmounts ? "•••••" : Money.format(abs(ledger.pendingCents))
+                            Text(String(localized: "gebucht \(sign) \(pendingText) vorgemerkt"))
+                                .accessibilityLabel(model.hideAmounts ? String(localized: "Betrag ausgeblendet, vorgemerkt") : String(localized: "gebucht \(word) \(pendingText) vorgemerkt"))
                         }
                     }
                 }
@@ -1071,11 +1080,17 @@ private struct LedgerHeader: View {
                     let pending = ledger.account.flatMap { model.forecastBasis(of: $0.id) }.map { $0.startCents - $0.bookedCents } ?? 0
                     Figure(label: "Nach Geplantem", cents: balance.bookedCents + pending + planned, currency: balance.currency) {
                         // Two short lines like "Verfügbar": one long line made the figure too wide.
-                        Text("gebucht \(planned < 0 ? "−" : "+") \(model.hideAmounts ? "•••••" : Money.format(abs(planned))) geplant")
-                            .accessibilityLabel(model.hideAmounts ? "Betrag ausgeblendet, selbst geplant" : "simuliert: gebucht \(planned < 0 ? "abzüglich" : "zuzüglich") \(Money.format(abs(planned))) selbst geplant")
+                        let plannedSign = planned < 0 ? "−" : "+"
+                        let plannedWord = planned < 0 ? String(localized: "abzüglich") : String(localized: "zuzüglich")
+                        let plannedText = model.hideAmounts ? "•••••" : Money.format(abs(planned))
+                        Text(String(localized: "gebucht \(plannedSign) \(plannedText) geplant"))
+                            .accessibilityLabel(model.hideAmounts ? String(localized: "Betrag ausgeblendet, selbst geplant") : String(localized: "simuliert: gebucht \(plannedWord) \(Money.format(abs(planned))) selbst geplant"))
                         if pending != 0 {
-                            Text("\(pending < 0 ? "−" : "+") \(model.hideAmounts ? "•••••" : Money.format(abs(pending))) vorgemerkt")
-                                .accessibilityLabel(model.hideAmounts ? "Betrag ausgeblendet, vorgemerkt" : "\(pending < 0 ? "minus" : "plus") \(Money.format(abs(pending))) vorgemerkt")
+                            let pendingSign = pending < 0 ? "−" : "+"
+                            let pendingWord = pending < 0 ? String(localized: "minus") : String(localized: "plus")
+                            let pendingText = model.hideAmounts ? "•••••" : Money.format(abs(pending))
+                            Text(String(localized: "\(pendingSign) \(pendingText) vorgemerkt"))
+                                .accessibilityLabel(model.hideAmounts ? String(localized: "Betrag ausgeblendet, vorgemerkt") : String(localized: "\(pendingWord) \(Money.format(abs(pending))) vorgemerkt"))
                         }
                     }
                     .help("Simuliert: gebuchter Saldo mit vorgemerkten und selbst geplanten Buchungen. Regelmäßige Buchungen zeigt die Prognose (⌥⌘P).")
@@ -1105,14 +1120,14 @@ private struct CompactableLabelStyle: LabelStyle {
 }
 
 private struct Figure<Caption: View>: View {
-    let label: String
+    let label: LocalizedStringResource
     let cents: Int
     let currency: String
     @ViewBuilder var caption: Caption
 
     var body: some View {
         VStack(alignment: .trailing, spacing: 2) {
-            Text(label.uppercased())
+            Text(String(localized: label).uppercased())
                 .font(.caption)
                 .foregroundStyle(.secondary)
             AmountText(cents: cents, currency: currency, colorsInflow: false)
@@ -1129,7 +1144,7 @@ private struct Figure<Caption: View>: View {
 }
 
 extension Figure where Caption == EmptyView {
-    init(label: String, cents: Int, currency: String) {
+    init(label: LocalizedStringResource, cents: Int, currency: String) {
         self.init(label: label, cents: cents, currency: currency) { EmptyView() }
     }
 }
@@ -1143,9 +1158,9 @@ private struct LedgerFooter: View {
         HStack(spacing: 6) {
             Text(summary)
             if ledger.cancelledCount > 0 {
-                Button(model.showCancelled ? "ausblenden" : "einblenden") { model.showCancelled.toggle() }
+                Button(model.showCancelled ? String(localized: "ausblenden") : String(localized: "einblenden")) { model.showCancelled.toggle() }
                     .buttonStyle(.link)
-                    .help(model.showCancelled ? "Stornos ausblenden (⌥⌘S)" : "Stornos einblenden (⌥⌘S)")
+                    .help(model.showCancelled ? String(localized: "Stornos ausblenden (⌥⌘S)") : String(localized: "Stornos einblenden (⌥⌘S)"))
             }
             Spacer()
             if let status = model.categorizationStatus, selection.isEmpty {
@@ -1174,9 +1189,10 @@ private struct LedgerFooter: View {
             }
             if !selection.isEmpty {
                 let selected = ledger.transactions(selection)
-                Text("Ausgewählt: \(selected.count) · \(model.hideAmounts ? "•••••" : Money.format(ledger.sumCents(selected), currency: ledger.sumCurrency))")
+                let selectedSum = model.hideAmounts ? "•••••" : Money.format(ledger.sumCents(selected), currency: ledger.sumCurrency)
+                Text(String(localized: "Ausgewählt: \(selected.count) · \(selectedSum)"))
                     .monospacedDigit()
-                    .accessibilityLabel(model.hideAmounts ? "Ausgewählt: \(selected.count), Betrag ausgeblendet" : "Ausgewählt: \(selected.count), Summe \(Money.format(ledger.sumCents(selected), currency: ledger.sumCurrency))")
+                    .accessibilityLabel(model.hideAmounts ? String(localized: "Ausgewählt: \(selected.count), Betrag ausgeblendet") : String(localized: "Ausgewählt: \(selected.count), Summe \(selectedSum)"))
             }
         }
         .font(.callout)
@@ -1186,10 +1202,10 @@ private struct LedgerFooter: View {
     }
 
     private var summary: String {
-        var parts = [ledger.query.isFiltering ? "\(ledger.bookedCount) Treffer" : "\(ledger.bookedCount) Umsätze"]
-        if !ledger.upcoming.isEmpty { parts.append("\(ledger.upcoming.count) vorgemerkt") }
+        var parts = [ledger.query.isFiltering ? String(localized: "\(ledger.bookedCount) Treffer") : String(localized: "\(ledger.bookedCount) Umsätze")]
+        if !ledger.upcoming.isEmpty { parts.append(String(localized: "\(ledger.upcoming.count) vorgemerkt")) }
         if ledger.cancelledCount > 0 {
-            parts.append("\(ledger.cancelledCount) storniert")
+            parts.append(String(localized: "\(ledger.cancelledCount) storniert"))
         }
         return parts.joined(separator: " · ")
     }
@@ -1294,37 +1310,37 @@ struct TransactionRow: View, Equatable {
 
     private var accessibilityText: String {
         var parts = [transaction.counterpartName]
-        if info.isNew { parts.append("neu") }
+        if info.isNew { parts.append(String(localized: "neu")) }
         switch status {
-        case .pending: parts.append("vorgemerkt")
-        case .planned: parts.append("geplant")
-        case .cancelled: parts.append("storniert")
+        case .pending: parts.append(String(localized: "vorgemerkt"))
+        case .planned: parts.append(String(localized: "geplant"))
+        case .cancelled: parts.append(String(localized: "storniert"))
         case .booked: break
         }
         let sub = subtitle
         if !sub.isEmpty { parts.append(sub) }
         if let category = transaction.categoryID {
-            parts.append(model.needsReview(transaction) ? "Kategorievorschlag \(category.title)" : "Kategorie \(category.title)")
+            parts.append(model.needsReview(transaction) ? String(localized: "Kategorievorschlag \(category.title)") : String(localized: "Kategorie \(category.title)"))
         }
-        if info.isRecurring, status != .cancelled { parts.append("wiederkehrend") }
-        if transaction.isImported { parts.append("importiert") }
+        if info.isRecurring, status != .cancelled { parts.append(String(localized: "wiederkehrend")) }
+        if transaction.isImported { parts.append(String(localized: "importiert")) }
         return parts.joined(separator: ", ")
     }
 
     private var accessibilityAmount: String {
-        model.hideAmounts ? "Betrag ausgeblendet" : Money.format(transaction.amountCents, currency: transaction.currency, signed: true)
+        model.hideAmounts ? String(localized: "Betrag ausgeblendet") : Money.format(transaction.amountCents, currency: transaction.currency, signed: true)
     }
 
     private var subtitle: String {
         var parts: [String] = []
         if info.showsDate { parts.append(listDate(transaction.effectiveDate)) }
-        if let person = info.initiatorName { parts.append("von \(person)") }
+        if let person = info.initiatorName { parts.append(String(localized: "von \(person)")) }
         if let account = info.accountName { parts.append(account) }
         if !transaction.purpose.isEmpty { parts.append(transaction.purpose) }
         // ⇧⌘H: the original amount in a foreign currency is an amount too.
         if let foreign = model.foreignAmountText(of: transaction) { parts.append(foreign) }
         if status == .planned {
-            parts.append("fällig \(shortDate(transaction.valueDate))")
+            parts.append(String(localized: "fällig \(shortDate(transaction.valueDate))"))
         }
         return parts.joined(separator: " · ")
     }
@@ -1363,7 +1379,7 @@ struct TransactionRow: View, Equatable {
         .strikethrough(false)
     }
 
-    private static let dayMonth = Date.FormatStyle(locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone).day().month(.abbreviated)
+    private static let dayMonth = Date.FormatStyle(locale: Locale.autoupdatingCurrent, timeZone: BankDay.bankTimeZone).day().month(.abbreviated)
     private static let dayMonthYear = dayMonth.year()
 
     /// "3. Nov." this year, "3. Nov. 2025" otherwise.
@@ -1412,10 +1428,10 @@ private struct LoadMoreRow: View {
 extension AccountType {
     var title: String {
         switch self {
-        case .giro: "Girokonto"
-        case .tagesgeld: "Tagesgeld"
-        case .depot: "Depot"
-        case .card: "Kreditkarte"
+        case .giro: String(localized: "Girokonto")
+        case .tagesgeld: String(localized: "Tagesgeld")
+        case .depot: String(localized: "Depot")
+        case .card: String(localized: "Kreditkarte")
         }
     }
 }
@@ -1437,12 +1453,12 @@ enum IBANFormat {
 extension TransactionQuery.Sort {
     var title: String {
         switch self {
-        case .newestFirst: "Datum, neueste zuerst"
-        case .oldestFirst: "Datum, älteste zuerst"
-        case .largestOutflow: "Größte Ausgaben zuerst"
-        case .largestInflow: "Größte Eingänge zuerst"
-        case .counterpart: "Empfänger/Auftraggeber A–Z"
-        case .newFirst: "Neue zuerst"
+        case .newestFirst: String(localized: "Datum, neueste zuerst")
+        case .oldestFirst: String(localized: "Datum, älteste zuerst")
+        case .largestOutflow: String(localized: "Größte Ausgaben zuerst")
+        case .largestInflow: String(localized: "Größte Eingänge zuerst")
+        case .counterpart: String(localized: "Empfänger/Auftraggeber A–Z")
+        case .newFirst: String(localized: "Neue zuerst")
         }
     }
 }
@@ -1450,9 +1466,9 @@ extension TransactionQuery.Sort {
 extension TransactionQuery.Direction {
     var title: String {
         switch self {
-        case .all: "Ein- und Ausgänge"
-        case .inflow: "Nur Eingänge"
-        case .outflow: "Nur Ausgänge"
+        case .all: String(localized: "Ein- und Ausgänge")
+        case .inflow: String(localized: "Nur Eingänge")
+        case .outflow: String(localized: "Nur Ausgänge")
         }
     }
 }
@@ -1460,13 +1476,13 @@ extension TransactionQuery.Direction {
 extension TransactionQuery.Period {
     var title: String {
         switch self {
-        case .all: "Gesamter Zeitraum"
-        case .thisMonth: "Dieser Monat"
-        case .lastMonth: "Letzter Monat"
-        case .last30Days: "Letzte 30 Tage"
-        case .last90Days: "Letzte 90 Tage"
-        case .thisYear: "Dieses Jahr"
-        case .lastYear: "Letztes Jahr"
+        case .all: String(localized: "Gesamter Zeitraum")
+        case .thisMonth: String(localized: "Dieser Monat")
+        case .lastMonth: String(localized: "Letzter Monat")
+        case .last30Days: String(localized: "Letzte 30 Tage")
+        case .last90Days: String(localized: "Letzte 90 Tage")
+        case .thisYear: String(localized: "Dieses Jahr")
+        case .lastYear: String(localized: "Letztes Jahr")
         }
     }
 }
@@ -1504,7 +1520,7 @@ private struct FilterMenu: View {
             Toggle("Nur ohne Kategorie", isOn: $query.onlyUncategorized)
             Toggle("Nur neue", isOn: $query.onlyNew)
                 .help("Nur Umsätze, die seit dem Abgleich neu sind; gelesene bleiben bis zum Wechsel der Liste stehen (⌃⌘N)")
-            Toggle(ledger.importedCount > 0 ? "Nur importierte (\(ledger.importedCount))" : "Nur importierte", isOn: $query.onlyImported)
+            Toggle(ledger.importedCount > 0 ? String(localized: "Nur importierte (\(ledger.importedCount))") : String(localized: "Nur importierte"), isOn: $query.onlyImported)
                 .help("Nur Umsätze aus CSV-Importen (⌃⌘I)")
             if !ledger.categories.isEmpty || query.category != nil {
                 Picker("Kategorie", selection: $query.category) {
@@ -1554,8 +1570,9 @@ private struct FilterBar: View {
                 .lineLimit(1)
                 .truncationMode(.middle)
             Spacer(minLength: 8)
-            Text("\(ledger.listedCount) Treffer · \(model.hideAmounts ? "•••••" : Money.format(ledger.listedCents, currency: ledger.sumCurrency))")
-                .accessibilityLabel(model.hideAmounts ? "\(ledger.listedCount) Treffer, Betrag ausgeblendet" : "\(ledger.listedCount) Treffer, Summe \(Money.format(ledger.listedCents, currency: ledger.sumCurrency))")
+            let listedSum = model.hideAmounts ? "•••••" : Money.format(ledger.listedCents, currency: ledger.sumCurrency)
+            Text(String(localized: "\(ledger.listedCount) Treffer · \(listedSum)"))
+                .accessibilityLabel(model.hideAmounts ? String(localized: "\(ledger.listedCount) Treffer, Betrag ausgeblendet") : String(localized: "\(ledger.listedCount) Treffer, Summe \(listedSum)"))
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
             if ledger.query.onlyImported {
@@ -1585,13 +1602,16 @@ private struct FilterBar: View {
         if query.direction != .all { parts.append(query.direction.title) }
         if query.period != .all { parts.append(query.period.title) }
         if query.onlyUncategorized {
-            parts.append("ohne Kategorie")
+            parts.append(String(localized: "ohne Kategorie"))
         } else if let category = query.category {
             parts.append(category.title)
         }
-        if query.onlyImported { parts.append("importiert") }
-        if query.onlyNew { parts.append("neu") }
-        if let key = query.initiator { parts.append("von \(ledger.person(key)?.name ?? "…")") }
+        if query.onlyImported { parts.append(String(localized: "importiert")) }
+        if query.onlyNew { parts.append(String(localized: "neu")) }
+        if let key = query.initiator {
+            let name = ledger.person(key)?.name ?? "…"
+            parts.append(String(localized: "von \(name)"))
+        }
         if let account = query.accounts.first { parts.append(ledger.accountName(account)) }
         return parts.joined(separator: " · ")
     }
@@ -1643,7 +1663,7 @@ struct SuggestionChip: View {
             HStack(spacing: 3) {
                 Image(systemName: category.symbol)
                     .imageScale(.small)
-                Text(category.title + "?")
+                Text("\(category.title)?")
                     .lineLimit(1)
                 Image(systemName: "chevron.down")
                     .font(.caption2.weight(.semibold))

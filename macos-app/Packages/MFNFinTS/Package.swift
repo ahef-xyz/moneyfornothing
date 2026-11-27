@@ -7,6 +7,7 @@ import PackageDescription
 //   Banks/DKB/, Parsers/CAMT*, TAN/Decoupled*             DKB agent
 let package = Package(
     name: "MFNFinTS",
+    defaultLocalization: "de",
     platforms: [.macOS(.v26)],
     products: [
         .library(name: "MFNFinTS", targets: ["MFNFinTS"]),
@@ -16,7 +17,7 @@ let package = Package(
         .package(path: "../MFNConformance"),
     ],
     targets: [
-        .target(name: "MFNFinTS", dependencies: [.product(name: "MFNCore", package: "MFNCore")]),
+        .target(name: "MFNFinTS", dependencies: [.product(name: "MFNCore", package: "MFNCore")], resources: [.process("Resources")]),
         .testTarget(
             name: "MFNFinTSTests",
             dependencies: [

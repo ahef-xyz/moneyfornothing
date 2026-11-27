@@ -14,9 +14,9 @@ enum AppIconChoice: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .dark: "Schwarz"
-        case .flat: "Violett"
-        case .retro: "Retro 3D"
+        case .dark: String(localized: "Schwarz")
+        case .flat: String(localized: "Violett")
+        case .retro: String(localized: "Retro 3D")
         }
     }
 

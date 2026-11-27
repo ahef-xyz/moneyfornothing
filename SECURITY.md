@@ -13,6 +13,26 @@ In scope: leaks of credentials, session data, database keys or personal data; we
 database encryption, app lock or Keychain handling; anything that could make MFN act on an account
 instead of only reading it.
 
+## Banks over YAXI (from 0.7.0)
+
+Opt-in per bank. MFN talks to YAXI (`api.yaxi.tech`, `integration.yaxi.tech` for test keys) through YAXI's
+client `routex-client-swift` (pinned 0.6.2). The client verifies the AMD SEV-SNP attestation of YAXI's
+enclave and seals every request and response with a key settled with that enclave, so YAXI's staff and its
+data centre cannot read credentials, consent or results. The user's own YAXI API key lives only in the
+Keychain (never in a backup); MFN issues the short-lived tickets on the Mac and runs no server. Tickets
+exist only for the accounts, balances and transactions services; a test fails if code for transfers or
+payment collection appears. Results of the consent flow are HS256 JWTs and are checked with the key and
+the ticket ID. The bank login stays in the Keychain like other bank logins and is only sent when the bank
+wants a new consent; the consent itself (`ConnectionData`) is in the Keychain too. Bank logos come from
+`logos.yaxi.tech` (no cookies, that host only, PNG, size cap; off with "Load Bank Icons from Websites" / "Bank-Symbole von den Websites laden").
+
+YAXI records web logs with masked IP addresses, records of service calls (kept up to seven years for fraud
+investigation) and traces (90 days), see https://docs.yaxi.tech/diagnostics.html. MFN never sends YAXI a
+diagnostic archive.
+
+Also in scope: any way for MFN to issue a ticket beyond reading, to leak the YAXI key or consent, or to
+accept an unattested or unsealed answer.
+
 ## AI assistants (MCP, from 0.6.0)
 
 Off by default. When the user switches it on, MFN listens on a Unix socket (mode 0600) in its App Group

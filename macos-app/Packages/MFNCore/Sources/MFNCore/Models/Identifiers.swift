@@ -15,6 +15,9 @@ public enum ConnectorID: String, Codable, Sendable, CaseIterable, Hashable {
     case manual
     /// v11: PayPal over its website (visible web login, package `MFNPayPal`).
     case paypal
+    /// v12: any bank through YAXI's attested service, with the user's own YAXI access (package
+    /// `MFNYAXI`, docs/v0.7.0.md). The bank itself is a YAXI connection ID stored per connection.
+    case yaxi
 
     public var displayName: String {
         switch self {
@@ -25,8 +28,9 @@ public enum ConnectorID: String, Codable, Sendable, CaseIterable, Hashable {
         case .easybank: "easybank"
         case .n26: "N26"
         case .mock: "Demo"
-        case .manual: "Ohne Anbindung"
+        case .manual: String(localized: "Ohne Anbindung", bundle: .module)
         case .paypal: "PayPal"
+        case .yaxi: "YAXI"
         }
     }
 }

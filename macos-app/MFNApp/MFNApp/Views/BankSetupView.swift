@@ -1,5 +1,6 @@
 import AppKit
 import MFNCore
+import MFNYAXI
 import SwiftUI
 
 /// "Bank hinzufügen" assistant (sheet). Native look like the account assistants of Mail or
@@ -7,6 +8,12 @@ import SwiftUI
 struct BankSetupView: View {
     @Bindable var setup: BankSetup
     @Environment(AppModel.self) private var model
+    @Environment(\.openSettings) private var openSettings
+    @FocusState private var searchFocused: Bool
+    @ScaledMetric(relativeTo: .title) private var searchSymbolSize: CGFloat = 26
+
+    /// The bank as the user knows it: the YAXI bank's own name, else the connector's.
+    private var bankName: String { setup.access?.yaxiBank?.name ?? setup.connector?.displayName ?? "" }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -37,7 +44,8 @@ struct BankSetupView: View {
     private var showsWebPage: Bool {
         guard let connection = setup.connection, let request = model.presenter.request(for: connection.id),
               case let .webLogin(webLogin) = request.challenge else { return false }
-        return webLogin.automation == nil
+        // v12: a bank redirect opens in the system's login window, not inside the assistant.
+        return webLogin.automation == nil && SystemLogin.callbackScheme(of: webLogin) == nil
     }
 
     // MARK: Header
@@ -46,6 +54,14 @@ struct BankSetupView: View {
         HStack(spacing: 12) {
             if setup.isManualStep {
                 ConnectorBadge(connector: .manual, size: 36)
+            } else if let bank = setup.access?.yaxiBank, setup.step != .chooseBank, setup.step != .yaxiSearch {
+                BankBadge(connection: Connection(id: "setup", connectorID: .yaxi, displayName: bank.name), size: 36, yaxiLogoID: bank.logoID)
+            } else if setup.step == .yaxiSearch {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: searchSymbolSize))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 36, height: 36)
+                    .accessibilityHidden(true)
             } else if let connector = setup.connector, setup.step != .chooseBank {
                 ConnectorBadge(connector: connector, size: 36)
             } else {
@@ -64,20 +80,22 @@ struct BankSetupView: View {
         }
     }
 
-    private var title: String {
+    private var title: LocalizedStringKey {
         switch setup.step {
         case .chooseBank: "Bank hinzufügen"
-        case .credentials, .connecting, .failed: "Bei \(setup.connector?.displayName ?? "") anmelden"
+        case .credentials, .connecting, .failed: "Bei \(bankName) anmelden"
+        case .yaxiSearch: "Andere Bank über YAXI"
         case .accounts: "Konten gefunden"
         case .manualAccount: setup.manualEditing == nil ? "Konto ohne Anbindung anlegen" : "Konto bearbeiten"
         case .manualCreated: "Konto angelegt"
         }
     }
 
-    private var subtitle: String {
+    private var subtitle: LocalizedStringKey {
         switch setup.step {
         case .chooseBank: "Wähle die Bank, deren Konten MFN abgleichen soll."
-        case .credentials: "Gib die Zugangsdaten für das Online-Banking ein."
+        case .yaxiSearch: "Suche deine Bank unter den Banken, die YAXI erreicht."
+        case .credentials: setup.loginHappensAtBank ? "Die Anmeldung läuft direkt bei deiner Bank." : "Gib die Zugangsdaten für das Online-Banking ein."
         case .connecting: "MFN meldet sich an. Freigaben erscheinen hier."
         case .accounts: "Mit „Fertig“ startet der erste Abgleich mit der verfügbaren Historie."
         case .failed: "Die Anmeldung hat nicht geklappt."
@@ -98,36 +116,115 @@ struct BankSetupView: View {
         case let .failed(message): failure(message)
         case .manualAccount: ManualAccountForm(setup: setup)
         case .manualCreated: manualCreated
+        case .yaxiSearch: yaxiSearch
         }
+    }
+
+    private func bankRow(_ access: BankAccess) -> some View {
+        let reason = BankSetup.unavailableReason(access)
+        return HStack(spacing: 10) {
+            ConnectorBadge(connector: access.connector, size: 24)
+            Text(access.displayName)
+            Spacer()
+            if let reason {
+                Text(reason)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.trailing)
+            } else if let note = BankSetup.note(access) {
+                Text(note)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.trailing)
+                    .help(BankSetup.detail(access) ?? note)
+            }
+        }
+        .padding(.vertical, 3)
+        .opacity(reason == nil ? 1 : 0.5)
+        // One VoiceOver element (bank, note); the explanation is the hint, not only a tooltip.
+        .accessibilityElement(children: .combine)
+        .tag(access)
+        .selectionDisabled(reason != nil)
+        .accessibilityHint(reason ?? [BankSetup.detail(access), BankSetup.advice(access)].compactMap { $0 }.joined(separator: " "))
+    }
+
+    // MARK: YAXI (v12)
+
+    private var yaxiSearch: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if model.yaxiAccess.hasKey {
+                TextField("Name oder BLZ der Bank", text: $setup.yaxiQuery)
+                    .textFieldStyle(.roundedBorder)
+                    .focused($searchFocused)
+                    .onAppear { searchFocused = true }
+                    .onChange(of: setup.yaxiQuery) { setup.yaxiQueryChanged() }
+                    .onSubmit { setup.chooseYAXIBank() }
+                List(setup.yaxiResults, selection: $setup.yaxiSelection) { bank in
+                    BankBadgeRow(name: bank.name, logoID: bank.logoID, country: bank.countryNames)
+                        .tag(bank.id)
+                        .onAppear { model.loadYAXILogo(bank.logoID) }
+                }
+                .listStyle(.bordered(alternatesRowBackgrounds: false))
+                .contextMenu(forSelectionType: YAXIBank.ID.self) { _ in } primaryAction: { _ in setup.chooseYAXIBank() }
+                HStack(spacing: 8) {
+                    if setup.yaxiSearching { ProgressView().controlSize(.small).accessibilityLabel("Suche läuft") }
+                    if let message = setup.yaxiMessage {
+                        Text(message).font(.callout).foregroundStyle(.secondary)
+                    }
+                }
+                // VoiceOver hears what the search found (the list changes silently otherwise).
+                .onChange(of: setup.yaxiResults.count) { _, count in
+                    guard count > 0 else { return }
+                    AccessibilityNotification.Announcement(count == 1 ? String(localized: "1 Bank gefunden") : String(localized: "\(count) Banken gefunden")).post()
+                }
+                .onChange(of: setup.yaxiMessage) { _, message in
+                    if let message { AccessibilityNotification.Announcement(message).post() }
+                }
+                Text("Jede Suche ist ein Aufruf bei YAXI und zählt zu deinem Kontingent.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text(setup.yaxiMessage ?? "")
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("YAXI meldet sich in einer geprüften, verschlüsselten Umgebung bei über tausend Banken an. Den Zugang legst du selbst bei YAXI an; MFN stellt mit deinem Schlüssel nur Abrufe von Konten, Salden und Umsätzen aus.")
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("Einstellungen öffnen …") { openSettings() }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 16)
     }
 
     private var bankList: some View {
         List(selection: $setup.access) {
-            ForEach(BankSetup.banks) { access in
-                let reason = BankSetup.unavailableReason(access)
+            ForEach(BankSetup.banks.filter { BankSetup.unavailableReason($0) == nil }) { access in bankRow(access) }
+            // v12: every other bank, through the user's own YAXI access.
+            if !model.isDemo {
                 HStack(spacing: 10) {
-                    ConnectorBadge(connector: access.connector, size: 24)
-                    Text(access.displayName)
+                    Image(systemName: "magnifyingglass")
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 24, height: 24)
+                        .accessibilityHidden(true)
+                    Text("Andere Bank über YAXI …")
+                        .fixedSize(horizontal: false, vertical: true)
+                    BetaBadge()
                     Spacer()
-                    if let reason {
-                        Text(reason)
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                    } else if let note = BankSetup.note(access) {
-                        Text(note)
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                            .help(BankSetup.detail(access) ?? note)
-                    }
+                    Text("über 1.000 Banken")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.trailing)
                 }
                 .padding(.vertical, 3)
-                .opacity(reason == nil ? 1 : 0.5)
-                // One VoiceOver element (bank, note); the explanation is the hint, not only a tooltip.
                 .accessibilityElement(children: .combine)
-                .tag(access)
-                .selectionDisabled(reason != nil)
-                .accessibilityHint(reason ?? BankSetup.detail(access) ?? "")
+                .accessibilityHint("Suche unter den Banken, die YAXI erreicht. Braucht einen eigenen YAXI-Zugang.")
+                .tag(BankSetup.yaxiRow)
             }
+            ForEach(BankSetup.banks.filter { BankSetup.unavailableReason($0) != nil }) { access in bankRow(access) }
         }
         .listStyle(.bordered(alternatesRowBackgrounds: false))
         .padding(.horizontal, 20)
@@ -148,16 +245,31 @@ struct BankSetupView: View {
                 } footer: {
                     Text("So erscheint die Bank in der Seitenleiste. Eine Bank lässt sich mehrfach hinzufügen, z. B. für einen zweiten Zugang.")
                 }
-                Section {
-                    CredentialForm(fields: access.credentialFields, values: $setup.values)
-                } footer: {
-                    CredentialNote()
+                if setup.loginHappensAtBank {
+                    Section {
+                        AtBankSteps(bank: setup.access?.yaxiBank?.name ?? String(localized: "deiner Bank"))
+                    }
+                } else {
+                    Section {
+                        CredentialForm(fields: access.credentialFields, values: $setup.values)
+                    } footer: {
+                        if access.connector == .yaxi {
+                            Text("MFN liest nur, keine Überweisungen, keine Aufträge. Die Zugangsdaten bleiben im Schlüsselbund dieses Macs.")
+                        } else {
+                            CredentialNote()
+                        }
+                    }
                 }
                 if let detail = BankSetup.detail(access) {
                     Section {
                         Label(detail, systemImage: "info.circle")
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
+                        if let advice = BankSetup.advice(access) {
+                            Text(advice)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
                 }
             }
@@ -174,7 +286,11 @@ struct BankSetupView: View {
             } else {
                 HStack(spacing: 10) {
                     ProgressView().controlSize(.small)
-                    Text("Verbindung zu \(setup.connector?.displayName ?? "der Bank") wird aufgebaut …")
+                    if bankName.isEmpty {
+                        Text("Verbindung zur Bank wird aufgebaut …")
+                    } else {
+                        Text("Verbindung zu \(bankName) wird aufgebaut …")
+                    }
                 }
             }
         }
@@ -253,7 +369,7 @@ struct BankSetupView: View {
 
     private var footer: some View {
         HStack {
-            if setup.step == .credentials || (setup.step == .manualAccount && !setup.manualOnly) {
+            if setup.step == .credentials || setup.step == .yaxiSearch || (setup.step == .manualAccount && !setup.manualOnly) {
                 Button("Zurück") { setup.backToBanks() }
             }
             if setup.step == .chooseBank {
@@ -287,11 +403,15 @@ struct BankSetupView: View {
                     .keyboardShortcut(.defaultAction)
                     .disabled(setup.access.map { BankSetup.unavailableReason($0) != nil } ?? true)
             case .credentials:
-                Button("Anmelden") { setup.login() }
+                Button(setup.loginHappensAtBank ? "Weiter zur Bank" : "Anmelden") { setup.login() }
                     .keyboardShortcut(.defaultAction)
                     .disabled(setup.credentialProblem != nil)
             case .connecting:
                 EmptyView()
+            case .yaxiSearch:
+                Button("Weiter") { setup.chooseYAXIBank() }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(setup.yaxiSelection == nil)
             case .accounts:
                 if setup.isFinishing { ProgressView().controlSize(.small) }
                 Button("Fertig") { Task { await setup.finish() } }
@@ -325,13 +445,72 @@ struct BankSetupView: View {
 
     static func detail(_ account: Account) -> String {
         let type = switch account.type {
-        case .giro: "Girokonto"
-        case .tagesgeld: "Tagesgeld"
-        case .depot: "Depot"
-        case .card: "Kreditkarte"
+        case .giro: String(localized: "Girokonto")
+        case .tagesgeld: String(localized: "Tagesgeld")
+        case .depot: String(localized: "Depot")
+        case .card: String(localized: "Kreditkarte")
         }
         if let last4 = account.cardLast4 { return "\(type) ·· \(last4)" }
         if let iban = account.iban, iban.count > 4 { return "\(type) ·· \(iban.suffix(4))" }
         return type
+    }
+}
+
+/// A search result: the bank's logo from YAXI (monogram until it is loaded) and its name.
+private struct BankBadgeRow: View {
+    let name: String
+    let logoID: String?
+    /// Two banks may share a name (easybank in Germany and Austria).
+    let country: String?
+
+    var body: some View {
+        HStack(spacing: 10) {
+            BankBadge(connection: Connection(id: "search", connectorID: .yaxi, displayName: name), size: 22, yaxiLogoID: logoID)
+            Text(name)
+            Spacer()
+            if let country {
+                Text(country)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 2)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// What happens next for a bank over YAXI that asks MFN for no login data (easybank, many PSD2 banks).
+private struct AtBankSteps: View {
+    let bank: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("\(bank) braucht keine Zugangsdaten in MFN. So geht es weiter:")
+            step(1, "Nach „Weiter zur Bank“ öffnet sich ein Anmeldefenster mit der Seite von \(bank). Melde dich dort an wie im Browser. Manche Banken fragen stattdessen in ihrer App nach einer Freigabe.")
+            step(2, "Gib dort den Zugriff auf deine Konten frei. MFN sieht weder die Seite noch deine Eingaben.")
+            step(3, "Danach schließt sich das Fenster von selbst, und MFN zeigt die gefundenen Konten.")
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func step(_ number: Int, _ text: LocalizedStringKey) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text("\(number).")
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+            Text(text)
+        }
+    }
+}
+
+/// Small "Beta" marker next to features that are new: text with a hairline border, no colour meaning.
+struct BetaBadge: View {
+    var body: some View {
+        Text("Beta")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 1)
+            .overlay(Capsule().strokeBorder(.secondary, lineWidth: 0.5))
     }
 }

@@ -2,7 +2,7 @@ import MFNCore
 import SwiftUI
 
 enum BudgetFormat {
-    private static let locale = Locale(identifier: "de_DE")
+    private static let locale = Locale.autoupdatingCurrent
 
     /// "November", "Q4 2026", "2026", or "25. Okt. – 24. Nov." for shifted periods.
     static func periodTitle(_ status: BudgetStatus) -> String {
@@ -25,26 +25,30 @@ enum BudgetFormat {
     static func stateText(_ status: BudgetStatus, hide: Bool) -> String {
         let money = { (c: Int) in hide ? "•••••" : Money.format(c) }
         switch status.state {
-        case .onTrack: return "Prognose \(money(status.forecastCents)) – im Rahmen"
-        case .atRisk: return "Prognose \(money(status.forecastCents)) – \(money(status.forecastCents - status.budget.amountCents)) über Budget"
-        case .exceeded: return "\(money(status.spentCents - status.budget.amountCents)) über Budget"
+        case .onTrack: return String(localized: "Prognose \(money(status.forecastCents)) – im Rahmen")
+        case .atRisk: return String(localized: "Prognose \(money(status.forecastCents)) – \(money(status.forecastCents - status.budget.amountCents)) über Budget")
+        case .exceeded: return String(localized: "\(money(status.spentCents - status.budget.amountCents)) über Budget")
         }
     }
 
     static func breakdown(_ status: BudgetStatus, hide: Bool) -> String {
         let money = { (c: Int) in hide ? "•••••" : Money.format(c) }
         let short = Date.FormatStyle(locale: locale, timeZone: BankDay.bankTimeZone).day().month(.abbreviated)
-        let asOf = status.dataAsOf < BankDay.today ? "Stand der Daten: \(status.dataAsOf.startDate.formatted(short)) – danach geschätzt\n" : ""
+        let asOf = status.dataAsOf < BankDay.today ? String(localized: "Stand der Daten: \(status.dataAsOf.startDate.formatted(short)) – danach geschätzt\n") : ""
         let anchor = status.budget.anchor.map { a in
-            "Zeitraum beginnt mit der Aufladung" + (a.counterpart.map { " von „\($0)“" } ?? "") + " (± \(a.toleranceDays) Tage um den \(status.budget.startDay).)\n"
+            if let counterpart = a.counterpart {
+                String(localized: "Zeitraum beginnt mit der Aufladung von „\(counterpart)“ (± \(a.toleranceDays) Tage um den \(status.budget.startDay).)\n")
+            } else {
+                String(localized: "Zeitraum beginnt mit der Aufladung (± \(a.toleranceDays) Tage um den \(status.budget.startDay).)\n")
+            }
         } ?? ""
-        return asOf + anchor + """
+        return asOf + anchor + String(localized: """
         Ausgegeben \(money(status.spentCents)) (ohne Umbuchungen, abzüglich Erstattungen)
         + geplant \(money(status.plannedCents))
         + erwartete Fixkosten \(money(status.expectedRecurringCents))
         + übliche Ausgaben für \(status.daysLeft) Tage \(money(status.expectedVariableCents))
         = Prognose \(money(status.forecastCents)) bei Budget \(money(status.budget.amountCents))
-        """
+        """)
     }
 }
 
@@ -78,12 +82,12 @@ struct BudgetBar: View {
                 }
                 Spacer(minLength: 8)
                 if status.dataAsOf < BankDay.today {
-                    Text("Stand \(status.dataAsOf.startDate.formatted(.dateTime.day().month(.abbreviated).locale(Locale(identifier: "de_DE"))))")
+                    Text("Stand \(status.dataAsOf.startDate.formatted(.dateTime.day().month(.abbreviated).locale(Locale.autoupdatingCurrent)))")
                         .foregroundStyle(.secondary)
                 }
                 Label(BudgetFormat.stateText(status, hide: model.hideAmounts), systemImage: warn ? "exclamationmark.triangle" : "checkmark.circle")
                     .monospacedDigit()
-                    .accessibilityLabel(model.hideAmounts ? "Budgetstatus, Beträge ausgeblendet" : BudgetFormat.stateText(status, hide: false))
+                    .accessibilityLabel(model.hideAmounts ? String(localized: "Budgetstatus, Beträge ausgeblendet") : BudgetFormat.stateText(status, hide: false))
                     .foregroundStyle(warn ? AnyShapeStyle(Color.orange) : AnyShapeStyle(.secondary))
             }
             .font(.callout)
@@ -130,9 +134,9 @@ struct BudgetRing: View {
 
     static func stateWord(_ status: BudgetStatus) -> String {
         switch status.state {
-        case .onTrack: "im Rahmen"
-        case .atRisk: "Prognose über Budget"
-        case .exceeded: "über Budget"
+        case .onTrack: String(localized: "im Rahmen")
+        case .atRisk: String(localized: "Prognose über Budget")
+        case .exceeded: String(localized: "über Budget")
         }
     }
 
@@ -178,18 +182,33 @@ struct BudgetSheet: View {
 
     private var cents: Int? { BudgetSheet.parseCents(amountText) }
 
-    /// "2.000", "2000,50", "1.234,5" (German) and "12.5", "12.50" (a "." with 1–2 trailing
-    /// digits and no "," is the decimal point) → cents; `nil` if not a positive amount.
+    /// Amounts in German or English style → cents; `nil` if not a positive amount.
+    /// Both "," and "." present: the last one is the decimal separator ("1.234,50", "1,234.50").
+    /// Only one kind: once with 1–2 trailing digits it is the decimal separator ("12,5", "12.50"),
+    /// otherwise it groups thousands ("2.000", "2,000", "1.000.000").
     static func parseCents(_ text: String) -> Int? {
-        var cleaned = text.replacingOccurrences(of: "€", with: "").filter { !$0.isWhitespace }
-        if cleaned.contains(",") {
-            cleaned = cleaned.replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: ".")
-        } else if let dot = cleaned.lastIndex(of: "."), cleaned.filter({ $0 == "." }).count == 1,
-                  (1...2).contains(cleaned.distance(from: dot, to: cleaned.endIndex) - 1) {
-            // Decimal point: keep it.
-        } else {
-            cleaned = cleaned.replacingOccurrences(of: ".", with: "")
+        var cleaned = String(text.replacingOccurrences(of: "€", with: "")
+            .filter { !$0.isWhitespace && $0 != "'" && $0 != "\u{2019}" }
+            .map { char -> Character in
+                if char == "\u{066B}" { return "." }
+                if char.isASCII { return char }
+                if let digit = char.wholeNumberValue, digit < 10 { return Character(Unicode.Scalar(UInt8(48 + digit))) }
+                return char
+            })
+        let comma = cleaned.lastIndex(of: ","), dot = cleaned.lastIndex(of: ".")
+        if let comma, let dot {
+            let (decimal, grouping): (Character, Character) = comma > dot ? (",", ".") : (".", ",")
+            cleaned = cleaned.filter { $0 != grouping }.map { $0 == decimal ? "." : String($0) }.joined()
+        } else if let separator = comma ?? dot {
+            let mark = cleaned[separator]
+            let trailing = cleaned.distance(from: separator, to: cleaned.endIndex) - 1
+            if cleaned.filter({ $0 == mark }).count == 1, (1...2).contains(trailing) {
+                cleaned = cleaned.map { $0 == mark ? "." : String($0) }.joined()
+            } else {
+                cleaned = cleaned.filter { $0 != mark }
+            }
         }
+        if cleaned.filter({ $0 == "." }).count > 1 { return nil }
         guard cleaned.allSatisfy({ $0.isASCII && ($0.isNumber || $0 == ".") }),
               let value = Decimal(string: cleaned, locale: Locale(identifier: "en_US_POSIX")), value > 0,
               value < 1_000_000_000 else { return nil }
@@ -224,7 +243,7 @@ struct BudgetSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(existing == nil ? "Budget festlegen" : "Budget ändern").font(.headline)
+            Text(existing == nil ? String(localized: "Budget festlegen") : String(localized: "Budget ändern")).font(.headline)
             Text(account.name).foregroundStyle(.secondary)
             Form {
                 TextField("Betrag (€)", text: $amountText, prompt: Text("z. B. 2.000"))
@@ -245,7 +264,7 @@ struct BudgetSheet: View {
                 Toggle("Zeitraum beginnt mit der Aufladung", isOn: $anchored)
                 if anchored {
                     Stepper(value: $tolerance, in: 1...(period == .weekly ? 3 : 7)) {
-                        Text("Toleranz ± \(tolerance) \(tolerance == 1 ? "Tag" : "Tage")").monospacedDigit()
+                        Text(tolerance == 1 ? String(localized: "Toleranz ± \(tolerance) Tag") : String(localized: "Toleranz ± \(tolerance) Tage")).monospacedDigit()
                     }
                     Picker("Aufladung von", selection: $anchorCounterpart) {
                         Text("Automatisch (größte Aufladung)").tag("")
@@ -273,8 +292,8 @@ struct BudgetSheet: View {
             .lineLimit(2, reservesSpace: true)
             .frame(maxWidth: .infinity, alignment: .leading)
             Text(anchored
-                 ? "Wird das Konto bis zu \(tolerance) Tage vor oder nach dem Starttag aufgeladen (Gehalt, Umbuchung, Überweisung), beginnt der Zeitraum an diesem Tag. Ohne Aufladung gilt der Starttag. Automatisch zählt nur eine Aufladung ab einem Viertel des Budgets."
-                 : "Gezählt werden Ausgaben des Kontos (gebucht und vorgemerkt), abzüglich Erstattungen; Umbuchungen zwischen eigenen Konten zählen nicht.")
+                 ? String(localized: "Wird das Konto bis zu \(tolerance) Tage vor oder nach dem Starttag aufgeladen (Gehalt, Umbuchung, Überweisung), beginnt der Zeitraum an diesem Tag. Ohne Aufladung gilt der Starttag. Automatisch zählt nur eine Aufladung ab einem Viertel des Budgets.")
+                 : String(localized: "Gezählt werden Ausgaben des Kontos (gebucht und vorgemerkt), abzüglich Erstattungen; Umbuchungen zwischen eigenen Konten zählen nicht."))
                 .lineLimit(3, reservesSpace: true)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -307,7 +326,7 @@ struct BudgetSheet: View {
         .frame(width: 440)
         .onAppear {
             if let existing {
-                amountText = (Decimal(existing.amountCents) / 100).formatted(.number.locale(Locale(identifier: "de_DE")))
+                amountText = RecurringDraft.text(existing.amountCents)
                 period = existing.period
                 startDay = existing.startDay
                 anchored = existing.anchor != nil
@@ -322,7 +341,8 @@ struct BudgetSheet: View {
     }
 
     private static func weekday(_ day: Int) -> String {
-        ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"][day - 1]
+        [String(localized: "Montag"), String(localized: "Dienstag"), String(localized: "Mittwoch"), String(localized: "Donnerstag"),
+         String(localized: "Freitag"), String(localized: "Samstag"), String(localized: "Sonntag")][day - 1]
     }
 }
 

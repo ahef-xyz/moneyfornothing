@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "MFNIntelligence",
+    defaultLocalization: "de",
     platforms: [.macOS(.v26)],
     products: [
         // kNN over the user's own bookings (NaturalLanguage) and the Foundation Models stage.

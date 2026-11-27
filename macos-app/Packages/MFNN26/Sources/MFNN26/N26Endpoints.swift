@@ -66,12 +66,12 @@ public struct N26Endpoints: Sendable, Equatable {
             url: loginURL,
             completion: .cookiesPresent([sessionCookie]),
             cookieDomains: cookieDomains,
-            message: "Bitte bei N26 anmelden und in der N26-App bestätigen.",
+            message: String(localized: "Bitte bei N26 anmelden und in der N26-App bestätigen.", bundle: .module),
             storageKeys: [
                 .javaScript(key: csrfStorageKey, expression: #"document.querySelector('meta[name="csrf-token"]')?.content"#, domain: host),
                 .javaScript(key: pekStorageKey, expression: "window.__PEK__", domain: host),
             ],
-            automation: WebLoginAutomation(script: N26LoginScript.source, message: "Anmeldung bei N26 …", timeout: 300)
+            automation: WebLoginAutomation(script: N26LoginScript.source, message: N26LoginScript.loginMessage, timeout: 300)
         )
     }
 }

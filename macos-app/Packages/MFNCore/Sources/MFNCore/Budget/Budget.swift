@@ -7,10 +7,10 @@ public struct AccountBudget: Hashable, Codable, Sendable, Identifiable {
 
         public var title: String {
             switch self {
-            case .weekly: "Woche"
-            case .monthly: "Monat"
-            case .quarterly: "Quartal"
-            case .yearly: "Jahr"
+            case .weekly: String(localized: "Woche", bundle: .module)
+            case .monthly: String(localized: "Monat", bundle: .module)
+            case .quarterly: String(localized: "Quartal", bundle: .module)
+            case .yearly: String(localized: "Jahr", bundle: .module)
             }
         }
     }

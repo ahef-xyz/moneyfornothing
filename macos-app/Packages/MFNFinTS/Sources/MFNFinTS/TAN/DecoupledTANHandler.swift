@@ -41,7 +41,7 @@ public struct DecoupledTANHandler: FinTSTANHandler {
 
     private static let log = Log.logger("fints-tan")
 
-    public static let defaultMessage = "Bitte bestätige den Zugriff in der DKB-App."
+    public static let defaultMessage = String(localized: "Bitte bestätige den Zugriff in der DKB-App.", bundle: .module)
 
     public init(parameters: DecoupledTANParameters, presenter: (any AuthChallengePresenter)?, clock: any DecoupledClock = SystemDecoupledClock()) {
         self.parameters = parameters

@@ -24,7 +24,7 @@ private func booked(_ cents: Int, on iso: String, status: TransactionStatus = .b
     }
 
     @Test func manualHasNoCredentialsSetupOrConnector() {
-        #expect(ConnectorID.manual.displayName == "Ohne Anbindung")
+        #expect(!ConnectorID.manual.displayName.isEmpty)
         #expect(ConnectorID.manual.credentialFields.isEmpty)
         #expect(!ConnectorID.manual.supportsSetup)
         #expect(!ConnectorID.manual.hasConnector)

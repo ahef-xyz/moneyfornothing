@@ -93,7 +93,7 @@ public struct C24Endpoints: Sendable, Hashable {
         loginURL: URL,
         loginCompletion: WebLoginRequest.Completion,
         cookieDomains: [String],
-        loginMessage: String = "Scanne den QR-Code mit der C24-App und gib die 6 Ziffern aus der App ein.",
+        loginMessage: String? = nil,
         sessionStorageKey: String = "sessionStore",
         sessionStorageSource: StorageKey.Source = .sessionStorage,
         sessionStorageDomain: String = "banking.c24.de",
@@ -119,7 +119,7 @@ public struct C24Endpoints: Sendable, Hashable {
         self.loginURL = loginURL
         self.loginCompletion = loginCompletion
         self.cookieDomains = cookieDomains
-        self.loginMessage = loginMessage
+        self.loginMessage = loginMessage ?? String(localized: "Scanne den QR-Code mit der C24-App und gib die 6 Ziffern aus der App ein.", bundle: .module)
         self.sessionStorageKey = sessionStorageKey
         self.sessionStorageSource = sessionStorageSource
         self.sessionStorageDomain = sessionStorageDomain

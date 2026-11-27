@@ -1,0 +1,22 @@
+{
+  "sourceLanguage" : "de",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "new", "value" : "MoneyForNothing" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "MoneyForNothing" } }
+      }
+    },
+    "NSFaceIDUsageDescription" : {
+      "comment" : "Privacy - Face ID Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "new", "value" : "MoneyForNothing entsperrt deine Finanzdaten mit Touch ID." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "MoneyForNothing unlocks your financial data with Touch ID." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

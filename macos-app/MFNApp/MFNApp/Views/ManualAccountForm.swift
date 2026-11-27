@@ -36,7 +36,7 @@ struct ManualAccountForm: View {
                 .accessibilityHint(setup.manualCurrencyLocked ? Self.currencyLockedText : "")
                 TextField("IBAN (optional)", text: $setup.manual.iban, prompt: Text("DE00 0000 0000 0000 0000 00"))
                     .monospacedDigit()
-                    .accessibilityHint(ibanProblem ?? "Optional, wird nur angezeigt und nie übertragen.")
+                    .accessibilityHint(ibanProblem ?? String(localized: "Optional, wird nur angezeigt und nie übertragen."))
                 if let ibanProblem {
                     Label(ibanProblem, systemImage: "exclamationmark.circle")
                         .font(.callout)
@@ -53,7 +53,7 @@ struct ManualAccountForm: View {
                 TextField("Startsaldo (optional)", text: $setup.manual.openingAmount, prompt: Text("0,00"))
                     .monospacedDigit()
                     .multilineTextAlignment(.trailing)
-                    .accessibilityHint(openingProblem ? "Kein gültiger Betrag" : "Betrag in \(setup.manual.currency), negativ mit Minus")
+                    .accessibilityHint(openingProblem ? String(localized: "Kein gültiger Betrag") : String(localized: "Betrag in \(setup.manual.currency), negativ mit Minus"))
                 Toggle("Startsaldo gilt vor einem Datum", isOn: $setup.manual.usesOpeningDate)
                     .disabled(setup.manual.openingAmount.trimmingCharacters(in: .whitespaces).isEmpty)
                 if setup.manual.usesOpeningDate {
@@ -87,5 +87,5 @@ struct ManualAccountForm: View {
         }
     }
 
-    static let currencyLockedText = "Die Währung lässt sich nicht ändern, solange das Konto Umsätze hat: ihre Beträge sind in dieser Währung gespeichert."
+    static var currencyLockedText: String { String(localized: "Die Währung lässt sich nicht ändern, solange das Konto Umsätze hat: ihre Beträge sind in dieser Währung gespeichert.") }
 }

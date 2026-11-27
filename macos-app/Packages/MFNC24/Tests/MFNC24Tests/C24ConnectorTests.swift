@@ -422,7 +422,7 @@ private func account(_ harness: Harness, named name: String) async throws -> Acc
         var visible = C24Endpoints.production
         visible.headlessLogin = false
         #expect(visible.loginRequest.automation == nil)
-        #expect(visible.loginRequest.message.contains("QR-Code"))
+        #expect(visible.loginRequest.message.contains("QR"))
     }
 
     /// Production endpoints (verified) over the fixture backend: login, storage hand-over, sync.

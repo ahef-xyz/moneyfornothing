@@ -71,27 +71,31 @@ extension ConnectorID {
         case .ing:
             // v8: FinTS (fints.ing.de): Zugangsnummer (last 10 digits of the IBAN) or user name, and the
             // PIN for FinTS. No web banking any more.
-            [CredentialField(key: "userID", label: "Zugangsnummer", kind: .text, prompt: "Zugangsnummer oder Benutzername"),
-             CredentialField(key: "pin", label: "PIN", kind: .secret)]
+            [CredentialField(key: "userID", label: String(localized: "Zugangsnummer", bundle: .module), kind: .text, prompt: String(localized: "Zugangsnummer oder Benutzername", bundle: .module)),
+             CredentialField(key: "pin", label: String(localized: "PIN", bundle: .module), kind: .secret)]
         case .dkb:
             // v6: web banking login (banking.dkb.de) until FinTS is registered.
-            [CredentialField(key: "username", label: "Anmeldename", kind: .text),
-             CredentialField(key: "password", label: "Passwort", kind: .secret)]
+            [CredentialField(key: "username", label: String(localized: "Anmeldename", bundle: .module), kind: .text),
+             CredentialField(key: "password", label: String(localized: "Passwort", bundle: .module), kind: .secret)]
         case .tradeRepublic:
-            [CredentialField(key: "phoneNumber", label: "Telefonnummer", kind: .phone, prompt: "+49 …"),
-             CredentialField(key: "pin", label: "PIN", kind: .secret, length: 4, isNumeric: true)]
+            [CredentialField(key: "phoneNumber", label: String(localized: "Telefonnummer", bundle: .module), kind: .phone, prompt: "+49 …"),
+             CredentialField(key: "pin", label: String(localized: "PIN", bundle: .module), kind: .secret, length: 4, isNumeric: true)]
         case .c24:
             // v5: C24 has no password login (QR code + 6 digits from the app).
             []
         case .easybank:
-            [CredentialField(key: "username", label: "Benutzername", kind: .text),
-             CredentialField(key: "password", label: "Passwort", kind: .secret)]
+            [CredentialField(key: "username", label: String(localized: "Benutzername", bundle: .module), kind: .text),
+             CredentialField(key: "password", label: String(localized: "Passwort", bundle: .module), kind: .secret)]
         case .n26:
-            [CredentialField(key: "username", label: "E-Mail", kind: .email),
-             CredentialField(key: "password", label: "Passwort", kind: .secret)]
+            [CredentialField(key: "username", label: String(localized: "E-Mail", bundle: .module), kind: .email),
+             CredentialField(key: "password", label: String(localized: "Passwort", bundle: .module), kind: .secret)]
         case .paypal:
             // v11: the user logs in on PayPal's own page in a visible web view; MFN stores
             // no PayPal password.
+            []
+        case .yaxi:
+            // v12: the fields depend on the bank YAXI reaches (`CredentialsModel`, labels from
+            // YAXI); the app builds them per connection.
             []
         case .mock, .manual:
             []
@@ -104,7 +108,8 @@ extension ConnectorID {
         switch self {
         case .tradeRepublic, .c24, .easybank, .n26, .dkb, .ing, .paypal: true
         // v10: `.manual` is created by its own sheet ("Konto ohne Anbindung anlegen"), not the wizard.
-        case .mock, .manual: false
+        // v12: `.yaxi` gets its own assistant path (search first) in 0.7.0 M3.
+        case .mock, .manual, .yaxi: false
         }
     }
 }

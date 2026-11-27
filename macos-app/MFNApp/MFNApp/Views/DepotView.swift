@@ -16,6 +16,13 @@ struct DepotView: View {
         case positions = "Positionen"
         case transactions = "Umsätze"
         var id: Self { self }
+
+        var title: LocalizedStringKey {
+            switch self {
+            case .positions: "Positionen"
+            case .transactions: "Umsätze"
+            }
+        }
     }
 
     var body: some View {
@@ -36,7 +43,7 @@ struct DepotView: View {
             if content.hasTransactions {
                 ToolbarItem(placement: .principal) {
                     Picker("Ansicht", selection: $mode) {
-                        ForEach(Mode.allCases) { Text($0.rawValue).tag($0) }
+                        ForEach(Mode.allCases) { Text($0.title).tag($0) }
                     }
                     .pickerStyle(.segmented)
                     .help("Positionen oder Umsätze des Depots anzeigen")
@@ -260,22 +267,22 @@ private struct DepotHeader: View {
     }
 
     private func gainAccessibilityValue(_ gain: (cents: Int, ratio: Double?, count: Int)) -> String {
-        var parts = [model.hideAmounts ? "ausgeblendet" : GainText.spoken(gain.cents, ratio: gain.ratio, currency: content.currency)]
-        if gain.count < content.rows.count { parts.append("\(gain.count) von \(content.rows.count) Positionen") }
+        var parts = [model.hideAmounts ? String(localized: "ausgeblendet") : GainText.spoken(gain.cents, ratio: gain.ratio, currency: content.currency)]
+        if gain.count < content.rows.count { parts.append(String(localized: "\(gain.count) von \(content.rows.count) Positionen")) }
         return parts.joined(separator: ", ")
     }
 
     private func gainCaption(_ gain: (cents: Int, ratio: Double?, count: Int)) -> String {
         var parts: [String] = []
         if let ratio = gain.ratio { parts.append(model.hideAmounts ? "••" : PositionFormat.signedPercent(ratio)) }
-        if gain.count < content.rows.count { parts.append("\(gain.count) von \(content.rows.count) Positionen") }
-        return parts.isEmpty ? "seit Kauf" : parts.joined(separator: " · ")
+        if gain.count < content.rows.count { parts.append(String(localized: "\(gain.count) von \(content.rows.count) Positionen")) }
+        return parts.isEmpty ? String(localized: "seit Kauf") : parts.joined(separator: " · ")
     }
 
     private var details: String {
         var parts = [model.connectionName(content.account.connectionID), content.account.type.title]
         if let lastSync = content.lastSync {
-            parts.append("abgeglichen \(DayFormat.syncTime(lastSync))")
+            parts.append(String(localized: "abgeglichen \(DayFormat.syncTime(lastSync))"))
         }
         return parts.joined(separator: " · ")
     }
@@ -342,7 +349,7 @@ private struct GainCell: View {
                 }
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(model.hideAmounts ? "Gewinn/Verlust ausgeblendet"
+            .accessibilityLabel(model.hideAmounts ? String(localized: "Gewinn/Verlust ausgeblendet")
                                 : GainText.spoken(gain, ratio: row.position.gainRatio, currency: row.currency))
         } else {
             Text("–")
@@ -356,8 +363,8 @@ private struct GainCell: View {
 /// VoiceOver wording for a gain: "Gewinn 1.234,56 €, plus 12,3 %" / "Verlust …".
 enum GainText {
     static func spoken(_ cents: Int, ratio: Double?, currency: String) -> String {
-        let word = cents < 0 ? "Verlust" : "Gewinn"
-        var text = "\(word) \(Money.format(abs(cents), currency: currency))"
+        let word = cents < 0 ? String(localized: "Verlust") : String(localized: "Gewinn")
+        var text = String(localized: "\(word) \(Money.format(abs(cents), currency: currency))")
         if let ratio { text += ", \(PositionFormat.signedPercent(ratio))" }
         return text
     }
@@ -389,7 +396,7 @@ private struct ShareCell: View {
 }
 
 enum PositionFormat {
-    private static let german = Locale(identifier: "de_DE")
+    private static let german = Locale.autoupdatingCurrent
 
     static func quantity(_ value: Decimal) -> String {
         value.formatted(.number.precision(.fractionLength(0 ... 6)).locale(german))

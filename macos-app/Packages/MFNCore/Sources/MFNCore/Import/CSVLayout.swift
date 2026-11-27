@@ -37,28 +37,28 @@ public enum CSVField: String, Sendable, Hashable, CaseIterable, Codable {
 
     public var title: String {
         switch self {
-        case .bookingDate: "Buchungstag"
-        case .valueDate: "Wertstellung"
-        case .amount: "Betrag"
-        case .debit: "Soll (Ausgang)"
-        case .credit: "Haben (Eingang)"
-        case .debitCreditMark: "Soll/Haben-Kennzeichen"
-        case .counterparty: "Gegenpartei"
-        case .payer: "Zahlungspflichtige*r"
-        case .payee: "Zahlungsempfänger*in"
-        case .counterpartIBAN: "IBAN Gegenkonto"
-        case .purpose: "Verwendungszweck"
-        case .bookingText: "Buchungstext"
-        case .currency: "Währung"
-        case .status: "Status"
-        case .creditorID: "Gläubiger-ID"
-        case .mandateReference: "Mandatsreferenz"
-        case .endToEndReference: "Kundenreferenz"
-        case .originalAmount: "Betrag in Fremdwährung"
-        case .originalCurrency: "Fremdwährung"
-        case .account: "Konto"
-        case .categoryID: "Kategorie-ID"
-        case .categoryName: "Kategorie"
+        case .bookingDate: String(localized: "Buchungstag", bundle: .module)
+        case .valueDate: String(localized: "Wertstellung", bundle: .module)
+        case .amount: String(localized: "Betrag", bundle: .module)
+        case .debit: String(localized: "Soll (Ausgang)", bundle: .module)
+        case .credit: String(localized: "Haben (Eingang)", bundle: .module)
+        case .debitCreditMark: String(localized: "Soll/Haben-Kennzeichen", bundle: .module)
+        case .counterparty: String(localized: "Gegenpartei", bundle: .module)
+        case .payer: String(localized: "Zahlungspflichtige*r", bundle: .module)
+        case .payee: String(localized: "Zahlungsempfänger*in", bundle: .module)
+        case .counterpartIBAN: String(localized: "IBAN Gegenkonto", bundle: .module)
+        case .purpose: String(localized: "Verwendungszweck", bundle: .module)
+        case .bookingText: String(localized: "Buchungstext", bundle: .module)
+        case .currency: String(localized: "Währung", bundle: .module)
+        case .status: String(localized: "Status", bundle: .module)
+        case .creditorID: String(localized: "Gläubiger-ID", bundle: .module)
+        case .mandateReference: String(localized: "Mandatsreferenz", bundle: .module)
+        case .endToEndReference: String(localized: "Kundenreferenz", bundle: .module)
+        case .originalAmount: String(localized: "Betrag in Fremdwährung", bundle: .module)
+        case .originalCurrency: String(localized: "Fremdwährung", bundle: .module)
+        case .account: String(localized: "Konto", bundle: .module)
+        case .categoryID: String(localized: "Kategorie-ID", bundle: .module)
+        case .categoryName: String(localized: "Kategorie", bundle: .module)
         }
     }
 
@@ -156,7 +156,7 @@ public struct CSVPreset: Sendable, Hashable, Identifiable {
         self.stripsFormulaQuote = stripsFormulaQuote
     }
 
-    public var displayName: String { verified ? name : "\(name) (ungeprüft)" }
+    public var displayName: String { verified ? name : String(localized: "\(name) (ungeprüft)", bundle: .module) }
 
     /// MFN's own CSV export (⇧⌘E, `TransactionCSVExporter`): UTF-8 BOM, `;`, `dd.MM.yyyy`,
     /// `-1234,56`, status `gebucht`/`vorgemerkt`/`geplant`/`storniert`, text fields with a leading
@@ -221,7 +221,7 @@ public struct CSVPreset: Sendable, Hashable, Identifiable {
 
     /// N26 before 2023.
     public static let n26Legacy = CSVPreset(
-        id: "n26-legacy", name: "N26 (älteres Format)", verified: false,
+        id: "n26-legacy", name: String(localized: "N26 (älteres Format)", bundle: .module), verified: false,
         signature: ["Datum", "Empfänger", "Transaktionstyp", "Betrag (EUR)"],
         aliases: [
             .counterparty: ["Empfänger"],

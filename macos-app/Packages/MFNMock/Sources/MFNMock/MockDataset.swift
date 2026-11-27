@@ -1,7 +1,7 @@
 import Foundation
 import MFNCore
 
-/// Complete fake banking world: 5 banks, 11 accounts, ~1,500 transactions over 18 months.
+/// Complete fake banking world: 7 banks (one of them over YAXI), 14 accounts, ~1,500 transactions over 18 months.
 ///
 /// Covers every state the UI has to render: booked, pending, planned and cancelled
 /// transactions, foreign-currency card payments, open and closed credit-card periods,
@@ -63,6 +63,8 @@ public enum MockAccounts {
     public static let easyVisa: AccountID = "mock-easybank-visa"
     public static let easyTagesgeld: AccountID = "mock-easybank-tagesgeld"
     public static let paypal: AccountID = "mock-paypal-eur"
+    public static let sparkasseGiro: AccountID = "mock-sparkasse-giro"
+    public static let sparkasseTagesgeld: AccountID = "mock-sparkasse-tagesgeld"
 }
 
 public enum MockConnections {
@@ -72,9 +74,16 @@ public enum MockConnections {
     public static let c24: ConnectionID = "mock-c24"
     public static let easybank: ConnectionID = "mock-easybank"
     public static let paypal: ConnectionID = "mock-paypal"
+    /// A bank over YAXI (`connectorID: .yaxi`), served by the mock connector.
+    public static let sparkasse: ConnectionID = "mock-sparkasse"
 }
 
 extension MockDataset {
+    /// Logo IDs of YAXI's logo service (`logos.yaxi.tech`) for the demo banks over YAXI. The app loads
+    /// them only in the DEBUG screenshot mode (never cached, never in a released app); otherwise the demo
+    /// shows the monogram, as the user set up no YAXI connection.
+    public static let demoYAXILogoIDs: [ConnectionID: String] = [MockConnections.sparkasse: "sparkasse"]
+
     /// Demo budgets (added once to the demo ledger), chosen against the generated spending so
     /// the sidebar shows different states: comfortable, tight and over budget.
     public static let demoBudgets: [AccountBudget] = [

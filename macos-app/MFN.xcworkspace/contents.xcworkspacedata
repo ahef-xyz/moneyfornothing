@@ -43,4 +43,7 @@
    <FileRef
       location = "group:Packages/MFNMCP">
    </FileRef>
+   <FileRef
+      location = "group:Packages/MFNYAXI">
+   </FileRef>
 </Workspace>

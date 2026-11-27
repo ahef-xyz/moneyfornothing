@@ -73,7 +73,14 @@ struct MonogramAvatar: View {
 struct BankBadge: View {
     let connection: Connection
     var size: CGFloat = 15
+    /// v12: YAXI's logo ID for a bank that is not a connection yet (search, assistant).
+    var yaxiLogoID: String? = nil
     @Environment(AppModel.self) private var model
+
+    private var icon: NSImage? {
+        guard connection.connectorID == .yaxi else { return model.bankIcons[connection.connectorID] }
+        return (yaxiLogoID ?? model.yaxiLogoIDs[connection.id]).flatMap { model.yaxiLogos[$0] }
+    }
 
     var body: some View {
         if connection.isManual {
@@ -84,7 +91,7 @@ struct BankBadge: View {
                 .frame(width: size, height: size)
                 .background(Monogram.bankColor(connection), in: RoundedRectangle(cornerRadius: size * 0.23, style: .continuous))
                 .accessibilityHidden(true)
-        } else if let icon = model.bankIcons[connection.connectorID] {
+        } else if let icon {
             Image(nsImage: icon)
                 .resizable()
                 .interpolation(.high)
@@ -110,7 +117,7 @@ struct BankBadge: View {
 /// Hint chip in the transaction list. `dashed` marks a status (vorgemerkt, geplant), so the
 /// difference never depends on colour alone.
 struct HintChip: View {
-    let text: String
+    let text: LocalizedStringKey
     var dashed = false
     var muted = false
 
@@ -144,13 +151,15 @@ struct NewCountBadge: View {
 
     /// "1 neuer Umsatz seit dem Abgleich" / "3 neue Umsätze seit dem Abgleich".
     static func text(_ count: Int) -> String {
-        count == 1 ? "1 neuer Umsatz seit dem Abgleich" : "\(count) neue Umsätze seit dem Abgleich"
+        count == 1
+            ? String(localized: "1 neuer Umsatz seit dem Abgleich")
+            : String(localized: "\(count) neue Umsätze seit dem Abgleich")
     }
 }
 
 /// "Neu" / count badge in the accent colour (accent = "Zu prüfen"/new only).
 struct AccentBadge: View {
-    let text: String
+    let text: LocalizedStringKey
 
     var body: some View {
         Text(text)
@@ -219,7 +228,7 @@ enum Monogram {
         case .easybank: "E"
         case .n26: "N"
         case .paypal: "P"
-        case .mock, .manual: String(connection.displayName.prefix(1)).uppercased()
+        case .mock, .manual, .yaxi: String(connection.displayName.prefix(1)).uppercased()
         }
     }
 
@@ -233,7 +242,7 @@ enum Monogram {
         case .easybank: Color(red: 0.45, green: 0.75, blue: 0.27)
         case .n26: Color(red: 0.21, green: 0.63, blue: 0.62)
         case .paypal: Color(red: 0.0, green: 0.19, blue: 0.53)
-        case .mock: color(for: connection.displayName)
+        case .mock, .yaxi: color(for: connection.displayName)
         case .manual: .gray
         }
     }

@@ -5,6 +5,7 @@ import LocalAuthentication
 import MFNCore
 import MFNIntelligence
 import MFNMock
+import MFNYAXI
 import MFNScrape
 import MFNStore
 import Observation
@@ -182,6 +183,12 @@ final class AppModel {
     @ObservationIgnored private var dayObserver: NSObjectProtocol?
     /// Bank favicons, loaded from the banks' own websites (see `BankIconStore`).
     private(set) var bankIcons: [ConnectorID: NSImage] = [:]
+    /// v12: logos of banks over YAXI (`YAXILogos`), by YAXI's logo ID, and the logo ID per connection.
+    private(set) var yaxiLogos: [String: NSImage] = [:]
+    private(set) var yaxiLogoIDs: [ConnectionID: String] = [:]
+    @ObservationIgnored private var yaxiLogoRequests: Set<String> = []
+    /// Connections whose logo ID was looked up (keychain) this launch.
+    @ObservationIgnored private var yaxiLogoChecked: Set<ConnectionID> = []
 
     @ObservationIgnored private let databaseURL: URL
     /// Keychain account of the database key. Live mode uses its own, so setting up its database
@@ -215,6 +222,8 @@ final class AppModel {
     var categoryFailure: String?
     /// Settings → MCP.
     @ObservationIgnored private(set) lazy var assistantAccess = AssistantAccess(model: self)
+    /// v12: the user's own YAXI key and the bank search (Settings → Banken, assistant).
+    let yaxiAccess = YAXIAccess()
     /// ⌘K: transactions whose category the picker sheet sets.
     var categoryPicker: CategoryPickerRequest?
     /// ⇧⌘K: the rule being created or edited in the sheet over the main window.
@@ -225,6 +234,7 @@ final class AppModel {
     /// (only once ever, see `offerCategorySetupIfNeeded`).
     @ObservationIgnored private var setupOfferPending = false
     @ObservationIgnored private lazy var iconStore: BankIconStore? = (try? BankIconStore.defaultCacheDirectory()).map(BankIconStore.init)
+    @ObservationIgnored private lazy var yaxiLogoStore: YAXILogos? = (try? BankIconStore.defaultCacheDirectory()).map(YAXILogos.init)
 
     /// Registers connectors for the opened store: the stored connections (live) or the mock banks (demo).
     typealias ConnectorRegistration = @MainActor (SyncEngine, any LedgerStore, AuthSheetPresenter) async throws -> Void
@@ -247,11 +257,11 @@ final class AppModel {
               let selected = ledger.connections.first(where: { $0.id == bank })
         else { return nil }
         let same = ledger.connections.filter { $0.connectorID == selected.connectorID && $0.id != selected.id }
-        if BankAccess.of(selected).isFinTS {
-            let sources = same.filter { !BankAccess.of($0).isFinTS }
+        if BankAccess.isFinTS(selected) {
+            let sources = same.filter { !BankAccess.isFinTS($0) }
             return sources.count == 1 ? sources.first.map { MergeRequest(source: $0, target: selected) } : nil
         }
-        let targets = same.filter { BankAccess.of($0).isFinTS }
+        let targets = same.filter { BankAccess.isFinTS($0) }
         return targets.count == 1 ? targets.first.map { MergeRequest(source: selected, target: $0) } : nil
     }
 
@@ -277,8 +287,10 @@ final class AppModel {
         negativeRed = NegativeRedAreas.current()
         // Settings toggles them via `@AppStorage`; one observer here instead of three
         // `@AppStorage` in every `AmountText`.
-        defaultsObserver = NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated {
+        // No `queue: .main`: that makes every writer wait for the main thread. `YAXIUsage` writes
+        // under its lock from a sync task, and a busy main thread then stalled every YAXI call.
+        defaultsObserver = NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: nil) { [weak self] _ in
+            Task { @MainActor in
                 let current = NegativeRedAreas.current()
                 if self?.negativeRed != current { self?.negativeRed = current }
             }
@@ -314,6 +326,12 @@ final class AppModel {
         var keyAccount = KeychainDatabaseKey.defaultAccount
         var seedsAlways = false
         #if DEBUG
+        // `MFN_DEMO_RESET=1`: start the persistent demo over, as on a new Mac. Removes only the demo
+        // profile (its ledger folder, its database key, its "once" marks and `.demo` settings); the
+        // real data (`MFN-Live`, its own key, unscoped settings) is never touched.
+        if ProcessInfo.processInfo.environment["MFN_DEMO_RESET"] == "1", !ScreenshotMode.isActive {
+            removeDemoLedger()
+        }
         // Website screenshots never show the demo ledger of this Mac (it may hold whatever was
         // tried in it, also a restored backup): they get a ledger of their own, new on every run.
         if ScreenshotMode.isActive {
@@ -479,13 +497,52 @@ final class AppModel {
                 #if DEBUG
                 // The screenshot ledger is thrown away with the next run: nobody has to think of
                 // a password for it.
-                if ScreenshotMode.isActive { await submitPassword(UUID().uuidString + UUID().uuidString) }
+                if ScreenshotMode.isActive {
+                    await submitPassword(UUID().uuidString + UUID().uuidString)
+                    return
+                }
                 #endif
+                // The demo: no password to think of. A random one nobody knows: the key stays in this
+                // Mac's keychain only (the demo may hold imported CSVs or a restored backup).
+                if isDemo {
+                    UserDefaults.standard.set(true, forKey: Self.demoSilentKey)
+                    await submitPassword(UUID().uuidString + UUID().uuidString)
+                }
             case .needsPassword:
-                vaultPrompt = .password
+                // A silently set up demo whose key is gone (keychain reset): nobody knows its password,
+                // so it starts over as on a new Mac. A demo with the user's own password asks as before.
+                if isDemo, UserDefaults.standard.bool(forKey: Self.demoSilentKey) {
+                    Self.removeDemoLedger()
+                    UserDefaults.standard.set(true, forKey: Self.demoSilentKey)
+                    vaultPrompt = .setup
+                    await submitPassword(UUID().uuidString + UUID().uuidString)
+                } else {
+                    vaultPrompt = .password
+                }
             }
         } catch {
             lock.lock(problem: Self.problem(for: error))
+        }
+    }
+
+    /// The demo ledger was set up without asking (random password): it can be started over if its key is lost.
+    static let demoSilentKey = "demoLedgerSilentPassword"
+
+    /// Deletes the persistent demo profile: its ledger folder, its database key, its "once" marks and
+    /// `.demo` settings. Never the real data (`MFN-Live`, its own key, unscoped settings).
+    static func removeDemoLedger() {
+        if let folder = try? databaseURL(directory: LaunchProfile.demo.directory).deletingLastPathComponent() {
+            try? FileManager.default.removeItem(at: folder)
+        }
+        SecItemDelete([
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: KeychainDatabaseKey.defaultService,
+            kSecAttrAccount as String: LaunchProfile.demo.keyAccount,
+            kSecUseDataProtectionKeychain as String: true,
+        ] as CFDictionary)
+        let defaults = UserDefaults.standard
+        for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("demo") || key.hasSuffix(".demo") {
+            defaults.removeObject(forKey: key)
         }
     }
 
@@ -693,30 +750,30 @@ final class AppModel {
     private static func message(for error: any Error) -> String {
         switch error {
         case VaultError.wrongPassword:
-            "Das Passwort ist falsch."
+            String(localized: "Das Passwort ist falsch.")
         case let VaultError.weakPassword(minimum):
-            "Das Passwort muss mindestens \(minimum) Zeichen haben."
+            String(localized: "Das Passwort muss mindestens \(minimum) Zeichen haben.")
         case VaultError.key(.authenticationCancelled):
-            "Entsperren abgebrochen."
+            String(localized: "Entsperren abgebrochen.")
         case VaultError.key(.keychain):
-            "MFN konnte den Schlüssel der Datenbank nicht im Schlüsselbund speichern oder lesen."
+            String(localized: "MFN konnte den Schlüssel der Datenbank nicht im Schlüsselbund speichern oder lesen.")
         case VaultError.key(.missingEntitlement):
-            "Die App ist nicht korrekt signiert (Schlüsselbund-Berechtigung fehlt)."
+            String(localized: "Die App ist nicht korrekt signiert (Schlüsselbund-Berechtigung fehlt).")
         case VaultError.keyUnrecoverable:
-            "Für diese Datenbank gibt es weder einen Schlüssel auf diesem Mac noch eine Passwort-Datei (ledger.key). Die Daten können nicht entschlüsselt werden."
+            String(localized: "Für diese Datenbank gibt es weder einen Schlüssel auf diesem Mac noch eine Passwort-Datei (ledger.key). Die Daten können nicht entschlüsselt werden.")
         case VaultError.store(.cannotDecrypt):
-            "Die Datenbank lässt sich mit diesem Schlüssel nicht entschlüsseln."
+            String(localized: "Die Datenbank lässt sich mit diesem Schlüssel nicht entschlüsseln.")
         case VaultError.store(.newerSchema), StoreError.newerSchema:
-            "Diese Datenbank stammt aus einer neueren Version von MFN."
+            String(localized: "Diese Datenbank stammt aus einer neueren Version von MFN.")
         default:
-            "Die Datenbank konnte nicht geöffnet werden."
+            String(localized: "Die Datenbank konnte nicht geöffnet werden.")
         }
     }
 
     /// The status code is not sensitive and is what a bug report needs.
     static func keychainNotice(for error: DatabaseKeyError) -> String {
-        let code = if case let .keychain(status) = error { "Schlüsselbund-Fehler \(status)" } else { errorKind(error) }
-        return "Deine Daten sind geöffnet und bleiben verschlüsselt. MFN konnte den Schlüssel der Datenbank aber nicht im Schlüsselbund dieses Macs ablegen und fragt deshalb bei jedem Entsperren nach dem Datenbank-Passwort. Bitte schick uns diesen Code: \(code)"
+        let code = if case let .keychain(status) = error { String(localized: "Schlüsselbund-Fehler \(String(status))") } else { errorKind(error) }
+        return String(localized: "Deine Daten sind geöffnet und bleiben verschlüsselt. MFN konnte den Schlüssel der Datenbank aber nicht im Schlüsselbund dieses Macs ablegen und fragt deshalb bei jedem Entsperren nach dem Datenbank-Passwort. Bitte schick uns diesen Code: \(code)")
     }
 
     /// What the lock screen shows when the data could not be opened: a plain sentence, what to do,
@@ -727,16 +784,16 @@ final class AppModel {
             let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
             return AppLock.Problem(
                 message: message(for: error),
-                hint: "Deine Daten sind unverändert. Mit der aktuellen Version von MFN lässt sich die Datenbank wieder öffnen.",
-                detail: "MFN \(version) kennt Schema bis \(supported), die Datenbank hat Schema \(found).",
+                hint: String(localized: "Deine Daten sind unverändert. Mit der aktuellen Version von MFN lässt sich die Datenbank wieder öffnen."),
+                detail: String(localized: "MFN \(version) kennt Schema bis \(supported), die Datenbank hat Schema \(found)."),
                 action: .update
             )
         case let VaultError.key(.keychain(status)):
             // The status code is not sensitive and is what a bug report needs.
             return AppLock.Problem(
                 message: message(for: error),
-                hint: "Deine Daten bleiben unverändert. Versuche es erneut. Wenn es wieder passiert, schick uns bitte den Code unten.",
-                detail: "Schlüsselbund-Fehler \(status)"
+                hint: String(localized: "Deine Daten bleiben unverändert. Versuche es erneut. Wenn es wieder passiert, schick uns bitte den Code unten."),
+                detail: String(localized: "Schlüsselbund-Fehler \(String(status))")
             )
         case VaultError.wrongPassword, VaultError.weakPassword, VaultError.key(.authenticationCancelled),
              VaultError.key(.missingEntitlement), VaultError.keyUnrecoverable, VaultError.store(.cannotDecrypt):
@@ -744,7 +801,7 @@ final class AppModel {
         default:
             return AppLock.Problem(
                 message: message(for: error),
-                hint: "Deine Daten bleiben unverändert. Versuche es erneut oder starte MFN neu.",
+                hint: String(localized: "Deine Daten bleiben unverändert. Versuche es erneut oder starte MFN neu."),
                 detail: errorKind(error)
             )
         }
@@ -846,10 +903,10 @@ final class AppModel {
     /// account through the regular store calls, the opening balance, then the computed balance.
     /// Never registered with the sync engine. A new one is removed again if a later write fails.
     func saveManualAccount(_ fields: ManualAccountFields, editing: Account? = nil) async -> ManualAccountOutcome {
-        guard let store, !lock.isLocked else { return .failed("MFN ist gesperrt.") }
+        guard let store, !lock.isLocked else { return .failed(String(localized: "MFN ist gesperrt.")) }
         // Stored amounts are in the account's currency; the form locks the picker, this is the backstop.
         if let editing, editing.currency != fields.currency, ledger.transactions.contains(where: { $0.accountID == editing.id }) {
-            return .failed("Die Währung lässt sich nicht ändern, solange das Konto Umsätze hat.")
+            return .failed(String(localized: "Die Währung lässt sich nicht ändern, solange das Konto Umsätze hat."))
         }
         let session = lockSession
         let ids = editing.map { ($0.connectionID, $0.id) } ?? ManualAccount.newIDs()
@@ -869,10 +926,10 @@ final class AppModel {
                     Log.logger("app").error("Halb angelegtes Konto nicht entfernt: \(String(describing: type(of: error)), privacy: .public)")
                 }
             }
-            return .failed(isStale(session) ? "MFN ist gesperrt." : "Das Konto konnte nicht gespeichert werden.")
+            return .failed(isStale(session) ? String(localized: "MFN ist gesperrt.") : String(localized: "Das Konto konnte nicht gespeichert werden."))
         }
         // Locked while saving: the store is closed, nothing more to write or select.
-        guard !isStale(session) else { return .failed("MFN ist gesperrt.") }
+        guard !isStale(session) else { return .failed(String(localized: "MFN ist gesperrt.")) }
         // The account and opening balance are stored; only the derived balance is left. One retry,
         // then report it as possibly stale instead of "not saved".
         var balanceStale = false
@@ -885,7 +942,7 @@ final class AppModel {
                 balanceStale = attempt == 2
             }
         }
-        guard !isStale(session) else { return .failed("MFN ist gesperrt.") }
+        guard !isStale(session) else { return .failed(String(localized: "MFN ist gesperrt.")) }
         if editing == nil { selection = .account(account.id) }
         return .saved(account.id, balanceStale: balanceStale)
     }
@@ -919,13 +976,15 @@ final class AppModel {
         guard !lock.isLocked, self.engine === engine else { throw ConnectorError.cancelled }
         selection = .overview
         let id = connection.id
+        // v12: a bank over YAXI added after unlocking gets its logo right away.
+        if connection.connectorID == .yaxi { loadYAXILogo(for: connection) }
         startSync { await engine.sync(id, trigger: .manual) }
     }
 
     /// "Bank entfernen": stops its sync, deletes connection, accounts, transactions, sync state,
     /// credentials, session and the connection's web data store. Returns an error text or `nil`.
     func removeConnection(_ connection: Connection) async -> String? {
-        guard let store else { return "MFN ist gesperrt." }
+        guard let store else { return String(localized: "MFN ist gesperrt.") }
         presenter.cancel(connection: connection.id)
         await engine?.unregister(connection.id)
         if let accountID = selectedAccountID, account(accountID)?.connectionID == connection.id {
@@ -934,7 +993,7 @@ final class AppModel {
         do {
             try await store.removeConnection(connection.id)
         } catch {
-            return connection.isManual ? "Das Konto konnte nicht entfernt werden: \(error)" : "Die Bank konnte nicht entfernt werden: \(error)"
+            return connection.isManual ? String(localized: "Das Konto konnte nicht entfernt werden: \(String(describing: error))") : String(localized: "Die Bank konnte nicht entfernt werden: \(String(describing: error))")
         }
         displayOrder.connections.removeAll { $0 == connection.id.rawValue }
         displayOrder.accounts[connection.id.rawValue] = nil
@@ -955,10 +1014,10 @@ final class AppModel {
     /// secrets of `source`. Both connections are paused meanwhile, so no sync writes in between;
     /// the plan is computed again from the current ledger, off the main actor.
     func mergeConnection(_ source: Connection, into target: Connection) async -> MergeOutcome {
-        guard let store else { return .failed("MFN ist gesperrt.") }
+        guard let store else { return .failed(String(localized: "MFN ist gesperrt.")) }
         for id in [source.id, target.id] {
             switch ledger.syncStates[id]?.phase {
-            case .syncing?, .waitingForApproval?: return .failed("Bitte warten, bis der Abgleich beendet ist.")
+            case .syncing?, .waitingForApproval?: return .failed(String(localized: "Bitte warten, bis der Abgleich beendet ist."))
             default: break
             }
         }
@@ -968,7 +1027,7 @@ final class AppModel {
         do {
             try await store.backup(to: backup)
         } catch {
-            return .failed("Keine Sicherung möglich, nichts geändert: \(error)")
+            return .failed(String(localized: "Keine Sicherung möglich, nichts geändert: \(String(describing: error))"))
         }
         // No sync may write into either connection while they are merged (unregister waits for a running one).
         await engine?.unregister(source.id)
@@ -983,7 +1042,7 @@ final class AppModel {
         } catch {
             // One transaction: nothing changed. Both banks sync again.
             await reregister([source, target])
-            return .failed("Zusammenführen fehlgeschlagen, nichts geändert: \(error)")
+            return .failed(String(localized: "Zusammenführen fehlgeschlagen, nichts geändert: \(String(describing: error))"))
         }
         await reregister([target])
         for (old, new) in changes.accounts {
@@ -1025,12 +1084,12 @@ final class AppModel {
     func deleteBackup(_ url: URL) -> String? {
         guard url.deletingLastPathComponent() == databaseURL.deletingLastPathComponent(),
               url.lastPathComponent.hasPrefix("ledger-vor-zusammenfuehren-")
-        else { return "Das ist keine Sicherung von MFN." }
+        else { return String(localized: "Das ist keine Sicherung von MFN.") }
         do {
             try FileManager.default.removeItem(at: url)
             return nil
         } catch {
-            return "Sicherung nicht löschbar: \(error.localizedDescription)"
+            return String(localized: "Sicherung nicht löschbar: \(error.localizedDescription)")
         }
     }
 
@@ -1046,7 +1105,20 @@ final class AppModel {
             complete = false
             Log.logger("app").error("Zugangsdaten nicht löschbar: \(String(describing: type(of: error)), privacy: .public)")
         }
-        if BankAccess.of(connection).isFinTS {
+        if connection.connectorID == .yaxi {
+            // Its logo leaves the cache (the folder would show which banks the user had).
+            if let logoID = YAXISetup.bank(of: connection.id)?.logoID, let directory = try? BankIconStore.defaultCacheDirectory() {
+                YAXILogos.remove(logoID, cacheDirectory: directory)
+            }
+            // Bank, consent and account list of the YAXI connection (not a session item).
+            do {
+                try YAXISetup.remove(connection.id)
+            } catch {
+                complete = false
+                Log.logger("app").error("YAXI-Zustand nicht löschbar: \(String(describing: type(of: error)), privacy: .public)")
+            }
+        }
+        if BankAccess.isFinTS(connection) {
             do {
                 try FinTSConnection.deleteState(of: connection)
             } catch {
@@ -1089,6 +1161,11 @@ final class AppModel {
 
     /// "Zugangsdaten ändern…": stores the new credentials; the next login uses them.
     func updateCredentials(_ credentials: BankCredentials, for connection: Connection) throws {
+        // v12: new credentials always mean a new consent: a stored consent the bank rejected would
+        // otherwise be sent again and the new login never used.
+        if connection.connectorID == .yaxi {
+            try YAXISetup.forgetConsent(of: connection.id)
+        }
         try credentialStore.set(credentials, for: connection.id)
         // New credentials lift the block after a rejected login (no retry with the old ones).
         if let engine { Task { await engine.credentialsChanged(connection.id) } }
@@ -1120,7 +1197,14 @@ final class AppModel {
     func loadBankIcons() {
         guard UserDefaults.standard.bool(forKey: Preferences.loadBankIcons), let iconStore else {
             bankIcons = [:]
+            yaxiLogos = [:]
+            yaxiLogoRequests = []
+            yaxiLogoChecked = []
             return
+        }
+        // v12: banks over YAXI: their logo ID is stored with the connection (keychain, once each).
+        for connection in snapshot.connections where connection.connectorID == .yaxi {
+            loadYAXILogo(for: connection)
         }
         let connectors = Set(snapshot.connections.map(\.connectorID)).union(ConnectorID.allCases.filter { $0 != .mock })
             .filter(\.hasConnector)
@@ -1129,6 +1213,41 @@ final class AppModel {
                 guard let data = await iconStore.icon(for: connector), let image = NSImage(data: data) else { return }
                 self?.bankIcons[connector] = image
             }
+        }
+    }
+
+    /// v12: the logo of a connection over YAXI (its logo ID is stored with the connection).
+    func loadYAXILogo(for connection: Connection) {
+        guard UserDefaults.standard.bool(forKey: Preferences.loadBankIcons), yaxiLogoChecked.insert(connection.id).inserted else { return }
+        let id = connection.id
+        // Demo banks over YAXI have no stored bank: their logo ID comes with the demo data.
+        if isDemo {
+            // Only the screenshot build (DEBUG) loads it, and never into the disk cache: the demo
+            // has no YAXI connection of the user's, so released apps never contact the logo host.
+            #if DEBUG
+            if ScreenshotMode.isActive, let logoID = MockDataset.demoYAXILogoIDs[id] {
+                yaxiLogoIDs[id] = logoID
+                loadYAXILogo(logoID, keep: false)
+            }
+            #endif
+            return
+        }
+        // The keychain read stays off the main thread.
+        Task { [weak self] in
+            guard let logoID = await Task.detached(operation: { YAXISetup.bank(of: id)?.logoID }).value else { return }
+            self?.yaxiLogoIDs[id] = logoID
+            self?.loadYAXILogo(logoID, keep: true)
+        }
+    }
+
+    /// v12: one YAXI bank logo, once per launch. `keep` only for connected banks (disk cache); search
+    /// hits stay in memory.
+    func loadYAXILogo(_ logoID: String?, keep: Bool = false) {
+        guard let logoID, UserDefaults.standard.bool(forKey: Preferences.loadBankIcons), let yaxiLogoStore,
+              yaxiLogos[logoID] == nil, yaxiLogoRequests.insert(logoID).inserted else { return }
+        Task { [weak self] in
+            guard let data = await yaxiLogoStore.logo(for: logoID, keep: keep), let image = NSImage(data: data) else { return }
+            self?.yaxiLogos[logoID] = image
         }
     }
 
@@ -1165,9 +1284,9 @@ final class AppModel {
 
     static func message(forPasswordChange error: VaultError) -> String {
         switch error {
-        case .wrongPassword: "Das bisherige Passwort ist falsch."
-        case let .weakPassword(minimum): "Das neue Passwort muss mindestens \(minimum) Zeichen haben."
-        default: "Passwort konnte nicht geändert werden: \(error)"
+        case .wrongPassword: String(localized: "Das bisherige Passwort ist falsch.")
+        case let .weakPassword(minimum): String(localized: "Das neue Passwort muss mindestens \(minimum) Zeichen haben.")
+        default: String(localized: "Passwort konnte nicht geändert werden: \(String(describing: error))")
         }
     }
 
@@ -1198,7 +1317,7 @@ final class AppModel {
             guard !Task.isCancelled else { return }
             // A run long enough to show progress says when it is done (VoiceOver).
             if self?.categorizationProgress != nil {
-                AccessibilityNotification.Announcement("Kategorisierung abgeschlossen").post()
+                AccessibilityNotification.Announcement(String(localized: "Kategorisierung abgeschlossen")).post()
             }
             self?.categorizeTask = nil
             self?.isCategorizing = false
@@ -1285,12 +1404,12 @@ final class AppModel {
 
     /// Manual categories from the assistant's rest step; waits for the store. Returns an error text.
     func setManualCategory(_ category: CategoryID?, for ids: [TransactionID]) async -> String? {
-        guard let service = categorization else { return "MFN ist gesperrt." }
+        guard let service = categorization else { return String(localized: "MFN ist gesperrt.") }
         do {
             try await service.setManual(category, for: ids)
             return nil
         } catch {
-            return "Die Kategorie konnte nicht gespeichert werden: \(error)"
+            return String(localized: "Die Kategorie konnte nicht gespeichert werden: \(String(describing: error))")
         }
     }
 
@@ -1333,7 +1452,7 @@ final class AppModel {
         let categories = Set(targets.map(\.categoryID))
         categoryPicker = CategoryPickerRequest(
             transactionIDs: targets.map(\.id),
-            title: targets.count == 1 ? targets[0].counterpartName : "\(targets.count) Umsätze",
+            title: targets.count == 1 ? targets[0].counterpartName : String(localized: "\(targets.count) Umsätze"),
             current: categories.count == 1 ? categories.first ?? nil : nil
         )
     }
@@ -1352,7 +1471,7 @@ final class AppModel {
     /// Quiet status of the background run ("412 von 1.500 Umsätzen eingeordnet").
     var categorizationStatus: String? {
         guard isCategorizing, let progress = categorizationProgress, progress.total > 0 else { return nil }
-        return "\(progress.done.formatted()) von \(progress.total.formatted()) Umsätzen eingeordnet"
+        return String(localized: "\(progress.done.formatted()) von \(progress.total.formatted()) Umsätzen eingeordnet")
     }
 
     /// The user's category (`nil` = none) for `ids`; source becomes `manual`, so they leave "Zu prüfen".
@@ -1364,7 +1483,7 @@ final class AppModel {
                 try await service.setManual(category, for: ids)
             } catch {
                 Log.logger("categorize").error("Kategorie nicht gespeichert: \(String(describing: type(of: error)), privacy: .public)")
-                if !lock.isLocked { categoryFailure = "Die Kategorie konnte nicht gespeichert werden. Bitte versuche es noch einmal." }
+                if !lock.isLocked { categoryFailure = String(localized: "Die Kategorie konnte nicht gespeichert werden. Bitte versuche es noch einmal.") }
             }
         }
     }
@@ -1396,7 +1515,7 @@ final class AppModel {
                 }
             } catch {
                 Log.logger("categorize").error("Vorschlag nicht übernommen: \(String(describing: type(of: error)), privacy: .public)")
-                if !lock.isLocked { categoryFailure = "Der Vorschlag konnte nicht übernommen werden. Bitte versuche es noch einmal." }
+                if !lock.isLocked { categoryFailure = String(localized: "Der Vorschlag konnte nicht übernommen werden. Bitte versuche es noch einmal.") }
             }
         }
     }
@@ -1439,22 +1558,22 @@ final class AppModel {
 
     /// Stores the rule, applies it and categorizes what is still open. Returns an error text.
     func saveRule(_ rule: CategoryRule) async -> String? {
-        guard let service = categorization else { return "MFN ist gesperrt." }
+        guard let service = categorization else { return String(localized: "MFN ist gesperrt.") }
         do {
             try await service.apply(rule: rule)
         } catch {
-            return "Die Regel konnte nicht gespeichert werden: \(error)"
+            return String(localized: "Die Regel konnte nicht gespeichert werden: \(String(describing: error))")
         }
         categorizeInBackground()
         return nil
     }
 
     func removeRule(_ id: UUID) async -> String? {
-        guard let service = categorization else { return "MFN ist gesperrt." }
+        guard let service = categorization else { return String(localized: "MFN ist gesperrt.") }
         do {
             try await service.removeRule(id)
         } catch {
-            return "Die Regel konnte nicht gelöscht werden: \(error)"
+            return String(localized: "Die Regel konnte nicht gelöscht werden: \(String(describing: error))")
         }
         return nil
     }
@@ -1574,22 +1693,22 @@ final class AppModel {
 
     /// Returns an error text for the sheet, `nil` on success.
     func saveBudget(_ budget: AccountBudget) async -> String? {
-        guard let store else { return "MFN ist gesperrt." }
+        guard let store else { return String(localized: "MFN ist gesperrt.") }
         do {
             try await store.setBudget(budget)
             return nil
         } catch {
-            return "Budget konnte nicht gespeichert werden: \(error)"
+            return String(localized: "Budget konnte nicht gespeichert werden: \(String(describing: error))")
         }
     }
 
     func removeBudget(for account: AccountID) async -> String? {
-        guard let store else { return "MFN ist gesperrt." }
+        guard let store else { return String(localized: "MFN ist gesperrt.") }
         do {
             try await store.removeBudget(for: account)
             return nil
         } catch {
-            return "Budget konnte nicht entfernt werden: \(error)"
+            return String(localized: "Budget konnte nicht entfernt werden: \(String(describing: error))")
         }
     }
 
@@ -1629,19 +1748,19 @@ final class AppModel {
     /// `LedgerStore.apply`), planned again against what is stored now (a sync may have run since
     /// the preview), then categorizes them like synced transactions.
     func importCSV(_ session: CSVImportSession) async -> CSVImportOutcome {
-        guard let store, !lock.isLocked, let account = session.account else { return .failure("MFN ist gesperrt.") }
+        guard let store, !lock.isLocked, let account = session.account else { return .failure(String(localized: "MFN ist gesperrt.")) }
         let lockSession = self.lockSession
         // Every row of this import carries the batch's ID (v10): marked, filterable, removable.
         let batchID = ImportBatchID.make()
         let document = session.document
         let stored = await store.storedTransactions(of: account.id)
-        guard !isStale(lockSession) else { return .failure("MFN ist gesperrt.") }
+        guard !isStale(lockSession) else { return .failure(String(localized: "MFN ist gesperrt.")) }
         // Parse and plan off the main actor, like the preview.
         let (incoming, plan) = await Task.detached(priority: .userInitiated) {
             let incoming = document.transactions(for: account, importID: batchID).transactions
             return (incoming, CSVImportPlan.make(incoming: incoming, stored: stored))
         }.value
-        guard !isStale(lockSession) else { return .failure("MFN ist gesperrt.") }
+        guard !isStale(lockSession) else { return .failure(String(localized: "MFN ist gesperrt.")) }
         let rows = plan.transactionsToImport(includingLikelyDuplicates: session.includeLikelyDuplicates)
         guard !rows.isEmpty else { return .success(count: 0, account: account.id) }
         let batch = ImportBatch(
@@ -1652,10 +1771,10 @@ final class AppModel {
             try await store.recordImport(batch, merge: CSVImportPlan.merge(rows, into: stored))
         } catch {
             Log.logger("import").error("CSV-Import nicht gespeichert: \(String(describing: type(of: error)), privacy: .public)")
-            return .failure(isStale(lockSession) ? "MFN ist gesperrt." : "Die Umsätze konnten nicht gespeichert werden.")
+            return .failure(isStale(lockSession) ? String(localized: "MFN ist gesperrt.") : String(localized: "Die Umsätze konnten nicht gespeichert werden."))
         }
         // Locked while writing: the store is closed; no balance, no categorization, no selection.
-        guard !isStale(lockSession) else { return .failure("MFN ist gesperrt.") }
+        guard !isStale(lockSession) else { return .failure(String(localized: "MFN ist gesperrt.")) }
         // Counts only, never contents.
         Log.logger("import").info("CSV importiert: \(rows.count, privacy: .public) Umsätze, \(plan.duplicates.count, privacy: .public) vorhanden")
         // Without a bank there is no reported balance: opening balance + booked transactions.
@@ -1664,7 +1783,7 @@ final class AppModel {
         } catch {
             Log.logger("import").error("Kontostand nicht gespeichert: \(String(describing: type(of: error)), privacy: .public)")
         }
-        guard !isStale(lockSession) else { return .failure("MFN ist gesperrt.") }
+        guard !isStale(lockSession) else { return .failure(String(localized: "MFN ist gesperrt.")) }
         categorizeInBackground()
         return .success(count: rows.count, account: account.id)
     }
@@ -1714,22 +1833,22 @@ final class AppModel {
 
     /// Returns an error text for the panel, `nil` on success.
     func savePlannedItem(_ item: PlannedItem) async -> String? {
-        guard let store else { return "MFN ist gesperrt." }
+        guard let store else { return String(localized: "MFN ist gesperrt.") }
         do {
             try await store.upsertPlannedItem(item)
             return nil
         } catch {
-            return "Die geplante Buchung konnte nicht gespeichert werden: \(error)"
+            return String(localized: "Die geplante Buchung konnte nicht gespeichert werden: \(String(describing: error))")
         }
     }
 
     func removePlannedItem(_ id: UUID) async -> String? {
-        guard let store else { return "MFN ist gesperrt." }
+        guard let store else { return String(localized: "MFN ist gesperrt.") }
         do {
             try await store.removePlannedItem(id)
             return nil
         } catch {
-            return "Die geplante Buchung konnte nicht entfernt werden: \(error)"
+            return String(localized: "Die geplante Buchung konnte nicht entfernt werden: \(String(describing: error))")
         }
     }
 
@@ -1863,6 +1982,11 @@ final class AppModel {
         snapshot = visible
         index = SnapshotIndex(snapshot: visible, forecastCache: forecastCache, needsReview: needsReview)
         snapshotRevision &+= 1
+        // v12: logos of banks over YAXI, once per connection and launch (also for ones that appear
+        // later: added, restored, or not yet loaded when the icons were first requested).
+        for connection in visible.connections where connection.connectorID == .yaxi && !yaxiLogoChecked.contains(connection.id) {
+            loadYAXILogo(for: connection)
+        }
     }
 
     // MARK: - New since the last sync
@@ -1989,7 +2113,7 @@ final class AppModel {
         let isDepot = if case let .account(id)? = selection { account(id)?.type == .depot } else { false }
         if !ledgerQuery.onlyNew, selection == .overview || selection == .subscriptions || selection == nil || isDepot {
             selection = .allAccounts
-            AccessibilityNotification.Announcement("Alle Konten, nur neue Umsätze").post()
+            AccessibilityNotification.Announcement(String(localized: "Alle Konten, nur neue Umsätze")).post()
         }
         ledgerQuery.onlyNew.toggle()
     }
@@ -2008,25 +2132,25 @@ final class AppModel {
 
     /// `nil` or blank restores the bank's name. Returns an error message for the UI.
     func renameAccount(_ account: AccountID, to name: String?) async -> String? {
-        guard let store else { return "Die Datenbank ist nicht geöffnet." }
+        guard let store else { return String(localized: "Die Datenbank ist nicht geöffnet.") }
         do {
             try await store.setCustomName(name, for: account)
             return nil
         } catch {
-            return "Name konnte nicht gespeichert werden: \(error)"
+            return String(localized: "Name konnte nicht gespeichert werden: \(String(describing: error))")
         }
     }
 
     func renameConnection(_ id: ConnectionID, to name: String) async -> String? {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return "Der Name darf nicht leer sein." }
-        guard let store, var connection = ledger.connections.first(where: { $0.id == id }) else { return "Die Datenbank ist nicht geöffnet." }
+        guard !trimmed.isEmpty else { return String(localized: "Der Name darf nicht leer sein.") }
+        guard let store, var connection = ledger.connections.first(where: { $0.id == id }) else { return String(localized: "Die Datenbank ist nicht geöffnet.") }
         connection.displayName = trimmed
         do {
             try await store.upsert(connection: connection)
             return nil
         } catch {
-            return "Name konnte nicht gespeichert werden: \(error)"
+            return String(localized: "Name konnte nicht gespeichert werden: \(String(describing: error))")
         }
     }
 
@@ -2492,7 +2616,7 @@ struct SnapshotIndex {
         }
     }
 
-    private static let shortDay = Date.FormatStyle(locale: Locale(identifier: "de_DE"), timeZone: BankDay.bankTimeZone).day().month(.wide)
+    private static let shortDay = Date.FormatStyle(locale: Locale.autoupdatingCurrent, timeZone: BankDay.bankTimeZone).day().month(.wide)
 
     /// The balance walked through the known payments only, as the shortfall warning counts it.
     static func knownPath(_ basis: ForecastBasis, today: BankDay) -> ForecastPath {

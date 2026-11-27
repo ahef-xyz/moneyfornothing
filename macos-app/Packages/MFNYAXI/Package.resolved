@@ -1,0 +1,42 @@
+{
+  "originHash" : "4e49efb9183d60822f44173c0a8c9959ce8448963ae0f6832c9c620f9af62c9c",
+  "pins" : [
+    {
+      "identity" : "routex-client-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/yaxitech/routex-client-swift",
+      "state" : {
+        "revision" : "53ba7f77c492361697effc6240dd456ccf61c034",
+        "version" : "0.6.2"
+      }
+    },
+    {
+      "identity" : "sqlcipher.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sqlcipher/SQLCipher.swift.git",
+      "state" : {
+        "revision" : "e7415c5e6b4fd9b78874bb956aad8a42b08e9966",
+        "version" : "4.20.0"
+      }
+    },
+    {
+      "identity" : "swift-asn1",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-asn1",
+      "state" : {
+        "revision" : "97fd57437fc94cfa6b62f2b8f84c50f433534e17",
+        "version" : "1.7.5"
+      }
+    },
+    {
+      "identity" : "swift-crypto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-crypto",
+      "state" : {
+        "revision" : "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+        "version" : "4.5.2"
+      }
+    }
+  ],
+  "version" : 3
+}

@@ -34,7 +34,7 @@ final class AutoBackup {
         case weekly = 7
 
         var id: Int { rawValue }
-        var title: String { self == .daily ? "Täglich" : "Wöchentlich" }
+        var title: String { self == .daily ? String(localized: "Täglich") : String(localized: "Wöchentlich") }
         /// A little under the nominal interval, so the backup does not drift later every time.
         var interval: TimeInterval { TimeInterval(rawValue) * 86_400 - 2 * 3_600 }
     }
@@ -146,9 +146,9 @@ extension AppModel {
     func createBackup() {
         guard canBackUp else { return }
         let panel = NSSavePanel()
-        panel.title = "Sicherung erstellen"
-        panel.message = "Die Sicherung ist verschlüsselt. Zum Wiederherstellen brauchst du dein heutiges Datenbank-Passwort."
-        panel.prompt = "Sichern"
+        panel.title = String(localized: "Sicherung erstellen")
+        panel.message = String(localized: "Die Sicherung ist verschlüsselt. Zum Wiederherstellen brauchst du dein heutiges Datenbank-Passwort.")
+        panel.prompt = String(localized: "Sichern")
         panel.nameFieldStringValue = LedgerBackup.fileName(at: Date())
         panel.allowedContentTypes = [.mfnBackup]
         panel.canCreateDirectories = true
@@ -175,9 +175,9 @@ extension AppModel {
                 isBackingUp = false
                 if let failure {
                     Log.logger("backup").error("Backup failed: \(String(describing: failure), privacy: .private)")
-                    backupNotice = BackupNotice(title: "Die Sicherung konnte nicht erstellt werden.", message: Self.message(for: failure))
+                    backupNotice = BackupNotice(title: String(localized: "Die Sicherung konnte nicht erstellt werden."), message: Self.message(for: failure))
                 } else {
-                    AccessibilityNotification.Announcement("Sicherung erstellt").post()
+                    AccessibilityNotification.Announcement(String(localized: "Sicherung erstellt")).post()
                 }
             }
         }
@@ -187,8 +187,8 @@ extension AppModel {
     func chooseBackupToRestore() {
         guard canRestoreBackup else { return }
         let panel = NSOpenPanel()
-        panel.title = "Aus Sicherung wiederherstellen"
-        panel.prompt = "Auswählen"
+        panel.title = String(localized: "Aus Sicherung wiederherstellen")
+        panel.prompt = String(localized: "Auswählen")
         panel.allowedContentTypes = [.mfnBackup]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
@@ -201,7 +201,7 @@ extension AppModel {
             do throws(BackupError) {
                 restoreRequest = RestoreRequest(url: url, info: try LedgerBackup.info(of: url))
             } catch {
-                backupNotice = BackupNotice(title: "Diese Datei lässt sich nicht wiederherstellen.", message: Self.message(for: error))
+                backupNotice = BackupNotice(title: String(localized: "Diese Datei lässt sich nicht wiederherstellen."), message: Self.message(for: error))
             }
         }
     }
@@ -221,7 +221,7 @@ extension AppModel {
     /// is moved aside, never deleted. With data open, MFN locks afterwards: the next unlock opens
     /// the restored database.
     func restoreBackup(_ request: RestoreRequest, password: String) async -> String? {
-        guard let vault = backupVault, !isBackingUp, !lock.isLocked else { return "MFN ist gesperrt." }
+        guard let vault = backupVault, !isBackingUp, !lock.isLocked else { return String(localized: "MFN ist gesperrt.") }
         let session = lockSession
         isBackingUp = true
         defer { isBackingUp = false }
@@ -233,7 +233,7 @@ extension AppModel {
         }
         guard !isStale(session) else {
             vault.discard(prepared)
-            return "MFN wurde gesperrt."
+            return String(localized: "MFN wurde gesperrt.")
         }
         let open = backupStore
         if let open {
@@ -241,7 +241,7 @@ extension AppModel {
             await open.close()
             guard !isStale(session) else {
                 vault.discard(prepared)
-                return "MFN wurde gesperrt."
+                return String(localized: "MFN wurde gesperrt.")
             }
         }
         let date = request.info.createdAt.formatted(date: .long, time: .shortened)
@@ -252,30 +252,30 @@ extension AppModel {
             vault.discard(prepared)
             Log.logger("backup").error("Restore failed: \(String(describing: error), privacy: .private)")
             restoreRequest = nil
-            backupNotice = BackupNotice(title: "Die Sicherung konnte nicht wiederhergestellt werden.",
-                                        message: "Deine bisherigen Daten sind unverändert. " + Self.message(for: error))
+            backupNotice = BackupNotice(title: String(localized: "Die Sicherung konnte nicht wiederhergestellt werden."),
+                                        message: String(localized: "Deine bisherigen Daten sind unverändert.") + " " + Self.message(for: error))
             // The database was closed for the swap: the next unlock opens it again.
             if open != nil { lock.lock() }
             return nil
         }
         // Order and hidden accounts refer to this database's banks and accounts.
         if let settings = prepared.settings { applyBackupSettings(settings) }
-        var message = "Die Daten aus der Sicherung vom \(date) sind jetzt aktiv."
+        var message = String(localized: "Die Daten aus der Sicherung vom \(date) sind jetzt aktiv.")
         if result.previousDatabase != nil {
-            message += " Die bisherigen Daten liegen verschlüsselt als Kopie im Datenordner; du kannst sie löschen, wenn alles stimmt."
+            message += " " + String(localized: "Die bisherigen Daten liegen verschlüsselt als Kopie im Datenordner; du kannst sie löschen, wenn alles stimmt.")
         }
         if result.keyNotStored != nil {
-            message += " Der Schlüssel ließ sich nicht im Schlüsselbund speichern: MFN fragt beim Entsperren nach dem Datenbank-Passwort."
+            message += " " + String(localized: "Der Schlüssel ließ sich nicht im Schlüsselbund speichern: MFN fragt beim Entsperren nach dem Datenbank-Passwort.")
         }
-        message += " Bankzugänge sind nicht Teil der Sicherung: auf einem anderen Mac meldest du dich bei jeder Bank einmal neu an."
+        message += " " + String(localized: "Bankzugänge sind nicht Teil der Sicherung: auf einem anderen Mac meldest du dich bei jeder Bank einmal neu an.")
         restoreRequest = nil
         if open != nil {
             lock.lock()
-            message += " MFN ist gesperrt; entsperre, um weiterzuarbeiten."
+            message += " " + String(localized: "MFN ist gesperrt; entsperre, um weiterzuarbeiten.")
         } else {
             await openRestoredDatabase(password: password)
         }
-        backupNotice = BackupNotice(title: "Sicherung wiederhergestellt", message: message, previous: result.previousDatabase)
+        backupNotice = BackupNotice(title: String(localized: "Sicherung wiederhergestellt"), message: message, previous: result.previousDatabase)
         return nil
     }
 
@@ -323,7 +323,7 @@ extension AppModel {
         guard !isDemo, !lock.isLocked, let vault = backupVault, let store = backupStore else { return }
         guard force ? (auto.hasFolder && !auto.isRunning) : auto.isDue() else { return }
         guard let folder = auto.openFolder() else {
-            auto.finish(failure: "Der Ordner für die Sicherung ist nicht erreichbar. Wähle ihn in den Einstellungen neu.")
+            auto.finish(failure: String(localized: "Der Ordner für die Sicherung ist nicht erreichbar. Wähle ihn in den Einstellungen neu."))
             return
         }
         auto.begin()
@@ -360,8 +360,8 @@ extension AppModel {
     /// Settings → Sicherung: the folder for automatic backups.
     func chooseAutoBackupFolder() {
         let panel = NSOpenPanel()
-        panel.title = "Ordner für automatische Sicherungen"
-        panel.prompt = "Auswählen"
+        panel.title = String(localized: "Ordner für automatische Sicherungen")
+        panel.prompt = String(localized: "Auswählen")
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.canCreateDirectories = true
@@ -371,8 +371,8 @@ extension AppModel {
             if autoBackup.setFolder(url) {
                 runAutoBackupIfDue()
             } else {
-                backupNotice = BackupNotice(title: "Dieser Ordner lässt sich nicht verwenden.",
-                                            message: "MFN konnte sich den Ordner nicht merken. Wähle einen anderen.")
+                backupNotice = BackupNotice(title: String(localized: "Dieser Ordner lässt sich nicht verwenden."),
+                                            message: String(localized: "MFN konnte sich den Ordner nicht merken. Wähle einen anderen."))
             }
         }
     }
@@ -380,19 +380,19 @@ extension AppModel {
     static func message(for error: BackupError) -> String {
         switch error {
         case .notABackup:
-            "Das ist keine Sicherung von MoneyForNothing."
+            String(localized: "Das ist keine Sicherung von MoneyForNothing.")
         case .unsupportedFormat, .newerSchema:
-            "Diese Sicherung stammt aus einer neueren Version von MFN. Aktualisiere MFN und versuche es erneut."
+            String(localized: "Diese Sicherung stammt aus einer neueren Version von MFN. Aktualisiere MFN und versuche es erneut.")
         case .damaged:
-            "Die Sicherung ist unvollständig oder beschädigt."
+            String(localized: "Die Sicherung ist unvollständig oder beschädigt.")
         case .wrongPassword:
-            "Das Passwort ist falsch. Gebraucht wird das Datenbank-Passwort aus der Zeit, als die Sicherung erstellt wurde."
+            String(localized: "Das Passwort ist falsch. Gebraucht wird das Datenbank-Passwort aus der Zeit, als die Sicherung erstellt wurde.")
         case .vault(.store(.closed)):
-            "MFN wurde gesperrt."
+            String(localized: "MFN wurde gesperrt.")
         case .vault:
-            "Die Datenbank ließ sich nicht lesen oder schreiben."
+            String(localized: "Die Datenbank ließ sich nicht lesen oder schreiben.")
         case let .file(detail):
-            "Die Datei ließ sich nicht lesen oder schreiben. \(detail)"
+            String(localized: "Die Datei ließ sich nicht lesen oder schreiben. \(detail)")
         }
     }
 }

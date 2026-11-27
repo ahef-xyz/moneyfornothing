@@ -156,7 +156,7 @@ struct HeadlessLoginView: View {
             stored = try model.credentialStore.credentials(for: request.connection.id)
         } catch {
             stored = nil
-            self.error = "Zugangsdaten nicht lesbar: \(error.localizedDescription)"
+            self.error = String(localized: "Zugangsdaten nicht lesbar: \(error.localizedDescription)")
         }
         if let credentials = HeadlessLogin.usableCredentials(stored, for: connector) {
             run(with: credentials)
@@ -172,7 +172,7 @@ struct HeadlessLoginView: View {
         do {
             try model.credentialStore.set(credentials, for: request.connection.id)
         } catch {
-            self.error = "Zugangsdaten konnten nicht gespeichert werden: \(error.localizedDescription)"
+            self.error = String(localized: "Zugangsdaten konnten nicht gespeichert werden: \(error.localizedDescription)")
             return
         }
         values = [:]

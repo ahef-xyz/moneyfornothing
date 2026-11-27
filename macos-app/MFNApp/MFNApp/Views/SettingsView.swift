@@ -101,7 +101,7 @@ private struct GeneralSettings: View {
             } header: {
                 Text("Seitenleiste")
             } footer: {
-                Text("Die Symbole kommen als Favicon direkt von der Website der jeweiligen Bank, ohne Cookies und ohne Dienst Dritter. Ohne Laden zeigt MFN farbige Kürzel.")
+                Text("Die Symbole kommen als Favicon direkt von der Website der jeweiligen Bank, ohne Cookies. Für Banken über YAXI kommt das Logo von YAXIs Logo-Dienst (logos.yaxi.tech). Ohne Laden zeigt MFN farbige Kürzel.")
             }
         }
         .formStyle(.grouped)
@@ -144,8 +144,10 @@ private struct SyncSettings: View {
         }
     }
 
-    static func title(_ minutes: Int) -> String {
-        minutes < 60 ? "alle \(minutes) Minuten" : minutes == 60 ? "jede Stunde" : "alle \(minutes / 60) Stunden"
+    static func title(_ minutes: Int) -> LocalizedStringResource {
+        if minutes < 60 { return "alle \(minutes) Minuten" }
+        if minutes == 60 { return "jede Stunde" }
+        return "alle \(minutes / 60) Stunden"
     }
 }
 
@@ -179,6 +181,7 @@ private struct BankSettings: View {
             if !model.isDemo {
                 Button("Bank hinzufügen …") { model.showBankSetup() }
                     .disabled(!model.canAddBank)
+                YAXIKeySettings()
             }
         }
         .formStyle(.grouped)
@@ -238,15 +241,17 @@ private struct ConnectionSettingsRow: View {
         let accounts = all.count
         let hidden = all.count(where: { model.isHidden($0.id) })
         let synced: String = switch state.phase {
-        case .syncing: "Abgleich läuft …"
-        case .waitingForApproval: "wartet auf Freigabe"
+        case .syncing: String(localized: "Abgleich läuft …")
+        case .waitingForApproval: String(localized: "wartet auf Freigabe")
         case let .failed(error): error.description
-        case let .storeFailed(message): "Speichern fehlgeschlagen: \(message)"
-        case .idle: state.lastSuccess.map { "abgeglichen \(DayFormat.syncTime($0))" } ?? "noch nicht abgeglichen"
+        case let .storeFailed(message): String(localized: "Speichern fehlgeschlagen: \(message)")
+        case .idle: state.lastSuccess.map { String(localized: "abgeglichen \(DayFormat.syncTime($0))") } ?? String(localized: "noch nicht abgeglichen")
         }
-        let status = connection.isManual ? "ohne Anbindung, Umsätze per CSV-Import" : synced
-        let hiddenText = hidden > 0 ? " (\(hidden) ausgeblendet)" : ""
-        return "\(accounts) \(accounts == 1 ? "Konto" : "Konten")\(hiddenText) · \(status)"
+        let status = connection.isManual ? String(localized: "ohne Anbindung, Umsätze per CSV-Import")
+            : connection.connectorID == .yaxi ? String(localized: "über YAXI · \(synced)") : synced
+        let accountsText = accounts == 1 ? String(localized: "\(accounts) Konto") : String(localized: "\(accounts) Konten")
+        let countText = hidden > 0 ? String(localized: "\(accountsText) (\(hidden) ausgeblendet)") : accountsText
+        return String(localized: "\(countText) · \(status)")
     }
 
     private func isError(_ state: SyncState) -> Bool {
@@ -266,9 +271,9 @@ private struct SecuritySettings: View {
     var body: some View {
         Form {
             Section {
-                LabeledContent("Beim Start", value: "Touch ID oder Passwort")
-                LabeledContent("Bei Bildschirmsperre", value: "sperren")
-                LabeledContent("Nach Inaktivität", value: "\(Int(AppLock.idleTimeout.components.seconds / 60)) Minuten")
+                LabeledContent("Beim Start") { Text("Touch ID oder Passwort") }
+                LabeledContent("Bei Bildschirmsperre") { Text("sperren") }
+                LabeledContent("Nach Inaktivität") { Text("\(Int(AppLock.idleTimeout.components.seconds / 60)) Minuten") }
                 Button("Jetzt sperren") { model.lock.lock() }
                     .disabled(model.lock.isLocked)
             } header: {
@@ -339,8 +344,8 @@ private struct ChangePasswordSheet: View {
 
     private var hint: String {
         if let error { return error }
-        if !repeated.isEmpty, new != repeated { return "Die Passwörter stimmen nicht überein." }
-        return "Mindestens \(LedgerVault.minimumPasswordLength) Zeichen. Nur die Datei ledger.key wird neu geschrieben."
+        if !repeated.isEmpty, new != repeated { return String(localized: "Die Passwörter stimmen nicht überein.") }
+        return String(localized: "Mindestens \(LedgerVault.minimumPasswordLength) Zeichen. Nur die Datei ledger.key wird neu geschrieben.")
     }
 
     private func submit() {
@@ -400,7 +405,7 @@ private struct DeveloperSettings: View {
                     Button("Kategorien-Assistent wieder anbieten") {
                         UserDefaults.standard.removeObject(forKey: model.setupOfferedKey)
                         assistantReset = true
-                        AccessibilityNotification.Announcement("Der Kategorien-Assistent wird nach dem nächsten Abgleich wieder angeboten.").post()
+                        AccessibilityNotification.Announcement(String(localized: "Der Kategorien-Assistent wird nach dem nächsten Abgleich wieder angeboten.")).post()
                     }
                     if assistantReset {
                         Label("Wird nach dem nächsten Abgleich angeboten", systemImage: "checkmark")

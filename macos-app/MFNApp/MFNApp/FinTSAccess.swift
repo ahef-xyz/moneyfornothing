@@ -2,6 +2,7 @@ import CryptoKit
 import Foundation
 import MFNCore
 import MFNFinTS
+import MFNYAXI
 
 /// How a connection reaches its bank: the bank's standard connector (web banking, app API) or
 /// FinTS. App-side only, the frozen protocol knows one `ConnectorID` per bank.
@@ -15,8 +16,15 @@ import MFNFinTS
 struct BankAccess: Hashable, Identifiable {
     let connector: ConnectorID
     let isFinTS: Bool
+    /// v12: the bank behind a `.yaxi` access, as found in the assistant's search.
+    var yaxiBank: YAXIBank? = nil
 
-    var id: String { isFinTS ? "fints-\(connector.rawValue)" : connector.rawValue }
+    var id: String {
+        if let yaxiBank { return "yaxi-\(yaxiBank.id)" }
+        return isFinTS ? "fints-\(connector.rawValue)" : connector.rawValue
+    }
+
+    static func yaxi(_ bank: YAXIBank) -> BankAccess { BankAccess(connector: .yaxi, isFinTS: false, yaxiBank: bank) }
 
     /// The access a bank gets by default: FinTS for `fintsOnly`, else its own connector.
     static func standard(_ connector: ConnectorID) -> BankAccess {
@@ -28,7 +36,16 @@ struct BankAccess: Hashable, Identifiable {
     static let connectionPrefix = "fints-"
 
     static func of(_ connection: Connection) -> BankAccess {
-        BankAccess(connector: connection.connectorID, isFinTS: connection.id.rawValue.hasPrefix(connectionPrefix))
+        // A YAXI connection reads its bank from the keychain: only call this where fields are needed.
+        if connection.connectorID == .yaxi {
+            return BankAccess(connector: .yaxi, isFinTS: false, yaxiBank: YAXISetup.bank(of: connection.id))
+        }
+        return BankAccess(connector: connection.connectorID, isFinTS: connection.id.rawValue.hasPrefix(connectionPrefix))
+    }
+
+    /// Cheap check without the keychain (sidebar, merge, factory).
+    static func isFinTS(_ connection: Connection) -> Bool {
+        connection.connectorID != .yaxi && connection.id.rawValue.hasPrefix(connectionPrefix)
     }
 
     /// A web banking connection of a bank that is FinTS only now (no connector any more).
@@ -45,7 +62,8 @@ struct BankAccess: Hashable, Identifiable {
 
     /// "(FinTS)" only where the bank also has another access.
     var displayName: String {
-        isFinTS && !Self.fintsOnly.contains(connector) ? "\(connector.displayName) (FinTS)" : connector.displayName
+        if let yaxiBank { return yaxiBank.name }
+        return isFinTS && !Self.fintsOnly.contains(connector) ? "\(connector.displayName) (FinTS)" : connector.displayName
     }
 
     func newConnectionID() -> ConnectionID {
@@ -56,8 +74,10 @@ struct BankAccess: Hashable, Identifiable {
     /// Fields of the login form. FinTS logs in with the Zugangsnummer/Anmeldename and the PIN for
     /// FinTS (HBCI), which can differ from the web banking password. ING's are in `MFNCore` (v8).
     var credentialFields: [CredentialField] {
+        // v12: the fields of the bank YAXI reaches (from the search, or stored with the connection).
+        if connector == .yaxi { return yaxiBank?.credentialFields ?? [] }
         guard isFinTS, !Self.fintsOnly.contains(connector) else { return connector.credentialFields }
-        return [CredentialField(key: FinTSKeys.userID, label: "Anmeldename", kind: .text),
+        return [CredentialField(key: FinTSKeys.userID, label: String(localized: "Anmeldename"), kind: .text),
                 CredentialField(key: FinTSKeys.pin, label: "PIN", kind: .secret)]
     }
 

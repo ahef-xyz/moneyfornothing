@@ -17,13 +17,13 @@ final class CategorySetup: Identifiable {
 
         var title: String {
             switch self {
-            case .overview: "Überblick"
-            case .income: "Einnahmen"
-            case .fixedCost: "Fixkosten"
-            case .counterparty: "Häufige Gegenparteien"
-            case .transfer: "Umbuchungen"
-            case .rest: "Rest"
-            case .done: "Fertig"
+            case .overview: String(localized: "Überblick")
+            case .income: String(localized: "Einnahmen")
+            case .fixedCost: String(localized: "Fixkosten")
+            case .counterparty: String(localized: "Häufige Gegenparteien")
+            case .transfer: String(localized: "Umbuchungen")
+            case .rest: String(localized: "Rest")
+            case .done: String(localized: "Fertig")
             }
         }
 
@@ -303,7 +303,7 @@ final class CategorySetup: Identifiable {
         let categories = Set(targets.map(\.categoryID))
         picker = CategoryPickerRequest(
             transactionIDs: targets.map(\.id),
-            title: targets.count == 1 ? targets[0].counterpartName : "\(targets.count) Umsätze",
+            title: targets.count == 1 ? targets[0].counterpartName : String(localized: "\(targets.count) Umsätze"),
             current: categories.count == 1 ? categories.first ?? nil : nil
         )
     }
@@ -333,16 +333,16 @@ final class CategorySetup: Identifiable {
     static func sourceText(_ suggestion: CategorySuggestion) -> String {
         switch suggestion.source {
         case .rule:
-            if abs(suggestion.confidence - KnownMerchantStage.confidence) < 0.001 { "bekannter Händler" }
-            else if abs(suggestion.confidence - TransferStage.confidence) < 0.001 { "Umbuchung erkannt" }
-            else { "Regel" }
-        case .knn: "ähnlich"
-        case .llm: "KI"
-        case .manual: "manuell"
+            if abs(suggestion.confidence - KnownMerchantStage.confidence) < 0.001 { String(localized: "bekannter Händler") }
+            else if abs(suggestion.confidence - TransferStage.confidence) < 0.001 { String(localized: "Umbuchung erkannt") }
+            else { String(localized: "Regel") }
+        case .knn: String(localized: "ähnlich")
+        case .llm: String(localized: "KI")
+        case .manual: String(localized: "manuell")
         }
     }
 
     static func percent(_ value: Double) -> String {
-        value.formatted(.percent.precision(.fractionLength(0)).locale(Locale(identifier: "de_DE")))
+        value.formatted(.percent.precision(.fractionLength(0)).locale(Locale.autoupdatingCurrent))
     }
 }

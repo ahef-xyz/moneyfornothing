@@ -21,6 +21,7 @@
 		A00000000000000000000D0C /* MFNFinTS in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0C /* MFNFinTS */; };
 		A00000000000000000000D0D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0D /* Sparkle */; };
 		A00000000000000000000D0E /* MFNMCP in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0E /* MFNMCP */; };
+		A00000000000000000000D0F /* MFNYAXI in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000B0F /* MFNYAXI */; };
 		A00000000000000000001E01 /* mfn-mcp in Embed Helpers */ = {isa = PBXBuildFile; fileRef = A00000000000000000000506 /* mfn-mcp */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -109,6 +110,7 @@
 				A00000000000000000000D07 /* MFNTradeRepublic in Frameworks */,
 				A00000000000000000000D0D /* Sparkle in Frameworks */,
 				A00000000000000000000D0E /* MFNMCP in Frameworks */,
+				A00000000000000000000D0F /* MFNYAXI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +211,7 @@
 				A00000000000000000000B0C /* MFNFinTS */,
 				A00000000000000000000B0D /* Sparkle */,
 				A00000000000000000000B0E /* MFNMCP */,
+				A00000000000000000000B0F /* MFNYAXI */,
 				A00000000000000000000B09 /* MFNIntelligence */,
 				A00000000000000000000B07 /* MFNTradeRepublic */,
 			);
@@ -266,6 +269,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				de,
+				en,
 				Base,
 			);
 			mainGroup = A00000000000000000000201;
@@ -283,6 +287,7 @@
 				A00000000000000000000F08 /* XCLocalSwiftPackageReference "../Packages/MFNIntelligence" */,
 				A00000000000000000000F06 /* XCLocalSwiftPackageReference "../Packages/MFNTradeRepublic" */,
 				A00000000000000000000F0D /* XCLocalSwiftPackageReference "../Packages/MFNMCP" */,
+				A00000000000000000000F0E /* XCLocalSwiftPackageReference "../Packages/MFNYAXI" */,
 				A00000000000000000000F0C /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -362,10 +367,10 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn.mcp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -384,10 +389,10 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn.mcp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -448,7 +453,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -461,7 +466,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -480,7 +485,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -493,7 +498,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -510,9 +515,9 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -529,9 +534,9 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.ahef.mfn.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -585,6 +590,10 @@
 		A00000000000000000000F0D /* XCLocalSwiftPackageReference "../Packages/MFNMCP" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../Packages/MFNMCP;
+		};
+		A00000000000000000000F0E /* XCLocalSwiftPackageReference "../Packages/MFNYAXI" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MFNYAXI;
 		};
 		A00000000000000000000F01 /* XCLocalSwiftPackageReference "../Packages/MFNCore" */ = {
 			isa = XCLocalSwiftPackageReference;
@@ -648,6 +657,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A00000000000000000000F0D /* XCLocalSwiftPackageReference "../Packages/MFNMCP" */;
 			productName = MFNMCP;
+		};
+		A00000000000000000000B0F /* MFNYAXI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000F0E /* XCLocalSwiftPackageReference "../Packages/MFNYAXI" */;
+			productName = MFNYAXI;
 		};
 		A00000000000000000000B01 /* MFNCore */ = {
 			isa = XCSwiftPackageProductDependency;

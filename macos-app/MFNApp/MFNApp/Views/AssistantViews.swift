@@ -33,7 +33,7 @@ struct AssistantSettings: View {
                 }
                 if access.isEnabled {
                     LabeledContent("Verbunden") {
-                        Text(access.connectedClients.isEmpty ? "Kein Assistent" : access.connectedClients.map(\.displayName).joined(separator: ", "))
+                        Text(access.connectedClients.isEmpty ? String(localized: "Kein Assistent") : access.connectedClients.map(\.displayName).joined(separator: ", "))
                     }
                 }
             } header: {
@@ -94,11 +94,11 @@ struct AssistantSettings: View {
                 SetupStep(number: 1, title: "Zugang oben einschalten und die Konten wählen, die der Assistent sehen darf.")
                 VStack(alignment: .leading, spacing: 8) {
                     SetupStep(number: 2, title: "Am einfachsten: Diesen Satz in den Chat deines Assistenten einfügen. Assistenten, die ihre Einstellungen selbst ändern können (etwa in einem Code-Editor oder im Terminal), richten den Zugang damit selbst ein:")
-                    CodeBlock(text: Self.agentPrompt, copyLabel: "Satz kopieren") { copy(Self.agentPrompt, as: "Satz") }
+                    CodeBlock(text: Self.agentPrompt, copyLabel: "Satz kopieren") { copy(Self.agentPrompt, as: String(localized: "Satz")) }
                 }
                 VStack(alignment: .leading, spacing: 8) {
                     SetupStep(number: 3, title: "Oder von Hand: In deinem Programm einen MCP-Server eintragen. Die meisten Programme haben dafür eine Konfigurationsdatei im JSON-Format; dort kommt dieser Block hinein:")
-                    CodeBlock(text: Self.jsonFile, copyLabel: "JSON kopieren") { copy(Self.jsonFile, as: "JSON") }
+                    CodeBlock(text: Self.jsonFile, copyLabel: "JSON kopieren") { copy(Self.jsonFile, as: String(localized: "JSON")) }
                     Text("Steht in der Datei schon „mcpServers“, füge nur den Eintrag „moneyfornothing“ in die vorhandenen Klammern ein.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
@@ -107,7 +107,7 @@ struct AssistantSettings: View {
                 }
                 VStack(alignment: .leading, spacing: 8) {
                     SetupStep(number: 4, title: "Fragt dein Programm stattdessen in einem Formular: Name „moneyfornothing“, Typ „stdio“ (lokaler Befehl), ohne Argumente, und als Befehl dieser Pfad:")
-                    CodeBlock(text: AssistantAccess.helperPath, copyLabel: "Pfad kopieren") { copy(AssistantAccess.helperPath, as: "Pfad") }
+                    CodeBlock(text: AssistantAccess.helperPath, copyLabel: "Pfad kopieren") { copy(AssistantAccess.helperPath, as: String(localized: "Pfad")) }
                     Button("Helfer im Finder zeigen") {
                         NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: AssistantAccess.helperPath)])
                     }
@@ -147,18 +147,20 @@ struct AssistantSettings: View {
         }
     }
 
-    static let warning = """
+    static var warning: String {
+        String(localized: """
     Ein Assistent, den du verbindest, kann Salden, Umsätze und die Namen von Gegenparteien der freigegebenen Konten lesen.
 
     Mit einem Cloud-Modell verlassen diese Daten deinen Mac und gehen an den Anbieter des Modells. Mit einem lokalen Modell bleiben sie auf dem Mac. MFN kann nicht erkennen, welches Modell verbunden ist.
 
     Verwendungszwecke und Namen in Umsätzen schreiben andere. Solche Texte könnten versuchen, einen Assistenten zu steuern, besonders wenn er auch im Web suchen oder Dateien ändern darf.
-    """
+    """)
+    }
 
     /// For assistants that can change their own configuration: one sentence that says exactly
     /// what to add (name, transport, command, no arguments).
     static var agentPrompt: String {
-        "Richte bitte einen lokalen MCP-Server ein: Name „moneyfornothing“, Typ stdio, Befehl \"\(AssistantAccess.helperPath)\", ohne Argumente und ohne Umgebungsvariablen. Er gibt nur Lesezugriff auf meine Finanzdaten in MoneyForNothing."
+        String(localized: "Richte bitte einen lokalen MCP-Server ein: Name „moneyfornothing“, Typ stdio, Befehl \"\(AssistantAccess.helperPath)\", ohne Argumente und ohne Umgebungsvariablen. Er gibt nur Lesezugriff auf meine Finanzdaten in MoneyForNothing.")
     }
 
     /// A complete configuration file as most MCP programs read it (`mcpServers`).
@@ -182,7 +184,7 @@ struct AssistantSettings: View {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
         copied = kind
-        AccessibilityNotification.Announcement("\(kind) kopiert").post()
+        AccessibilityNotification.Announcement(String(localized: "\(kind) kopiert")).post()
         // The note goes away again, so a second copy shows up as new.
         Task {
             try? await Task.sleep(for: .seconds(2))
@@ -243,12 +245,12 @@ struct AssistantLogView: View {
 
     static func outcome(_ outcome: MCPActivity.Outcome) -> String {
         switch outcome {
-        case .answered: "Beantwortet"
-        case .toolError: "Fehlerhafte Anfrage"
-        case .locked: "Gesperrt"
-        case .refused: "Abgelehnt"
-        case .rateLimited: "Zu viele Anfragen"
-        case .failed: "Fehler"
+        case .answered: String(localized: "Beantwortet")
+        case .toolError: String(localized: "Fehlerhafte Anfrage")
+        case .locked: String(localized: "Gesperrt")
+        case .refused: String(localized: "Abgelehnt")
+        case .rateLimited: String(localized: "Zu viele Anfragen")
+        case .failed: String(localized: "Fehler")
         }
     }
 
@@ -312,7 +314,7 @@ struct AssistantToolbarButton: View {
 /// One numbered step of the setup.
 private struct SetupStep: View {
     let number: Int
-    let title: String
+    let title: LocalizedStringKey
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -330,7 +332,7 @@ private struct SetupStep: View {
 /// Text to copy into another program: monospaced, selectable, with its own copy button.
 private struct CodeBlock: View {
     let text: String
-    let copyLabel: String
+    let copyLabel: LocalizedStringKey
     let copy: () -> Void
 
     var body: some View {

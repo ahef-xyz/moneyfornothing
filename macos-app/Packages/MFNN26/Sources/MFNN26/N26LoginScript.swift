@@ -1,3 +1,5 @@
+import MFNScrape
+
 /// Headless login for `app.n26.com/login` (protocol v4, `WebLoginAutomation`).
 ///
 /// Why the form and not `fetch`: the web app encrypts every GraphQL payload (`variables.payload`, SJCL
@@ -30,14 +32,16 @@
 ///   `mfn.requestCode`. Selectors guessed.
 /// - Error containers keep their IDs on the client-rendered page (seen only in the bundle).
 enum N26LoginScript {
-    static let confirmMessage = "Bitte in der N26-App bestätigen."
+    static let confirmMessage = String(localized: "Bitte in der N26-App bestätigen.", bundle: .module)
+    static let loginMessage = String(localized: "Anmeldung bei N26 …", bundle: .module)
+    static let smsCodePrompt = String(localized: "Bestätigungscode aus der SMS von N26", bundle: .module)
     /// `sessionStorage` key remembering the submit across page loads (value `"1"`, never credentials).
     static let submittedMarker = "mfn.n26.submitted"
     /// The only host the script fills the form on (`N26Endpoints.production`).
     static let loginHost = "app.n26.com"
 
     static let source = #"""
-        const CONFIRM = "Bitte in der N26-App bestätigen.";
+        const CONFIRM = \#(JavaScriptLiteral.string(confirmMessage));
         const USER = ['input[name="username"]', 'input#email', 'input[autocomplete="email"]', 'input[type="email"]'];
         const PASS = ['input[name="password"]', 'input#password', 'input[autocomplete="current-password"]', 'input[type="password"]'];
         const SUBMIT = ['button[data-testid="login-button"]', 'form button[type="submit"]'];
@@ -126,7 +130,7 @@ enum N26LoginScript {
           current = { phase: "submitted" };
           // Marker first: should the click load a new page, the next run must not fill the form again.
           writeMarker();
-          mfn.status("Anmeldung bei N26 …");
+          mfn.status(\#(JavaScriptLiteral.string(loginMessage)));
           button.click();
         }
 
@@ -140,7 +144,7 @@ enum N26LoginScript {
           if (reason) throw new Error(reason);
           const code = !current.codeSent && find(CODE);
           if (code) {
-            const value = await mfn.requestCode("Bestätigungscode aus der SMS von N26", 6);
+            const value = await mfn.requestCode(\#(JavaScriptLiteral.string(smsCodePrompt)), 6);
             current = { phase: "submitted", codeSent: true };
             setValue(code, String(value));
             const submit = find(SUBMIT);

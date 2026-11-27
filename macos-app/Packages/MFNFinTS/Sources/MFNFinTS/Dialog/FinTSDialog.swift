@@ -227,7 +227,7 @@ public actor FinTSDialog {
             // Polls (HKTAN S) are sent by the handler itself; do not recurse into it.
             if requestTypes.first == "HKTAN" { return response }
             guard let tanHandler else {
-                throw .authRequired(.decoupled(message: challenge.challengeText ?? "Bitte bestätige den Zugriff in der App deiner Bank.", pollInterval: 2))
+                throw .authRequired(.decoupled(message: challenge.challengeText ?? String(localized: "Bitte bestätige den Zugriff in der App deiner Bank.", bundle: .module), pollInterval: 2))
             }
             return try await tanHandler.resolve(challenge, dialog: self)
         }

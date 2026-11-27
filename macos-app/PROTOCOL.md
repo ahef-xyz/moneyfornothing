@@ -1,6 +1,6 @@
 # PROTOCOL – BankConnector v6
 
-Version: 11
+Version: 12
 Eingefroren am: 2026-11-10
 
 Dieses Dokument ist der einzige Freeze-Marker. Keine Git-Tags.
@@ -37,6 +37,9 @@ public enum AuthChallenge: Hashable, Codable, Sendable {
     case code(prompt: String, length: Int)
     case pushConfirm(message: String)
     case webLogin(WebLoginRequest)
+    case choice(prompt: String, options: [AuthOption])            // v12, Antwort .code(<key>)
+    case imageCode(prompt: String, length: Int, image: AuthImage) // v12, photoTAN/chipTAN; length 0 = beliebig
+    case secret(prompt: String, length: Int)                     // v12, PIN/Passwort im Dialog, maskiert
 }
 public struct WebLoginRequest: Hashable, Codable, Sendable {
     var url: URL
@@ -55,7 +58,7 @@ public struct CredentialField { key, label, kind (.text/.email/.phone/.secret), 
 public struct BankCredentials { values: [String: String] }   // v4, description redacted, nur Keychain
 extension ConnectorID { var credentialFields: [CredentialField]; var supportsSetup: Bool }  // v4
 public struct CredentialStore { credentials(for:), set(_:for:), delete(for:) }  // v4, Keychain "credentials.<connectionID>"
-// ConnectorID: .ing, .dkb, .tradeRepublic, .c24, .easybank, .n26 (v4), .mock, .manual (v10), .paypal (v11)
+// ConnectorID: .ing, .dkb, .tradeRepublic, .c24, .easybank, .n26 (v4), .mock, .manual (v10), .paypal (v11), .yaxi (v12)
 public struct StorageKey: Hashable, Codable, Sendable {   // v2, deklariert als WebLoginRequest.StorageKey + Typealias
     var key: String                     // Storage-Key bzw. bei .javaScript der Übergabename
     var source: Source                  // .sessionStorage | .localStorage | .javaScript (v3)
@@ -156,6 +159,7 @@ Fett = Ergänzung gegenüber der Kurzfassung in CLAUDE.md §4 (Zuordnung, Mehrw�
 ## Änderungshistorie
 | Version | Datum | Änderung | Freigabe |
 | --- | --- | --- | --- |
+| 12 | 2026-11-25 | `ConnectorID.yaxi` (`displayName` „YAXI“, `credentialFields = []`, die Felder kommen pro Bank von YAXI und baut die App; `supportsSetup = false` bis zum eigenen Assistenten-Weg in 0.7.0 M3; kein Favicon): jede Bank über YAXIs attestierten Dienst mit dem eigenen YAXI-Zugang des Nutzers (Package `MFNYAXI`, `docs/v0.7.0.md`). Additiv, v11-Daten bleiben dekodierbar. Keine Signaturänderung. Dazu (M2, derselbe Tag): `AuthChallenge.choice(prompt:options:)` mit `AuthOption { key, label, detail? }` (Antwort `.code(<key>)`) und `.imageCode(prompt:length:image:)` mit `AuthImage { mimeType, data, physicalWidthMM? }` (photoTAN, chipTAN-Flickergrafik 62,5 mm; App zeigt nur PNG/JPEG/GIF bis 2 MB); `.code`/`.imageCode` mit `length` 0 = beliebige Länge; nach dem Audit `.secret(prompt:length:)` für PIN oder Passwort, die die Bank in einem Dialog verlangt (maskiert, Antwort `.code`) | Mensch, 2026-11-25 (Rückfrage „Protocol v12“: „Approve v12“) |
 | 11 | 2026-11-22 | `ConnectorID.paypal` (`displayName` „PayPal“, `credentialFields = []`, `supportsSetup = true`): PayPal über die Website, sichtbarer Web-Login ohne `automation` (Package `MFNPayPal`). Additiv, v10-Daten bleiben dekodierbar. Keine Signaturänderung. Der zuerst gebaute Weg über die offizielle REST-API wurde am selben Tag wieder entfernt: PayPal gibt Privatkonten keine Live-Zugangsdaten | Mensch, 2026-11-22 (Chat: „yes, let go with 2“, „remove the other“, „copy, anony. and go for it“) |
 | 10 | 2026-11-16 | Teil „Konten ohne Anbindung“ (Branch `manual-accounts`): `ConnectorID.manual` (keine Zugangsdaten, kein Assistent, kein Connector, kein Abgleich), `ConnectorID.hasConnector`. Additiv, v9-Daten bleiben dekodierbar. Store-Migration „openingBalance“ (Startsaldo, `LedgerStore` ist nicht eingefroren). Weitere v10-Änderungen anderer Branches stehen in eigenen Zeilen | Mensch, 2026-11-16 (Freigabe Bump v9 → v10 für `PROPOSALS.md` „Konten ohne Anbindung“) |
 | 1 | 2026-11-09 | Initiales Einfrieren nach M2 (inkl. `WebLoginRequest`, `BankDay`, `accountID` an `CardStatement`/`SecurityPosition`) | Mensch, 2026-11-09 |

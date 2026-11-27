@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "MFNCore",
+    defaultLocalization: "de",
     platforms: [.macOS(.v26)],
     products: [
         // Models, protocol, sync. No database: connector packages depend only on this.
@@ -15,7 +16,7 @@ let package = Package(
         .package(url: "https://github.com/sqlcipher/SQLCipher.swift.git", exact: "4.20.0"),
     ],
     targets: [
-        .target(name: "MFNCore"),
+        .target(name: "MFNCore", resources: [.process("Localizable.xcstrings")]),
         // `sqlite3_key` is only declared with SQLITE_HAS_CODEC; this shim exposes it to Swift.
         .target(
             name: "MFNSQLCipherKey",

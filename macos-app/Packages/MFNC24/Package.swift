@@ -4,6 +4,7 @@ import PackageDescription
 // C24 connector. Owned by the C24 agent (docs/archive/phase-2/AGENT-C24.md); everything else is read-only for it.
 let package = Package(
     name: "MFNC24",
+    defaultLocalization: "de",
     platforms: [.macOS(.v26)],
     products: [
         .library(name: "MFNC24", targets: ["MFNC24"]),
@@ -14,7 +15,7 @@ let package = Package(
         .package(path: "../MFNConformance"),
     ],
     targets: [
-        .target(name: "MFNC24", dependencies: [.product(name: "MFNCore", package: "MFNCore"), .product(name: "MFNScrape", package: "MFNScrape")]),
+        .target(name: "MFNC24", dependencies: [.product(name: "MFNCore", package: "MFNCore"), .product(name: "MFNScrape", package: "MFNScrape")], resources: [.process("Resources")]),
         .testTarget(
             name: "MFNC24Tests",
             dependencies: [

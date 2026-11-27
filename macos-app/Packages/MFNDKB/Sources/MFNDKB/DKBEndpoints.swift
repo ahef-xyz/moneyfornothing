@@ -112,8 +112,8 @@ public struct DKBEndpoints: Sendable, Equatable {
             url: URL(string: loginURL + loginPath) ?? origin,
             completion: .cookiesPresent(Self.completionCookies),
             cookieDomains: cookieDomains,
-            message: "Bitte bei der DKB anmelden und in der DKB-App bestätigen.",
-            automation: WebLoginAutomation(script: DKBLoginScript.source, message: "Anmeldung bei der DKB …", timeout: 480)
+            message: String(localized: "Bitte bei der DKB anmelden und in der DKB-App bestätigen.", bundle: .module),
+            automation: WebLoginAutomation(script: DKBLoginScript.source, message: DKBLoginScript.loginMessage, timeout: 480)
         )
     }
 }

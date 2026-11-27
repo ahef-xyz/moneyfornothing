@@ -137,7 +137,7 @@ private let credentials = BankCredentials(["username": "max@example.invalid", "p
         _ = login.pageLoaded()
         let r13 = login.handle(bridgeMessage: ["op": "requestCode", "prompt": "", "length": NSNumber(value: 999)])
         #expect(r13 == .askForCode(prompt: "", length: 0))
-        #expect(login.phase == .waitingForCode(prompt: "Bitte den Code eingeben.", length: 0))
+        #expect(login.phase == .waitingForCode(prompt: HeadlessLogin.defaultCodePrompt, length: 0))
         #expect(login.accepts(code: "12345678"))
     }
 

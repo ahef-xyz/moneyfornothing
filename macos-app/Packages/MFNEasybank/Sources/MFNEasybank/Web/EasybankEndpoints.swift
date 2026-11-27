@@ -44,7 +44,7 @@ enum EasybankEndpoints {
             url: url,
             completion: .cookiesPresent(["FedAuth", uniqueKeyName]),
             cookieDomains: ["easybank.de"],
-            message: "Bitte melde dich bei easybank an und gib den SMS-Code ein.",
+            message: String(localized: "Bitte melde dich bei easybank an und gib den SMS-Code ein.", bundle: .module),
             storageKeys: [
                 .javaScript(key: uniqueKeyName, expression: "window.VeriBranch && VeriBranch.Config && VeriBranch.Config.UniqueKey", domain: host),
                 .javaScript(key: pcidName, expression: "window.VeriBranch && VeriBranch.Config && VeriBranch.Config.PCID", domain: host),

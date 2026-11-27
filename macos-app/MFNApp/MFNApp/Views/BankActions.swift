@@ -9,8 +9,12 @@ struct CredentialsSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var values: [String: String] = [:]
     @State private var error: String?
+    /// Read once when the sheet opens (a YAXI bank's fields come from the keychain).
+    @State private var fields: [CredentialField] = []
 
-    private var fields: [CredentialField] { BankAccess.of(connection).credentialFields }
+    /// v12: a bank over YAXI that logs in at the bank has no fields; saving still starts a new
+    /// consent and lifts a block after a rejected login.
+    private var isYAXIWithoutFields: Bool { connection.connectorID == .yaxi && fields.isEmpty }
     private var problem: String? {
         CredentialForm.problem(CredentialForm.cleaned(values, fields: fields).values, fields: fields)
     }
@@ -26,7 +30,11 @@ struct CredentialsSheet: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            if fields.isEmpty {
+            if isYAXIWithoutFields {
+                Text("Diese Bank meldet sich auf ihrer eigenen Seite an. „Speichern“ setzt die Freigabe zurück; beim nächsten Abgleich fragt die Bank neu.")
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if fields.isEmpty {
                 Text("Diese Bank meldet sich ohne gespeicherte Zugangsdaten an.")
                     .foregroundStyle(.secondary)
             } else {
@@ -45,7 +53,7 @@ struct CredentialsSheet: View {
                     .keyboardShortcut(.cancelAction)
                 Button("Speichern", action: save)
                     .keyboardShortcut(.defaultAction)
-                    .disabled(problem != nil || fields.isEmpty)
+                    .disabled(problem != nil || (fields.isEmpty && !isYAXIWithoutFields))
             }
         }
         .padding(20)
@@ -54,6 +62,7 @@ struct CredentialsSheet: View {
     }
 
     private func load() {
+        fields = BankAccess.of(connection).credentialFields
         let stored = try? model.credentialStore.credentials(for: connection.id)
         values = [:]
         for field in fields where !field.isSecret {
@@ -69,7 +78,7 @@ struct CredentialsSheet: View {
             values = [:]
             dismiss()
         } catch {
-            self.error = "Speichern im Schlüsselbund fehlgeschlagen: \(error.localizedDescription)"
+            self.error = String(localized: "Speichern im Schlüsselbund fehlgeschlagen: \(error.localizedDescription)")
         }
     }
 }
@@ -81,7 +90,7 @@ struct BankActionsModifier: ViewModifier {
     @Binding var removing: Connection?
     @Environment(AppModel.self) private var model
     @State private var error: String?
-    @State private var errorTitle = "Bank entfernen"
+    @State private var errorTitle: LocalizedStringKey = "Bank entfernen"
 
     func body(content: Content) -> some View {
         content
@@ -103,7 +112,11 @@ struct BankActionsModifier: ViewModifier {
                 if connection.isManual {
                     Text("MFN löscht das Konto mit allen importierten Umsätzen und dem Startsaldo. Die CSV-Dateien bleiben, wo sie sind.")
                 } else {
-                    Text("MFN löscht \(count == 1 ? "das Konto" : "die \(count) Konten") dieser Bank mit allen Umsätzen sowie Zugangsdaten und Sitzung aus dem Schlüsselbund. Bei der Bank selbst ändert sich nichts.")
+                    if count == 1 {
+                        Text("MFN löscht das Konto dieser Bank mit allen Umsätzen sowie Zugangsdaten und Sitzung aus dem Schlüsselbund. Bei der Bank selbst ändert sich nichts.")
+                    } else {
+                        Text("MFN löscht die \(count) Konten dieser Bank mit allen Umsätzen sowie Zugangsdaten und Sitzung aus dem Schlüsselbund. Bei der Bank selbst ändert sich nichts.")
+                    }
                 }
             }
             .alert(errorTitle, isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
@@ -195,7 +208,7 @@ struct RenameSheet: View {
     @State private var error: String?
     @State private var isSaving = false
 
-    private var title: String {
+    private var title: LocalizedStringKey {
         switch target {
         case .bank: "Bank umbenennen"
         case .account: "Konto umbenennen"

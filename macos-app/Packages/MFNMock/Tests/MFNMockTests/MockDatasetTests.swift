@@ -8,8 +8,8 @@ import Testing
     let dataset = MockDataset.demo(today: Self.today, now: Self.today.startDate.addingTimeInterval(9 * 3600))
 
     @Test func shape() {
-        #expect(dataset.connections.count == 6)
-        #expect(dataset.accounts.count == 12)
+        #expect(dataset.connections.count == 7)
+        #expect(dataset.accounts.count == 14)
         let count = dataset.allTransactions.count
         #expect((1_300...1_700).contains(count), "\(count) transactions")
         let oldest = dataset.allTransactions.map(\.effectiveDate).min()
@@ -64,10 +64,16 @@ import Testing
     }
 
     @Test func giroBalancesStayPlausible() {
-        for id in [MockAccounts.ingGiro, MockAccounts.dkbGiro, MockAccounts.c24Giro, MockAccounts.trCash] {
+        for id in [MockAccounts.ingGiro, MockAccounts.dkbGiro, MockAccounts.c24Giro, MockAccounts.trCash, MockAccounts.sparkasseGiro] {
             let booked = dataset.balance(for: id).bookedCents
             #expect(booked > -200_000, "\(id): \(booked)")
         }
+    }
+
+    @Test func sparkasseIsABankOverYAXI() {
+        #expect(dataset.connections.first { $0.id == MockConnections.sparkasse }?.connectorID == .yaxi)
+        #expect(dataset.accounts(of: MockConnections.sparkasse).count == 2)
+        #expect(dataset.transactions[MockAccounts.sparkasseGiro]?.isEmpty == false)
     }
 
     @Test func noRealLookingIBANs() {
@@ -128,7 +134,7 @@ import Testing
         }
         await engine.syncAll(trigger: .manual)
         let snapshot = await store.snapshot()
-        #expect(snapshot.accounts.count == 12)
+        #expect(snapshot.accounts.count == 14)
         #expect(snapshot.transactions.count == dataset.allTransactions.count)
         #expect(snapshot.syncStates.values.allSatisfy { $0.phase == .idle })
         #expect(snapshot.securities.count == 6)

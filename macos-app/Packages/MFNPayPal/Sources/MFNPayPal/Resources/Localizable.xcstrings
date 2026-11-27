@@ -1,0 +1,17 @@
+{
+  "sourceLanguage": "de",
+  "strings": {
+    "Bitte melde dich bei PayPal an. MFN übernimmt danach die Sitzung und liest nur.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please sign in to PayPal. MFN then takes over the session and only reads."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

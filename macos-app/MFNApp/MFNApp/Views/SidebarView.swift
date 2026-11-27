@@ -96,21 +96,21 @@ struct SidebarView: View {
                                     .disabled(accounts.last?.id == account.id)
                                 Divider()
                                 let newCount = model.newCount(of: account.id)
-                                Button(newCount > 0 ? "Als gelesen markieren (\(newCount))" : "Als gelesen markieren") { model.markAllRead(of: account.id) }
+                                Button(newCount > 0 ? String(localized: "Als gelesen markieren (\(newCount))") : String(localized: "Als gelesen markieren")) { model.markAllRead(of: account.id) }
                                     .disabled(newCount == 0 || model.lock.isLocked)
                                 Button("Umbenennen …") { renaming = .account(account) }
                                 if connection.isManual {
                                     Button("Konto bearbeiten …") { model.showManualAccountEditor(for: account) }
                                         .disabled(!model.canAddBank || model.bankSetup != nil)
                                 }
-                                Button(model.budget(for: account.id) == nil ? "Budget festlegen …" : "Budget ändern …") { model.showBudgetEditor(for: account) }
+                                Button(model.budget(for: account.id) == nil ? String(localized: "Budget festlegen …") : String(localized: "Budget ändern …")) { model.showBudgetEditor(for: account) }
                                 if account.type != .depot {
                                     Button("Umsätze aus CSV importieren …") { model.beginCSVImport(for: account.id) }
                                         .disabled(!model.canImportCSV)
                                     Button("Umsätze als CSV exportieren …") { model.exportCSV(account: account.id) }
                                         .disabled(model.lock.isLocked)
                                     let imported = model.importedCount(of: account.id)
-                                    Button(imported > 0 ? "Importierte Umsätze entfernen (\(imported)) …" : "Importierte Umsätze entfernen …") {
+                                    Button(imported > 0 ? String(localized: "Importierte Umsätze entfernen (\(imported)) …") : String(localized: "Importierte Umsätze entfernen …")) {
                                         model.requestRemoveImports(of: account.id)
                                     }
                                     .disabled(imported == 0 || model.lock.isLocked)
@@ -154,8 +154,8 @@ struct SidebarView: View {
                             AccountTotalsMenu(connection: connection.id)
                             Button("Umbenennen …") { renaming = .bank(connection) }
                             // Developer mode: what merging a web connection into this FinTS one would do.
-                            if DeveloperMode.isAvailable, BankAccess.of(connection).isFinTS {
-                                let sources = connections.filter { $0.connectorID == connection.connectorID && !BankAccess.of($0).isFinTS }
+                            if DeveloperMode.isAvailable, BankAccess.isFinTS(connection) {
+                                let sources = connections.filter { $0.connectorID == connection.connectorID && !BankAccess.isFinTS($0) }
                                 if !sources.isEmpty {
                                     Menu("Zusammenführen prüfen") {
                                         ForEach(sources) { source in
@@ -219,7 +219,7 @@ struct SidebarView: View {
                 }
                 .buttonStyle(.borderless)
                 .disabled(!model.canAddBank)
-                .help(model.isDemo ? "In der Demo nicht verfügbar" : "Bank hinzufügen (⇧⌘N)")
+                .help(model.isDemo ? String(localized: "In der Demo nicht verfügbar") : String(localized: "Bank hinzufügen (⇧⌘N)"))
                 .accessibilityLabel("Bank hinzufügen")
                 if reordering {
                     Text("Ziehen zum Verschieben")
@@ -343,7 +343,7 @@ private struct ReorderInfoButton: View {
 }
 
 private struct InfoLine<Icon: View>: View {
-    let text: String
+    let text: LocalizedStringKey
     @ViewBuilder let icon: Icon
 
     var body: some View {
@@ -360,7 +360,7 @@ private struct InfoLine<Icon: View>: View {
 }
 
 extension InfoLine where Icon == InfoSymbol {
-    init(symbol: String, color: Color? = nil, text: String) {
+    init(symbol: String, color: Color? = nil, text: LocalizedStringKey) {
         self.init(text: text) { InfoSymbol(name: symbol, color: color) }
     }
 }
@@ -530,7 +530,7 @@ private struct BankDropDelegate: DropDelegate {
 }
 
 private struct SidebarRow<Trailing: View>: View {
-    let title: String
+    let title: LocalizedStringKey
     /// SF Symbol in the system accent colour, like the sidebars of Music and Finder.
     let symbol: String
     @ViewBuilder let trailing: Trailing
@@ -603,7 +603,7 @@ private struct ConnectionHeader: View {
             .accessibilityAction { toggle() }
             .accessibilityAction(named: "Bank nach oben") { move(-1) }
             .accessibilityAction(named: "Bank nach unten") { move(1) }
-            .accessibilityHint(model.isCollapsed(connection.id) ? "Konten einblenden" : "Konten ausblenden")
+            .accessibilityHint(model.isCollapsed(connection.id) ? String(localized: "Konten einblenden") : String(localized: "Konten ausblenden"))
             if connection.connectorID.hasConnector {
                 Button {
                     model.syncConnection(connection.id)
@@ -637,17 +637,17 @@ private struct ConnectionHeader: View {
 
     static func announcement(for phase: SyncState.Phase, bank: String) -> String? {
         switch phase {
-        case let .failed(error): "\(bank): Abgleich fehlgeschlagen. \(error.description)"
-        case .waitingForApproval: "\(bank): Anmeldung nötig"
-        case .storeFailed: "\(bank): Speichern fehlgeschlagen"
+        case let .failed(error): String(localized: "\(bank): Abgleich fehlgeschlagen. \(error.description)")
+        case .waitingForApproval: String(localized: "\(bank): Anmeldung nötig")
+        case .storeFailed: String(localized: "\(bank): Speichern fehlgeschlagen")
         case .idle, .syncing: nil
         }
     }
 
     private var syncHelp: String {
-        if connection.isManual { return "Ohne Anbindung: Umsätze per CSV-Import" }
-        guard let last = state.lastSuccess else { return "Noch nicht abgeglichen" }
-        return "Zuletzt abgeglichen: \(DayFormat.syncTime(last))"
+        if connection.isManual { return String(localized: "Ohne Anbindung: Umsätze per CSV-Import") }
+        guard let last = state.lastSuccess else { return String(localized: "Noch nicht abgeglichen") }
+        return String(localized: "Zuletzt abgeglichen: \(DayFormat.syncTime(last))")
     }
 
     @ViewBuilder
@@ -715,7 +715,7 @@ private struct AccountRow: View {
     /// Name plus what the row's symbols say (shortfall, new transactions).
     private var accessibilityName: String {
         var parts = [account.name]
-        if let shortfall = model.shortfall(for: account.id) { parts.append("Warnung: \(ShortfallFormat.short(shortfall))") }
+        if let shortfall = model.shortfall(for: account.id) { parts.append(String(localized: "Warnung: \(ShortfallFormat.short(shortfall))")) }
         let newCount = model.newCount(of: account.id)
         if newCount > 0 { parts.append(NewCountBadge.text(newCount)) }
         return parts.joined(separator: ", ")
@@ -764,7 +764,7 @@ private struct AccountRow: View {
                     AmountText(cents: balance.bookedCents, currency: balance.currency, colorsInflow: false)
                         .foregroundStyle(counted ? (isSelected ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary)) : AnyShapeStyle(.tertiary))
                 }
-                .help(counted ? "" : "Nicht in der Bank- und Gesamtsumme")
+                .help(counted ? "" : String(localized: "Nicht in der Bank- und Gesamtsumme"))
             }
         }
         .padding(.leading, indent)
@@ -866,20 +866,20 @@ private struct ApprovalCard: View {
         guard let request = model.presenter.request(for: connection.id) else { return false }
         switch request.challenge {
         case .decoupled, .pushConfirm: return true
-        case .code, .webLogin: return false
+        case .code, .webLogin, .choice, .imageCode, .secret: return false
         }
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(hasOpenRequest
-                 ? "Bitte in der \(connection.displayName)-App freigeben, dann weiter abgleichen."
-                 : "Anmeldung nötig. Der automatische Abgleich meldet sich nicht selbst an und wartet auf dich.")
+                 ? String(localized: "Bitte in der \(connection.displayName)-App freigeben, dann weiter abgleichen.")
+                 : String(localized: "Anmeldung nötig. Der automatische Abgleich meldet sich nicht selbst an und wartet auf dich."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 6) {
-                Button(hasOpenRequest ? "Freigegeben – weiter" : "Jetzt anmelden") {
+                Button(hasOpenRequest ? String(localized: "Freigegeben – weiter") : String(localized: "Jetzt anmelden")) {
                     if hasOpenRequest {
                         if let request = model.presenter.request(for: connection.id) { model.presenter.respond(to: request.id, .confirmed) }
                     } else {

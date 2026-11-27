@@ -53,9 +53,9 @@ public enum ManualAccount {
 
         public var message: String {
             switch self {
-            case .invalidCharacters: "Die IBAN darf nur Buchstaben und Ziffern enthalten und beginnt mit dem Ländercode."
-            case .wrongLength: "Die IBAN hat nicht die richtige Länge."
-            case .wrongChecksum: "Die Prüfziffer der IBAN stimmt nicht. Bitte auf Tippfehler prüfen."
+            case .invalidCharacters: String(localized: "Die IBAN darf nur Buchstaben und Ziffern enthalten und beginnt mit dem Ländercode.", bundle: .module)
+            case .wrongLength: String(localized: "Die IBAN hat nicht die richtige Länge.", bundle: .module)
+            case .wrongChecksum: String(localized: "Die Prüfziffer der IBAN stimmt nicht. Bitte auf Tippfehler prüfen.", bundle: .module)
             }
         }
     }

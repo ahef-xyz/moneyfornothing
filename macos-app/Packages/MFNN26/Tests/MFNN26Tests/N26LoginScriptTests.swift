@@ -232,7 +232,7 @@ private final class LoginPage {
         let page = LoginPage()
         page.onLogin = #"page.codeInput = new HTMLInputElement("otp");"#
         let outcome = try page.run()
-        #expect(outcome.codePrompts == ["Bestätigungscode aus der SMS von N26/6"])
+        #expect(outcome.codePrompts == ["\(N26LoginScript.smsCodePrompt)/6"])
         #expect(outcome.clicks == ["login", "login"]) // credentials, then the code
         #expect(outcome.state?["codeSent"] as? Bool == true)
     }

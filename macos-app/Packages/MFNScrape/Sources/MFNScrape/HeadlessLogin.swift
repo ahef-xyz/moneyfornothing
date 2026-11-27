@@ -72,6 +72,7 @@ public struct HeadlessLogin: Sendable, CustomStringConvertible, CustomDebugStrin
     public static let cancelledMessage = "cancelled"
     /// Longest status text shown (the text comes from the connector's script).
     static let maximumStatusLength = 200
+    static let defaultCodePrompt = String(localized: "Bitte den Code eingeben.", bundle: .module)
 
     /// User script injected into `contentWorldName` only (all frames: no; main frame only). The
     /// page's own scripts cannot see `mfn` nor the message handler.
@@ -220,7 +221,7 @@ public struct HeadlessLogin: Sendable, CustomStringConvertible, CustomDebugStrin
             let length = (message["length"] as? NSNumber)?.intValue ?? 0
             let clamped = (0...12).contains(length) ? length : 0
             qrCode = nil
-            phase = .waitingForCode(prompt: prompt.isEmpty ? "Bitte den Code eingeben." : prompt, length: clamped)
+            phase = .waitingForCode(prompt: prompt.isEmpty ? Self.defaultCodePrompt : prompt, length: clamped)
             return .askForCode(prompt: prompt, length: clamped)
         default:
             return .reject("invalid message")

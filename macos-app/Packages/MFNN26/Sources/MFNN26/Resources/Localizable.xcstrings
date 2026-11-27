@@ -1,0 +1,50 @@
+{
+  "sourceLanguage": "de",
+  "strings": {
+    "Anmeldung bei N26 …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing in to N26…"
+          }
+        }
+      }
+    },
+    "Bestätigungscode aus der SMS von N26": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verification code from the N26 text message"
+          }
+        }
+      }
+    },
+    "Bitte bei N26 anmelden und in der N26-App bestätigen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please sign in to N26 and confirm in the N26 app."
+          }
+        }
+      }
+    },
+    "Bitte in der N26-App bestätigen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please confirm in the N26 app."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

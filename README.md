@@ -22,8 +22,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://www.moneyfornothing.app/screenshots/de/overview-dark.png?v=0.5.0">
-    <img src="https://www.moneyfornothing.app/screenshots/de/overview.png?v=0.5.0" width="820" alt="MFN overview with demo data">
+    <source media="(prefers-color-scheme: dark)" srcset="https://www.moneyfornothing.app/screenshots/en/overview-dark.png?v=0.7.0">
+    <img src="https://www.moneyfornothing.app/screenshots/en/overview.png?v=0.7.0" width="820" alt="MFN overview with demo data">
   </picture>
 </p>
 
@@ -40,8 +40,8 @@ The source code is public so that anyone can check what the app does with their 
 yourself, but you may not pass it on (see [License](#license)).
 
 - **Read-only.** MFN never initiates transfers, orders or any other action that moves money.
-- **Local.** Everything stays on your Mac. No account, no server, no telemetry. The one exception is an AI
-  assistant you connect yourself (off by default, see below).
+- **Local.** Everything stays on your Mac. No account, no server, no telemetry. The exceptions are ones you
+  choose yourself: an AI assistant you connect (off by default) and banks you add over YAXI (see below).
 - **Encrypted.** The ledger is a SQLCipher database. Its key is protected by the Keychain
   (biometrics or device passcode) and, optionally, by your own password.
 - **Locked.** The app locks with Touch ID / device password at start, after screen lock and after inactivity.
@@ -57,6 +57,13 @@ yourself, but you may not pass it on (see [License](#license)).
   a new program gets access and logs every call. IBANs, references and bank IDs never leave; MFN does the
   sums. **With a cloud model this data goes to the model's provider**; with a local model it stays on
   your Mac. MFN cannot tell which one is connected.
+- **Any other bank over YAXI (from 0.7.0, beta), opt-in per bank.** With your own access at YAXI, MFN reaches more
+  than 1,000 further banks (FinTS and PSD2) through YAXI's service: "Andere Bank über YAXI" in the bank
+  assistant. YAXI logs in to the bank from an attested enclave (AMD SEV-SNP) and cannot read your data; the
+  client in MFN checks that attestation and encrypts every request. MFN issues the tickets on your Mac with your
+  own key and runs no server. Only accounts, balances and transactions; automatic syncs at most every 4 hours,
+  so a few accounts stay within YAXI's free calls. **These connections go through YAXI instead of straight from
+  your Mac to the bank.**
 - **New since the last sync.** New transactions are counted per account and marked in the list until you
   select them; filter or sort by them.
 - **Forecast.** Note one-off expenses for a future date and see the projected balance. Monthly payments
@@ -65,6 +72,8 @@ yourself, but you may not pass it on (see [License](#license)).
   and per year; add your own entries or adjust detected ones.
 - **Encrypted backup.** One file holds the whole database; its contents can only be read with the database
   password that was set when it was written. Optionally written automatically into a folder you choose. Bank logins are never part of a backup.
+- **German and English (from 0.7.0).** The app follows the language set in macOS. Amounts and dates follow
+  your region settings.
 
 Swift 6, SwiftUI/AppKit. Requires **macOS 26** on **Apple Silicon**.
 
@@ -79,6 +88,7 @@ Swift 6, SwiftUI/AppKit. Requires **macOS 26** on **Apple Silicon**.
 | easybank | The bank's own web login, then its web endpoints |
 | N26 | Headless web login with push approval |
 | PayPal | PayPal's own web login in a visible window (you sign in yourself), then its web endpoints |
+| Any other bank YAXI reaches (beta) | YAXI's service with your own YAXI access (FinTS or PSD2 behind it; accounts, balances, transactions; no depots) |
 
 CSV import works for every account, including accounts without a bank connection; CSV export works for every list. Unofficial and web-banking interfaces can change at any
 time and may break MFN without notice.
